@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Contact | {{ site.name }}{% endblock %}
+{% block description %}Contact {{ site.name }} with corrections, suggestions or questions.{% endblock %}
+{% block content %}
+<div class="prose">
+<h1>Contact</h1>
+<p>Found an outdated fee, a bug, or have an idea for a new calculator? Email
+<a href="mailto:{{ site.contact_email }}">{{ site.contact_email }}</a>.</p>
+</div>
+{% endblock %}

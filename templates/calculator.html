@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% from "_ad.html" import ad with context %}
+{% block title %}{{ page.title }}{% endblock %}
+{% block description %}{{ page.description }}{% endblock %}
+{% block head %}
+<script type="application/ld+json">{{ page.jsonld | tojson_safe }}</script>
+<script src="/assets/calc.js" defer></script>
+{% endblock %}
+
+{% block content %}
+<nav class="crumbs"><a href="/">Home</a> › <a href="/{{ page.category }}/">{{ cat.short }}</a></nav>
+<h1>{{ page.h1 }}</h1>
+<p class="intro">{{ page.intro }}</p>
+
+<div class="layout">
+  <div>
+    {{ page.calc }}
+    {{ ad() }}
+    <article class="article">
+      {{ page.article }}
+      {% if page.faq %}
+      <h2>Frequently asked questions</h2>
+      <div class="faq">
+        {% for f in page.faq %}
+        <details{{ ' open' if loop.first }}><summary>{{ f.q }}</summary><p>{{ f.a }}</p></details>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% if page.updated %}<p class="updated">Rates and figures last checked {{ page.updated }}.</p>{% endif %}
+      <p class="disclaimer">This calculator gives estimates for planning. Check current rates and product labels before you buy, list or file.</p>
+    </article>
+    {{ ad() }}
+  </div>
+  <aside class="sidebar">
+    {{ ad("side") }}
+    <h3>More {{ cat.short | lower }} calculators</h3>
+    <ul class="side-list">
+      {% for p in by_cat[page.category] if p.slug != page.slug %}<li><a href="{{ p.path }}">{{ p.short or p.h1 }}</a></li>{% endfor %}
+    </ul>
+  </aside>
+</div>
+
+<section class="related">
+  <h2>Related calculators</h2>
+  <div class="cards">
+    {% for p in related %}<a class="card" href="{{ p.path }}"><b>{{ p.short or p.h1 }}</b><span>{{ p.description }}</span></a>{% endfor %}
+  </div>
+</section>
+{% endblock %}

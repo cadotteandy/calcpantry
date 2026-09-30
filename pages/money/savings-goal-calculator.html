@@ -1,0 +1,145 @@
+---
+{
+  "title": "Savings Goal Calculator: How Much to Save Per Month",
+  "description": "Find how much to save each month, paycheck or week to reach a savings goal by your target date, with interest from a high-yield savings account included.",
+  "h1": "Savings Goal Calculator",
+  "short": "Savings Goal Calculator",
+  "intro": "Enter your goal, what you've already saved and when you need the money to see how much to put away each month, every two weeks or weekly.",
+  "updated": "September 2026",
+  "related": ["emergency-fund-calculator", "credit-card-payoff-calculator", "hourly-to-salary-calculator", "freelance-rate-calculator"],
+  "faq": [
+    {"q": "How much do I need to save each month to reach my goal?", "a": "Subtract what your current savings will grow to by the deadline from your goal, then spread the rest over the months you have, giving credit for interest along the way. For example, reaching $10,000 in two years from $1,000 at 4% APY takes about $358 a month."},
+    {"q": "What interest rate should I use?", "a": "Use the APY of the account where the money will sit. In September 2026 the best high-yield savings accounts pay around 4% to 4.5% APY, while the FDIC's national average for savings is under 0.5%. Rates can change at any time, so a slightly lower figure is a safer plan."},
+    {"q": "Is saving biweekly better than monthly?", "a": "The total you save is almost the same, and interest makes only a small difference. The real advantage of saving per paycheck is habit: an automatic transfer on payday is money you never see in your checking account."},
+    {"q": "Should I invest instead of using a savings account?", "a": "For goals less than about three to five years away, most people keep the money in savings, CDs or Treasury bills, because stock prices can fall right when you need the cash. Longer goals can tolerate more risk. This calculator assumes a steady rate and is not financial advice."},
+    {"q": "Is interest on savings taxable?", "a": "Yes. Interest from savings accounts is taxed as ordinary income in the year it's paid, and banks send a 1099-INT when it reaches $10. On a short-term goal the tax is small, but it slightly reduces the growth shown here."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="goal">Savings goal</label>
+          <div class="input"><span class="unit pre">$</span><input id="goal" name="goal" type="number" min="0" step="100" value="10000" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="current">Already saved</label>
+          <div class="input"><span class="unit pre">$</span><input id="current" name="current" type="number" min="0" step="100" value="1000" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="time">Time to goal</label>
+          <div class="input"><input id="time" name="time" type="number" min="0" step="1" value="2" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="unit">In</label>
+          <select id="unit" name="unit">
+            <option value="years">Years</option>
+            <option value="months">Months</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="apy">Interest rate (APY)</label>
+        <div class="input"><input id="apy" name="apy" type="number" min="0" max="20" step="0.05" value="4" inputmode="decimal"><span class="unit">%</span></div>
+        <div class="hint">Top high-yield savings accounts pay about 4–4.5% in September 2026. Use 0 to ignore interest.</div>
+      </div>
+      <div class="field">
+        <label for="freq">I'll save</label>
+        <select id="freq" name="freq">
+          <option value="12">Monthly</option>
+          <option value="26">Every two weeks</option>
+          <option value="52">Weekly</option>
+        </select>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your savings plan</h2>
+    <div class="result big"><span data-out="headLabel">Save each month</span><b data-out="pmt">—</b></div>
+    <div class="result"><span>Number of deposits</span><b data-out="periods">—</b></div>
+    <div class="result"><span>Total you contribute</span><b data-out="contrib">—</b></div>
+    <div class="result"><span>Interest earned</span><b data-out="interest">—</b></div>
+    <div class="result"><span>Current savings grow to</span><b data-out="curFv">—</b></div>
+    <div class="result"><span>Needed with no interest</span><b data-out="noInt">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+const LABELS = { 12: "Save each month", 26: "Save every two weeks", 52: "Save each week" };
+
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const f = [12, 26, 52].includes(Number(v.freq)) ? Number(v.freq) : 12;
+  const years = v.unit === "months" ? v.time / 12 : v.time;
+  const n = Math.round(years * f);                      // number of deposits
+  const i = Math.pow(1 + v.apy / 100, 1 / f) - 1;       // APY converted to a per-deposit rate
+  const growth = Math.pow(1 + i, n);
+  const curFv = v.current * growth;
+  const needed = v.goal - curFv;
+
+  out.set("headLabel", LABELS[f]);
+  out.set("periods", Calc.num(n, 0));
+  out.set("curFv", Calc.money(curFv));
+
+  if (n <= 0) {
+    ["pmt", "contrib", "interest", "noInt"].forEach((k) => out.set(k, "—"));
+    out.note("Enter how long you have to reach your goal.");
+    return;
+  }
+  // Future value of an ordinary annuity: FV = PMT × ((1 + i)^n − 1) ÷ i, solved for PMT.
+  const pmt = needed <= 0 ? 0 : (i > 0 ? needed * i / (growth - 1) : needed / n);
+  const contrib = pmt * n;
+  const interest = Math.max(v.goal, curFv) - v.current - contrib;
+
+  out.set("pmt", Calc.money(pmt));
+  out.set("contrib", Calc.money(contrib));
+  out.set("interest", Calc.money(interest));
+  out.set("noInt", Calc.money(Math.max(0, v.goal - v.current) / n));
+
+  if (needed <= 0) out.note("Your current savings will reach this goal on their own by the deadline. Nice.");
+  else if (f !== 12) out.note(`That's about ${Calc.money(pmt * f / 12)} a month. Assumes a steady rate with deposits at the end of each period. Not financial advice.`);
+  else out.note("Assumes a steady rate with deposits at the end of each month. Savings rates can change at any time. Not financial advice.");
+}));
+</script>
+<!-- article -->
+<p><strong>This is an estimate, not financial advice.</strong> It assumes the interest rate stays the same for the whole period, which savings account rates rarely do.</p>
+
+<h2>How the calculator works</h2>
+<p>Your current savings grow on their own until the deadline. The calculator works out what they'll be worth, subtracts that from your goal, and finds the regular deposit that covers the rest, giving each deposit credit for the interest it earns before the deadline.</p>
+<p>Banks quote an annual percentage yield (APY), which already includes compounding. The calculator converts it to a rate per deposit period, so a 4% APY account really does grow by 4% over a year whether you save weekly or monthly.</p>
+<div class="formula">rate per period i = (1 + APY)<sup>1 ÷ periods per year</sup> − 1<br>
+n = years × periods per year<br>
+still needed = goal − current savings × (1 + i)<sup>n</sup><br>
+deposit = still needed × i ÷ ((1 + i)<sup>n</sup> − 1)</div>
+<p>Deposits are assumed to land at the end of each period. Saving at the start of each period instead would make the required amount slightly lower.</p>
+
+<h2>Example: $10,000 in two years</h2>
+<p>You have $1,000 saved and want $10,000 in 24 months, saving monthly in a high-yield account paying 4% APY.</p>
+<table>
+  <tr><th>Step</th><th>Amount</th></tr>
+  <tr><td>Monthly rate (1.04<sup>1/12</sup> − 1)</td><td>0.3274%</td></tr>
+  <tr><td>$1,000 grows to (× 1.04²)</td><td>$1,081.60</td></tr>
+  <tr><td>Still needed ($10,000 − $1,081.60)</td><td>$8,918.40</td></tr>
+  <tr><td><strong>Save each month</strong></td><td><strong>$357.80</strong></td></tr>
+  <tr><td>Total contributed (24 deposits)</td><td>$8,587.21</td></tr>
+  <tr><td>Interest earned</td><td>$412.79</td></tr>
+  <tr><td>Needed with no interest ($9,000 ÷ 24)</td><td>$375.00</td></tr>
+</table>
+<p>Interest does about $17 a month of the work here. Over short periods, how much you save matters far more than the rate. Over longer ones, the rate starts to add up.</p>
+
+<h2>Where to keep goal money</h2>
+<h3>High-yield savings account</h3>
+<p>Online banks and credit unions pay around 4% APY while the FDIC national average for savings is under half a percent. Your money stays available at any time and is FDIC or NCUA insured up to $250,000 per depositor, per institution.</p>
+<h3>CDs and Treasury bills</h3>
+<p>If your date is fixed, a CD or T-bill ladder can lock in a rate. Treasury bill interest is exempt from state income tax, which helps in high-tax states.</p>
+
+<h2>Tips for hitting the goal</h2>
+<ul>
+  <li><strong>Automate it on payday.</strong> Pick "every two weeks" if you're paid biweekly and schedule the transfer for the same day.</li>
+  <li><strong>Use a separate account</strong> named after the goal. Money you can't see in checking is money you don't spend.</li>
+  <li><strong>Pad the goal a little.</strong> Rates drop and prices rise. Aiming 5–10% high leaves room for both.</li>
+  <li><strong>Pay off high-interest debt first.</strong> A card charging 22% costs far more than a 4% account earns, apart from a small emergency cushion.</li>
+</ul>

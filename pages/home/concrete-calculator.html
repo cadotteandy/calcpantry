@@ -1,0 +1,175 @@
+---
+{
+  "title": "Concrete Calculator: Yards and 40/60/80 lb Bags",
+  "description": "Calculate cubic yards of concrete for a slab, footing or round post hole, the number of 40, 60 or 80 lb premix bags, and the ready-mix cost with waste.",
+  "h1": "Concrete Calculator",
+  "short": "Concrete Calculator",
+  "intro": "Enter your slab or column dimensions to see how many cubic yards of concrete or premix bags you need, and what it will cost.",
+  "updated": "September 2026",
+  "related": ["gravel-calculator", "mulch-calculator", "flooring-calculator", "board-foot-calculator"],
+  "faq": [
+    {"q": "How many 80 lb bags of concrete make a yard?", "a": "An 80 lb bag of standard concrete mix yields about 0.60 cubic feet, so it takes 45 bags to make one cubic yard (27 cubic feet). With 60 lb bags it takes 60, and with 40 lb bags it takes 90."},
+    {"q": "How many bags of concrete do I need for a 10x10 slab?", "a": "A 10 by 10 foot slab 4 inches thick is 33.3 cubic feet, or 1.23 cubic yards. With 10 percent extra that becomes 36.7 cubic feet, which is 62 bags of 80 lb mix. At that size, ready-mix delivery or a mixer rental is often worth pricing."},
+    {"q": "When should I order ready-mix instead of bags?", "a": "Bags are practical up to roughly 1 cubic yard, which is already 45 heavy bags to mix by hand. Beyond that, ready-mix is usually cheaper per yard and gives a more consistent pour. Many plants charge a short-load fee on orders under 4 to 5 yards, so compare the total delivered price."},
+    {"q": "How thick should a concrete slab be?", "a": "Four inches is standard for patios, walkways and shed floors. Driveways and slabs that carry vehicles should be 5 to 6 inches, and garage floors for heavy trucks or equipment may need more plus reinforcement. Check local building codes for footings and structural work."},
+    {"q": "How much extra concrete should I order?", "a": "Add 5 to 10 percent. Excavations are rarely perfectly flat, forms bow slightly, and some concrete is always lost in the mixer or wheelbarrow. Running short mid-pour creates a cold joint, which is far worse than having a little left over."},
+    {"q": "How do I calculate concrete for a post hole?", "a": "Use the round column option. Enter the hole diameter, depth and number of holes. A 12 inch hole 4 feet deep holds about 3.1 cubic feet, roughly six 80 lb bags with 10 percent extra. Subtract a little if a wide post takes up space in the hole."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="shape">Shape</label>
+        <select id="shape" name="shape">
+          <option value="slab">Slab, patio or footing (rectangular)</option>
+          <option value="round">Round column or post hole</option>
+        </select>
+      </div>
+      <div data-show="slab">
+        <div class="fields">
+          <div class="row2">
+            <div class="field">
+              <label for="length">Length</label>
+              <div class="input"><input id="length" name="length" type="number" min="0" step="0.1" value="10" inputmode="decimal"><span class="unit">ft</span></div>
+            </div>
+            <div class="field">
+              <label for="width">Width</label>
+              <div class="input"><input id="width" name="width" type="number" min="0" step="0.1" value="10" inputmode="decimal"><span class="unit">ft</span></div>
+            </div>
+          </div>
+          <div class="field">
+            <label for="thickness">Thickness</label>
+            <div class="input"><input id="thickness" name="thickness" type="number" min="0" step="0.5" value="4" inputmode="decimal"><span class="unit">in</span></div>
+          </div>
+        </div>
+      </div>
+      <div data-show="round" hidden>
+        <div class="fields">
+          <div class="row2">
+            <div class="field">
+              <label for="diameter">Diameter</label>
+              <div class="input"><input id="diameter" name="diameter" type="number" min="0" step="0.5" value="12" inputmode="decimal"><span class="unit">in</span></div>
+            </div>
+            <div class="field">
+              <label for="colDepth">Depth / height</label>
+              <div class="input"><input id="colDepth" name="colDepth" type="number" min="0" step="0.5" value="4" inputmode="decimal"><span class="unit">ft</span></div>
+            </div>
+          </div>
+          <div class="field">
+            <label for="count">Number of holes or columns</label>
+            <div class="input"><input id="count" name="count" type="number" min="1" step="1" value="1" inputmode="numeric"></div>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="waste">Extra for waste</label>
+        <div class="input"><input id="waste" name="waste" type="number" min="0" max="50" step="1" value="10" inputmode="decimal"><span class="unit">%</span></div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="yardPrice">Ready-mix per yard</label>
+          <div class="input"><span class="unit pre">$</span><input id="yardPrice" name="yardPrice" type="number" min="0" step="1" value="170" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="bagPrice">Price per 80 lb bag</label>
+          <div class="input"><span class="unit pre">$</span><input id="bagPrice" name="bagPrice" type="number" min="0" step="0.01" value="6.50" inputmode="decimal"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Concrete needed</span><b data-out="yards">—</b></div>
+    <div class="result"><span>Volume in cubic feet</span><b data-out="cuft">—</b></div>
+    <div class="result"><span>80 lb bags</span><b data-out="b80">—</b></div>
+    <div class="result"><span>60 lb bags</span><b data-out="b60">—</b></div>
+    <div class="result"><span>40 lb bags</span><b data-out="b40">—</b></div>
+    <div class="result"><span>Ready-mix cost</span><b data-out="readyCost">—</b></div>
+    <div class="result"><span>Cost in 80 lb bags</span><b data-out="bagCost">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const slab = v.shape === "slab";
+  out.show("slab", slab);
+  out.show("round", !slab);
+
+  const r = v.diameter / 12 / 2;                     // radius in feet
+  const base = slab
+    ? v.length * v.width * v.thickness / 12
+    : Math.PI * r * r * v.colDepth * Math.max(1, Math.round(v.count));
+  const cuft = base * (1 + v.waste / 100);
+  const yards = cuft / 27;
+  const bags = (y) => Math.ceil(cuft / y - 1e-9);    // yields in cu ft per bag
+  const b80 = bags(0.60);
+
+  out.set("yards", `${Calc.num(yards, 2)} cu yd`);
+  out.set("cuft", `${Calc.num(cuft, 1)} cu ft`);
+  out.set("b80", Calc.num(b80, 0));
+  out.set("b60", Calc.num(bags(0.45), 0));
+  out.set("b40", Calc.num(bags(0.30), 0));
+  out.set("readyCost", Calc.money(yards * v.yardPrice));
+  out.set("bagCost", Calc.money(b80 * v.bagPrice));
+
+  if (cuft <= 0) return;
+  if (yards > 1) out.note(`That's ${Calc.num(b80 * 80 / 2000, 1)} tons of bagged mix. Above about 1 yard, ready-mix is usually easier; expect a short-load fee under 4–5 yards.`);
+  else out.note("Small pour: bags are practical. Mix one bag at a time and keep the rest dry.");
+}));
+</script>
+<!-- article -->
+<h2>How much concrete you need</h2>
+<p>Concrete is ordered by the <strong>cubic yard</strong> (27 cubic feet) from a ready-mix plant, or bought in premix
+bags that list their yield in cubic feet. Either way, the job starts with the volume of the form.</p>
+<p>For a slab or rectangular footing, that's length × width × thickness, with the thickness converted from inches to
+feet. For a round column, Sonotube or post hole, it's the area of the circle (π × radius²) times the depth. The
+calculator then adds your waste allowance, 10% by default, to cover uneven subgrade, form bulge and spillage.</p>
+
+<h2>Bag yields used</h2>
+<p>The bag counts use the yields printed on standard concrete mix from Quikrete and Sakrete:</p>
+<table>
+  <tr><th>Bag size</th><th>Yield</th><th>Bags per cubic yard</th></tr>
+  <tr><td>80 lb</td><td>0.60 cu ft</td><td>45</td></tr>
+  <tr><td>60 lb</td><td>0.45 cu ft</td><td>60</td></tr>
+  <tr><td>40 lb</td><td>0.30 cu ft</td><td>90</td></tr>
+</table>
+<p>High-strength and fast-setting mixes can yield slightly less per bag; check the label if you use one.</p>
+
+<h2>The formula</h2>
+<div class="formula">slab volume (cu ft) = length × width × (thickness in inches ÷ 12)<br>
+column volume (cu ft) = 3.1416 × (diameter in inches ÷ 24)² × depth × count<br>
+volume with waste = volume × (1 + waste %)<br>
+cubic yards = volume with waste ÷ 27<br>
+bags = volume with waste ÷ bag yield, rounded up</div>
+
+<h2>Example: a 10 × 10 ft patio slab, 4 inches thick</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Volume (10 × 10 × 4 ÷ 12)</td><td>33.3 cu ft</td></tr>
+  <tr><td>Plus 10% waste</td><td>36.7 cu ft</td></tr>
+  <tr><td><strong>Cubic yards (36.7 ÷ 27)</strong></td><td><strong>1.36 cu yd</strong></td></tr>
+  <tr><td>80 lb bags (36.7 ÷ 0.60)</td><td>62</td></tr>
+  <tr><td>60 lb bags (36.7 ÷ 0.45)</td><td>82</td></tr>
+  <tr><td>40 lb bags (36.7 ÷ 0.30)</td><td>123</td></tr>
+  <tr><td>Ready-mix at $170 per yard</td><td>$230.86</td></tr>
+  <tr><td>80 lb bags at $6.50 each</td><td>$403.00</td></tr>
+</table>
+<p>The $170 default sits in the middle of the $140–$195 per yard range most 2026 pricing guides report for standard
+3,000–4,000 PSI ready-mix. Real invoices add delivery, short-load fees for small orders (often $50–$150+) and
+sometimes pump rental, so a 1.4-yard pour can cost close to the bagged price once fees are in.</p>
+
+<h2>Tips for a smooth pour</h2>
+<ul>
+  <li><strong>Measure the actual depth.</strong> A slab planned at 4 inches over a dip that's really 5 inches uses 25%
+  more concrete. Check several spots after grading.</li>
+  <li><strong>Round ready-mix orders up.</strong> Plants usually sell in quarter- or half-yard steps. Running short
+  mid-pour is worse than paying for a little extra.</li>
+  <li><strong>Plan your labor.</strong> 62 bags is almost 2.5 tons of mix to lift, mix and place before it sets. For
+  more than about a yard, rent a mixer and line up help, or order ready-mix.</li>
+  <li><strong>Don't forget the base.</strong> Slabs typically sit on 4 inches of compacted gravel. The gravel
+  calculator can size that layer.</li>
+  <li><strong>Post holes:</strong> the round option assumes the hole is filled completely. A 4×4 post takes up about 0.09 cu ft per
+  foot of depth and a 6×6 about 0.21, so subtract that if you want an exact count.</li>
+</ul>

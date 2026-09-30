@@ -1,0 +1,174 @@
+---
+{
+  "title": "Flooring Calculator: Square Feet, Boxes and Cost",
+  "description": "Work out how many square feet and boxes of laminate, vinyl plank, hardwood or tile to buy, with waste for straight, diagonal or herringbone layouts.",
+  "h1": "Flooring Calculator",
+  "short": "Flooring Calculator",
+  "intro": "Enter your room dimensions, layout pattern and box size to see how many boxes of flooring to buy and the total cost.",
+  "updated": "September 2026",
+  "related": ["paint-calculator", "concrete-calculator", "board-foot-calculator", "gravel-calculator"],
+  "faq": [
+    {"q": "How much extra flooring should I buy?", "a": "Buy about 10 percent extra for a straight layout, 15 percent for a diagonal layout, and 20 percent for herringbone or chevron. Rooms with many corners, closets or angled walls may need a few percent more. Keep a spare box or two for future repairs, since the same product may be discontinued."},
+    {"q": "How do I calculate square footage for flooring?", "a": "Multiply the length by the width of the room in feet. For an L-shaped room, split it into two rectangles, calculate each one, and add them together. Include closets and any area under appliances you plan to floor."},
+    {"q": "How many boxes of flooring do I need?", "a": "Divide the square footage including waste by the square feet per box printed on the carton, then round up. A 12 by 15 foot room is 180 square feet, 198 with 10 percent waste, which is 10 boxes of 20 square feet each."},
+    {"q": "Do I need underlayment for laminate or vinyl plank?", "a": "Laminate almost always needs a foam underlayment, and a vapor barrier over concrete. Many vinyl plank and some laminate products come with a pad already attached, in which case extra underlayment can void the warranty. Check the product's installation instructions."},
+    {"q": "Should I round up to a full box?", "a": "Yes. Stores sell flooring by the box, and many accept returns of unopened boxes, so buying one more than you need is cheaper than a second trip or running out mid-install. Buy all boxes from the same production lot so color and texture match."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="l1">Room length</label>
+          <div class="input"><input id="l1" name="l1" type="number" min="0" step="0.1" value="15" inputmode="decimal"><span class="unit">ft</span></div>
+        </div>
+        <div class="field">
+          <label for="w1">Room width</label>
+          <div class="input"><input id="w1" name="w1" type="number" min="0" step="0.1" value="12" inputmode="decimal"><span class="unit">ft</span></div>
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" name="more"> Add more areas (closet, L-shape, hallway)</label>
+      <div data-show="more" hidden>
+        <div class="fields">
+          <div class="row2">
+            <div class="field">
+              <label for="l2">Area 2 length</label>
+              <div class="input"><input id="l2" name="l2" type="number" min="0" step="0.1" value="0" inputmode="decimal"><span class="unit">ft</span></div>
+            </div>
+            <div class="field">
+              <label for="w2">Area 2 width</label>
+              <div class="input"><input id="w2" name="w2" type="number" min="0" step="0.1" value="0" inputmode="decimal"><span class="unit">ft</span></div>
+            </div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="l3">Area 3 length</label>
+              <div class="input"><input id="l3" name="l3" type="number" min="0" step="0.1" value="0" inputmode="decimal"><span class="unit">ft</span></div>
+            </div>
+            <div class="field">
+              <label for="w3">Area 3 width</label>
+              <div class="input"><input id="w3" name="w3" type="number" min="0" step="0.1" value="0" inputmode="decimal"><span class="unit">ft</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="waste">Layout pattern</label>
+        <select id="waste" name="waste" data-num>
+          <option value="10">Straight (10% waste)</option>
+          <option value="15">Diagonal (15% waste)</option>
+          <option value="20">Herringbone / chevron (20% waste)</option>
+        </select>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="boxSize">Coverage per box</label>
+          <div class="input"><input id="boxSize" name="boxSize" type="number" min="0.1" step="0.01" value="20" inputmode="decimal"><span class="unit">sq ft</span></div>
+        </div>
+        <div class="field">
+          <label for="price">Price per sq ft</label>
+          <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="3.50" inputmode="decimal"></div>
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" name="under"> Add underlayment (100 sq ft rolls)</label>
+      <div class="field" data-show="under" hidden>
+        <label for="rollPrice">Price per underlayment roll</label>
+        <div class="input"><span class="unit pre">$</span><input id="rollPrice" name="rollPrice" type="number" min="0" step="0.01" value="30" inputmode="decimal"></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Boxes to buy</span><b data-out="boxes">—</b></div>
+    <div class="result"><span>Floor area</span><b data-out="area">—</b></div>
+    <div class="result"><span>Area with waste</span><b data-out="needed">—</b></div>
+    <div class="result"><span>Boxes cover</span><b data-out="covered">—</b></div>
+    <div class="result"><span>Flooring cost</span><b data-out="floorCost">—</b></div>
+    <div data-show="under" hidden>
+      <div class="result"><span>Underlayment rolls</span><b data-out="rolls">—</b></div>
+      <div class="result"><span>Underlayment cost</span><b data-out="underCost">—</b></div>
+    </div>
+    <div class="result"><span>Total materials cost</span><b data-out="total">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  out.show("more", v.more);
+  out.show("under", v.under);
+
+  let area = v.l1 * v.w1;
+  if (v.more) area += v.l2 * v.w2 + v.l3 * v.w3;
+  const needed = area * (1 + v.waste / 100);
+  const boxes = v.boxSize > 0 ? Math.ceil(needed / v.boxSize - 1e-9) : 0;
+  const covered = boxes * v.boxSize;
+  const floorCost = covered * v.price;             // you pay for whole boxes
+  const rolls = v.under ? Math.ceil(area / 100 - 1e-9) : 0;
+  const underCost = rolls * v.rollPrice;
+
+  out.set("boxes", boxes === 1 ? "1 box" : `${Calc.num(boxes, 0)} boxes`);
+  out.set("area", `${Calc.num(area, 1)} sq ft`);
+  out.set("needed", `${Calc.num(needed, 1)} sq ft`);
+  out.set("covered", `${Calc.num(covered, 1)} sq ft`);
+  out.set("floorCost", Calc.money(floorCost));
+  out.set("rolls", Calc.num(rolls, 0));
+  out.set("underCost", Calc.money(underCost));
+  out.set("total", Calc.money(floorCost + underCost));
+
+  if (area > 0) out.note(`That's ${Calc.money(floorCost / area)} per sq ft of floor once waste and whole boxes are counted.`);
+}));
+</script>
+<!-- article -->
+<h2>How to calculate flooring</h2>
+<p>Flooring is priced per square foot but sold by the box, so there are three numbers to get right: the floor area,
+the extra you need for cuts and waste, and how many whole boxes that adds up to.</p>
+<p>Start with length × width for each rectangular space. If the room is L-shaped or you're running the floor into a
+closet or hallway, tick "Add more areas" and enter each rectangle separately; the calculator adds them. Then it
+applies a waste factor based on the layout, divides by the coverage printed on the box, and rounds up.</p>
+
+<h3>Waste factors by pattern</h3>
+<table>
+  <tr><th>Layout</th><th>Waste allowance</th><th>Why</th></tr>
+  <tr><td>Straight (parallel to a wall)</td><td>10%</td><td>End cuts, damaged pieces, trimming around doorways</td></tr>
+  <tr><td>Diagonal (45°)</td><td>15%</td><td>Every row starts and ends with an angled cut</td></tr>
+  <tr><td>Herringbone / chevron</td><td>20%</td><td>Short pieces and angled perimeter cuts throughout</td></tr>
+</table>
+<p>These are the allowances most manufacturers and flooring retailers recommend. Add 2–5% more for rooms with lots of
+corners, a fireplace hearth or angled walls, or for tile with a large repeating pattern.</p>
+
+<h2>The formula</h2>
+<div class="formula">floor area = length × width (+ each extra area)<br>
+area with waste = floor area × (1 + waste %)<br>
+boxes = area with waste ÷ sq ft per box, rounded up<br>
+flooring cost = boxes × sq ft per box × price per sq ft</div>
+
+<h2>Example: a 12 × 15 ft bedroom with a straight layout</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Floor area (15 × 12)</td><td>180 sq ft</td></tr>
+  <tr><td>Plus 10% waste</td><td>198 sq ft</td></tr>
+  <tr><td><strong>Boxes (198 ÷ 20 = 9.9)</strong></td><td><strong>10 boxes</strong></td></tr>
+  <tr><td>Boxes cover</td><td>200 sq ft</td></tr>
+  <tr><td>Flooring cost (200 × $3.50)</td><td>$700.00</td></tr>
+</table>
+<p>With underlayment added, the same room needs 2 rolls of 100 sq ft (underlayment isn't cut to a pattern, so it
+uses the floor area without waste), adding $60 at $30 a roll for a total of $760.</p>
+<p>The $3.50 default is typical of mid-range laminate or luxury vinyl plank. Budget laminate runs about $1–$2 per sq ft,
+engineered hardwood $4–$9, and solid hardwood $5–$12, before installation.</p>
+
+<h2>Tips before you buy</h2>
+<ul>
+  <li><strong>Check the box, not the product page.</strong> Coverage varies a lot: vinyl plank cartons often hold
+  18–24 sq ft, laminate 14–25, and tile is frequently sold by the individual piece or smaller cartons.</li>
+  <li><strong>Buy one lot.</strong> Make sure every box has the same lot or run number so the color matches, and
+  open several boxes at once while installing to blend any variation.</li>
+  <li><strong>Keep a spare box.</strong> Leftover planks are the easiest way to repair water damage or a deep scratch
+  years later, when the product may no longer be made.</li>
+  <li><strong>Acclimate first.</strong> Laminate and wood usually need 48 hours in the room before installation.</li>
+  <li><strong>Mind the pad.</strong> Many vinyl planks have attached underlayment; adding more can void the warranty.
+  Over concrete, laminate needs a vapor barrier.</li>
+  <li><strong>Budget for transitions.</strong> Thresholds, reducers and quarter-round are sold separately, usually by
+  the linear foot or piece.</li>
+</ul>

@@ -1,0 +1,160 @@
+---
+{
+  "title": "Paint Calculator: How Many Gallons Do I Need?",
+  "description": "Find how many gallons of paint a room needs from its size, doors, windows and number of coats, with an optional ceiling and a total paint cost estimate.",
+  "h1": "Paint Calculator",
+  "short": "Paint Calculator",
+  "intro": "Enter your room size, openings and coats to see how many gallons of wall paint to buy and what it will cost.",
+  "updated": "September 2026",
+  "related": ["flooring-calculator", "concrete-calculator", "mulch-calculator", "board-foot-calculator"],
+  "faq": [
+    {"q": "How much does one gallon of paint cover?", "a": "Most interior wall paints list 350 to 400 square feet per gallon for one coat on smooth, primed drywall. Textured, porous or unprimed surfaces soak up more, so 250 to 300 square feet is more realistic there. Check the coverage printed on your can and enter it above."},
+    {"q": "How many gallons of paint do I need for a 12x12 room?", "a": "A 12 by 12 foot room with 8 foot ceilings has 384 square feet of wall. After subtracting one door and two windows you paint about 334 square feet. Two coats at 350 square feet per gallon need about 1.9 gallons, so buy 2 gallons. The ceiling adds another 144 square feet per coat."},
+    {"q": "Do I really need two coats of paint?", "a": "Usually, yes. Two coats give even color and sheen, hide roller marks and hold up better to cleaning. One coat can work when you repaint the same or a very similar color with a high-quality paint. Big color changes, especially light over dark, may need a primer plus two coats."},
+    {"q": "Should I subtract doors and windows when calculating paint?", "a": "Yes, for an accurate number. A standard interior door is about 20 square feet and a typical window about 15 square feet. In a room with only one or two openings the difference is small, and many painters skip the subtraction to build in a little extra."},
+    {"q": "Is it cheaper to buy quarts or a gallon?", "a": "A quart usually costs 35 to 45 percent of a gallon, so three quarts cost more than one gallon. If you only need a little beyond a whole number of gallons, one or two quarts can save money. If you need three quarts or more, buy the extra gallon."},
+    {"q": "Does ceiling paint need to be calculated separately?", "a": "Ceilings are normally painted with a flat ceiling paint in a different color from the walls, so treat them as a separate purchase. This calculator adds the ceiling to the total when you tick the box; to price it on its own, run the calculator with the wall height set to zero."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="length">Room length</label>
+          <div class="input"><input id="length" name="length" type="number" min="0" step="0.1" value="12" inputmode="decimal"><span class="unit">ft</span></div>
+        </div>
+        <div class="field">
+          <label for="width">Room width</label>
+          <div class="input"><input id="width" name="width" type="number" min="0" step="0.1" value="12" inputmode="decimal"><span class="unit">ft</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="height">Wall height</label>
+        <div class="input"><input id="height" name="height" type="number" min="0" step="0.1" value="8" inputmode="decimal"><span class="unit">ft</span></div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="doors">Doors</label>
+          <div class="input"><input id="doors" name="doors" type="number" min="0" step="1" value="1" inputmode="numeric"></div>
+          <div class="hint">About 20 sq ft each.</div>
+        </div>
+        <div class="field">
+          <label for="windows">Windows</label>
+          <div class="input"><input id="windows" name="windows" type="number" min="0" step="1" value="2" inputmode="numeric"></div>
+          <div class="hint">About 15 sq ft each.</div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="coats">Coats</label>
+          <select id="coats" name="coats" data-num>
+            <option value="1">1 coat</option>
+            <option value="2" selected>2 coats</option>
+            <option value="3">3 coats</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="coverage">Coverage per gallon</label>
+          <div class="input"><input id="coverage" name="coverage" type="number" min="1" step="10" value="350" inputmode="numeric"><span class="unit">sq ft</span></div>
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" name="ceiling"> Include the ceiling</label>
+      <div class="field">
+        <label for="price">Price per gallon</label>
+        <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="40" inputmode="decimal"></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Gallons to buy</span><b data-out="gallons">—</b></div>
+    <div class="result"><span>Wall area to paint</span><b data-out="wallArea">—</b></div>
+    <div data-show="ceil" hidden><div class="result"><span>Ceiling area</span><b data-out="ceilArea">—</b></div></div>
+    <div class="result"><span>Total area (all coats)</span><b data-out="total">—</b></div>
+    <div class="result"><span>Paint needed (exact)</span><b data-out="exact">—</b></div>
+    <div class="result"><span>Estimated paint cost</span><b data-out="cost">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const perimeter = 2 * (v.length + v.width);
+  const openings = v.doors * 20 + v.windows * 15;
+  const wallArea = Math.max(0, perimeter * v.height - openings);
+  const ceilArea = v.ceiling ? v.length * v.width : 0;
+  const total = (wallArea + ceilArea) * v.coats;
+  const exact = v.coverage > 0 ? total / v.coverage : 0;
+  const gallons = Math.ceil(exact - 1e-9);
+
+  // If the leftover past whole gallons is 2 quarts or less, quarts are cheaper.
+  const whole = Math.floor(exact + 1e-9);
+  const quarts = Math.ceil((exact - whole) * 4 - 1e-9);
+
+  out.set("gallons", gallons === 1 ? "1 gallon" : `${Calc.num(gallons, 0)} gallons`);
+  out.set("wallArea", `${Calc.num(wallArea, 0)} sq ft`);
+  out.show("ceil", v.ceiling);
+  out.set("ceilArea", `${Calc.num(ceilArea, 0)} sq ft`);
+  out.set("total", `${Calc.num(total, 0)} sq ft`);
+  out.set("exact", `${Calc.num(exact, 2)} gal`);
+  out.set("cost", Calc.money(gallons * v.price));
+
+  if (total <= 0) return;
+  if (quarts > 0 && quarts <= 2) {
+    const q = `${quarts} quart${quarts > 1 ? "s" : ""}`;
+    out.note(whole > 0
+      ? `You only need ${q} beyond ${whole} gallon${whole > 1 ? "s" : ""}. Buying ${whole} gal + ${q} is usually cheaper than an extra gallon.`
+      : `This job needs only about ${q}. A gallon is cheaper per quart but you may not need it.`);
+  } else {
+    out.note(`Buying ${gallons} gallon${gallons > 1 ? "s" : ""} leaves about ${Calc.num(gallons - exact, 1)} gal for touch-ups.`);
+  }
+}));
+</script>
+<!-- article -->
+<h2>How much paint a room needs</h2>
+<p>Paint is sold by coverage, not by room. A gallon of interior wall paint covers roughly
+<strong>350 to 400 square feet</strong> for one coat on smooth, primed drywall, which is the range printed on most
+Sherwin-Williams, Behr and Valspar cans (Benjamin Moore often claims 400 to 450). This calculator defaults to 350 sq ft
+so you round toward having enough rather than running short halfway around the room.</p>
+<p>To get the paintable area, it multiplies the room's perimeter by the wall height, then subtracts
+<strong>20 sq ft for each door</strong> (a standard 30–36 in × 80 in door) and <strong>15 sq ft for each window</strong>
+(about 3 × 5 ft). That area is multiplied by the number of coats and divided by the coverage per gallon. The result is
+rounded up to whole gallons, because that's how you'll buy it.</p>
+
+<h2>The formula</h2>
+<div class="formula">wall area = 2 × (length + width) × height − (doors × 20) − (windows × 15)<br>
+total area = (wall area + ceiling area) × coats<br>
+gallons = total area ÷ coverage per gallon, rounded up<br>
+cost = gallons × price per gallon</div>
+
+<h2>Example: a 12 × 12 ft bedroom</h2>
+<p>A 12 × 12 ft room with 8 ft walls, one door and two windows, painted with two coats at 350 sq ft per gallon
+and $40 per gallon, walls only.</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Gross wall area (48 ft perimeter × 8 ft)</td><td>384 sq ft</td></tr>
+  <tr><td>Minus 1 door (20) and 2 windows (30)</td><td>334 sq ft</td></tr>
+  <tr><td>Two coats</td><td>668 sq ft</td></tr>
+  <tr><td>Paint needed (668 ÷ 350)</td><td>1.91 gal</td></tr>
+  <tr><td><strong>Gallons to buy</strong></td><td><strong>2 gallons</strong></td></tr>
+  <tr><td>Estimated cost (2 × $40)</td><td>$80.00</td></tr>
+</table>
+<p>Tick "Include the ceiling" and the same room adds 144 sq ft per coat, bringing the total to 956 sq ft and about
+2.73 gallons, so you'd buy 3.</p>
+
+<h2>Getting the number right</h2>
+<h3>Adjust coverage for the surface</h3>
+<p>Coverage claims assume a smooth, sealed wall. Knockdown or orange-peel texture, bare drywall, fresh plaster and
+masonry all absorb more. Drop the coverage to 250–300 sq ft for those. New drywall should get a primer coat first,
+which typically covers 200–300 sq ft per gallon.</p>
+<h3>Plan for color changes</h3>
+<p>Going from a dark color to a light one, or painting a saturated red or yellow, often takes a third coat or a
+tinted primer. Choosing 3 coats above is a fair way to budget for it.</p>
+<h3>Trim and doors are separate</h3>
+<p>Baseboards, casings and doors are usually painted in semi-gloss, a different product. A quart covers trim in
+most average rooms.</p>
+<h3>Buy it all at once</h3>
+<p>Tinted paint can vary slightly between batches. If you need several gallons, buy them together, or mix them
+in a larger bucket (called boxing) so the color is consistent from wall to wall. Keep any leftover sealed for
+touch-ups; the note under the results tells you roughly how much you'll have.</p>

@@ -1,0 +1,166 @@
+---
+{
+  "title": "Dog Age Calculator: Dog Years to Human Years",
+  "description": "Convert your dog's age to human years by size (small to giant) or with the UCSD DNA-methylation formula, and see which life stage your dog is in.",
+  "h1": "Dog Age Calculator",
+  "short": "Dog Age Calculator",
+  "intro": "Enter your dog's age and size to get the human-equivalent age from the size-based vet chart, compare it with the newer epigenetic formula, and see your dog's life stage.",
+  "updated": "September 2026",
+  "related": ["dog-food-calculator", "puppy-weight-calculator", "cat-age-calculator", "dog-pregnancy-calculator"],
+  "faq": [
+    {"q": "How old is my dog in human years?", "a": "Using the AVMA rule of thumb, a dog's first year equals about 15 human years and the second adds about 9 more, so a 2-year-old dog is roughly 24. After that, add about 4 years per year for small dogs, 5 for medium, 6 for large and 7 for giant breeds. A 5-year-old medium dog is about 39."},
+    {"q": "Is one dog year really seven human years?", "a": "No. The one-to-seven rule is a myth. Dogs mature much faster than people in their first two years, then age more slowly, and the pace after that depends on size. Big dogs age faster than small dogs."},
+    {"q": "Why do large dogs age faster than small dogs?", "a": "Nobody knows for certain, but large and giant breeds grow extremely fast and have shorter average lifespans, often 8 to 12 years versus 13 to 16 for small breeds. That is why the chart adds more human years per year as size increases, and why big dogs are considered senior sooner."},
+    {"q": "What is the epigenetic dog age formula?", "a": "A study from UC San Diego compared DNA methylation changes in 104 Labrador retrievers with those in humans and proposed human age = 16 × ln(dog age) + 31. It ages young dogs very quickly: a 1-year-old dog comes out at 31 and a 2-year-old at about 42, then the curve flattens. It was built on one breed, so treat it as an interesting comparison rather than a precise answer."},
+    {"q": "When is a dog considered a senior?", "a": "The AAHA canine life stage guidelines define senior as the last 25% of a dog's expected lifespan. That works out to roughly 10 years for small dogs, 9 for medium, 8 for large and about 6 for giant breeds. Senior dogs benefit from checkups every 6 months."},
+    {"q": "How can a vet estimate my dog's age?", "a": "Vets look at teeth, eyes, coat, joints and muscle tone. Puppies can be aged fairly accurately by which teeth have come in, but estimates for adult dogs are rough and often span several years."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="years">Dog's age</label>
+          <div class="input"><input id="years" name="years" type="number" min="0" max="30" step="1" value="5" inputmode="numeric"><span class="unit">years</span></div>
+        </div>
+        <div class="field">
+          <label for="months">Plus</label>
+          <div class="input"><input id="months" name="months" type="number" min="0" max="11" step="1" value="0" inputmode="numeric"><span class="unit">months</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="size">Adult size</label>
+        <select id="size" name="size">
+          <option value="small">Small (20 lb / 9 kg or less)</option>
+          <option value="medium" selected>Medium (21–50 lb / 10–23 kg)</option>
+          <option value="large">Large (51–100 lb / 23–45 kg)</option>
+          <option value="giant">Giant (over 100 lb / 45 kg)</option>
+        </select>
+        <div class="hint">Use your dog's expected adult weight, even for a puppy.</div>
+      </div>
+      <div class="field">
+        <label for="method">Method</label>
+        <select id="method" name="method">
+          <option value="chart" selected>Size-based vet chart (AVMA rule)</option>
+          <option value="dna">Epigenetic formula (UCSD, 16 × ln(age) + 31)</option>
+        </select>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Human-equivalent age</span><b data-out="human">—</b></div>
+    <div class="result"><span>Life stage</span><b data-out="stage">—</b></div>
+    <div class="result"><span data-out="otherLabel">Other method</span><b data-out="other">—</b></div>
+    <div class="result"><span>Senior from about</span><b data-out="senior">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const age = Math.max(0, v.years + v.months / 12);   // dog age in years
+  const perYear = { small: 4, medium: 5, large: 6, giant: 7 }[v.size] || 5;
+  const seniorAt = { small: 10, medium: 9, large: 8, giant: 6 }[v.size] || 9;
+
+  // Size-based chart: 15 at one, 24 at two, then 4-7 per year by size.
+  // Under one year: interpolate 0 -> 10 at 6 months -> 15 at 12 months (rough).
+  let chart;
+  if (age >= 2) chart = 24 + (age - 2) * perYear;
+  else if (age >= 1) chart = 15 + (age - 1) * 9;
+  else if (age >= 0.5) chart = 10 + (age - 0.5) / 0.5 * 5;
+  else chart = age / 0.5 * 10;
+
+  // UCSD epigenetic clock (Wang et al., Cell Systems 2020); only meaningful from age 1.
+  const dna = age >= 1 ? 16 * Math.log(age) + 31 : NaN;
+
+  const puppyEnd = v.size === "giant" ? 1.5 : 1;
+  let stage;
+  if (age < puppyEnd) stage = "Puppy";
+  else if (age < 3) stage = "Young adult";
+  else if (age < seniorAt) stage = "Mature adult";
+  else stage = "Senior";
+
+  const useDna = v.method === "dna";
+  const main = useDna ? dna : chart;
+  out.set("human", isFinite(main) ? Calc.num(main, 0) + " years" : "Under 1 yr: n/a");
+  out.set("stage", stage);
+  out.set("otherLabel", useDna ? "Size-based chart says" : "Epigenetic formula says");
+  const other = useDna ? chart : dna;
+  out.set("other", isFinite(other) ? Calc.num(other, 0) + " years" : "n/a under 1 year");
+  out.set("senior", seniorAt + " years");
+
+  if (useDna && age < 1) out.note("The epigenetic formula is only meaningful from age 1 (it gives nonsense, even negative numbers, for young puppies). Switch to the size-based chart for puppies.");
+  else if (age > 0 && age < 1) out.note("Puppy equivalents are rough: dogs change so fast in the first year that any single number is an approximation.");
+  else if (age >= 1 && Math.abs(chart - dna) >= 10) out.note(`The two methods differ by ${Calc.num(Math.abs(chart - dna), 0)} years. The epigenetic formula ages young adults faster and older dogs slower, and it was built on Labradors only. Neither is a medical measurement.`);
+  else if (stage === "Senior") out.note("Senior dogs benefit from checkups every 6 months, including bloodwork and a look at teeth, joints and weight.");
+}));
+</script>
+<!-- article -->
+<h2>How dog years convert to human years</h2>
+<p>The "multiply by seven" rule is a myth. Dogs grow up very fast: a one-year-old dog is roughly as developed as a 15-year-old
+person, and a two-year-old is comparable to a young adult in their mid-20s. After that, aging slows, but how much it slows
+depends on size. Large and giant breeds age faster and have shorter lifespans than small dogs.</p>
+<p>The default method here is the rule of thumb published by the <strong>American Veterinary Medical Association (AVMA)</strong>:
+the first year equals about 15 human years, the second adds about 9, and each year after that adds roughly 4 to 7 human
+years depending on size. Size-based charts from AKC and many vet clinics follow the same pattern, with small differences
+in the exact numbers, so expect other calculators to be a year or two apart.</p>
+
+<h2>The formulas</h2>
+<div class="formula">Size-based chart:<br>
+age 1 = 15 human years, age 2 = 24 human years<br>
+over 2: human age = 24 + (dog age − 2) × Y<br>
+Y = 4 small, 5 medium, 6 large, 7 giant<br><br>
+Epigenetic (UCSD) formula, age 1 and up:<br>
+human age = 16 × ln(dog age) + 31</div>
+
+<h3>The epigenetic formula</h3>
+<p>In a study published in <em>Cell Systems</em> (preprint 2019, journal 2020), researchers at UC San Diego tracked
+age-related chemical marks on DNA, called methylation, in 104 Labrador retrievers and compared them with human data.
+The best fit was a logarithm: dogs race through the equivalent of human childhood and early adulthood in a couple of
+years, then the curve flattens. "ln" is the natural logarithm. The formula only makes sense from age 1; below that it
+drops toward zero and then goes negative. Because it came from a single breed, it doesn't account for size, which is
+why this calculator uses the size-based chart by default and shows the epigenetic answer for comparison.</p>
+
+<h2>Example: a 5-year-old medium dog</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>First two years</td><td>24</td></tr>
+  <tr><td>Three more years × 5 (medium)</td><td>+15</td></tr>
+  <tr><td><strong>Human-equivalent age (chart)</strong></td><td><strong>39 years</strong></td></tr>
+  <tr><td>Epigenetic: 16 × ln(5) + 31 = 16 × 1.609 + 31</td><td>57 years</td></tr>
+  <tr><td>Life stage</td><td>Mature adult (senior from about 9)</td></tr>
+</table>
+<p>The big gap is typical for middle-aged dogs: the epigenetic curve ages dogs quickly in early life, while the chart spreads aging more evenly.</p>
+
+<h2>Dog age chart by size</h2>
+<table>
+  <tr><th>Dog age</th><th>Small</th><th>Medium</th><th>Large</th><th>Giant</th><th>Epigenetic</th></tr>
+  <tr><td>1</td><td>15</td><td>15</td><td>15</td><td>15</td><td>31</td></tr>
+  <tr><td>2</td><td>24</td><td>24</td><td>24</td><td>24</td><td>42</td></tr>
+  <tr><td>4</td><td>32</td><td>34</td><td>36</td><td>38</td><td>53</td></tr>
+  <tr><td>6</td><td>40</td><td>44</td><td>48</td><td>52</td><td>60</td></tr>
+  <tr><td>8</td><td>48</td><td>54</td><td>60</td><td>66</td><td>64</td></tr>
+  <tr><td>10</td><td>56</td><td>64</td><td>72</td><td>80</td><td>68</td></tr>
+  <tr><td>12</td><td>64</td><td>74</td><td>84</td><td>94</td><td>71</td></tr>
+  <tr><td>14</td><td>72</td><td>84</td><td>96</td><td>108</td><td>73</td></tr>
+  <tr><td>16</td><td>80</td><td>94</td><td>108</td><td>122</td><td>75</td></tr>
+</table>
+
+<h2>Life stages</h2>
+<p>The 2019 <strong>AAHA Canine Life Stage Guidelines</strong> group dogs into puppy, young adult, mature adult and senior,
+with senior defined as the last 25% of the expected lifespan rather than a fixed birthday. This calculator uses these
+approximate cut-offs:</p>
+<ul>
+  <li><strong>Puppy:</strong> under 1 year (under 18 months for giant breeds, which keep growing longer).</li>
+  <li><strong>Young adult:</strong> until about 3 years.</li>
+  <li><strong>Mature adult:</strong> from 3 years until the senior stage.</li>
+  <li><strong>Senior:</strong> from about 10 years (small), 9 (medium), 8 (large) or 6 (giant).</li>
+</ul>
+
+<h2>Keep in mind</h2>
+<p>Human-year equivalents are a way to picture your dog's age, not a biological test. Genetics, body weight, exercise and
+dental health all affect how an individual dog ages; keeping a dog lean is one of the best-documented ways to add
+healthy years. Slowing down, stiffness, weight changes or increased thirst are worth a vet visit at any age.</p>
+<p><em>This calculator is for general information and is not veterinary advice.</em></p>

@@ -1,0 +1,152 @@
+---
+{
+  "title": "Gravel Calculator: Cubic Yards, Tons and Cost",
+  "description": "Estimate how much gravel you need in cubic yards, tons and 0.5 cu ft bags for pea gravel, crushed stone, river rock or road base, plus the total cost.",
+  "h1": "Gravel Calculator",
+  "short": "Gravel Calculator",
+  "intro": "Enter the length, width and depth of your path, patio base or driveway to see how many yards and tons of gravel to order.",
+  "updated": "September 2026",
+  "related": ["mulch-calculator", "concrete-calculator", "flooring-calculator", "paint-calculator"],
+  "faq": [
+    {"q": "How many tons are in a cubic yard of gravel?", "a": "Most gravel weighs between 1.4 and 1.7 tons per cubic yard. Pea gravel and washed crushed stone are around 1.4 tons, river rock about 1.45, and compacting road base or crusher run about 1.6 or more. Moisture adds weight, so wet material sold by the ton gives you slightly less volume."},
+    {"q": "How much area does a ton of gravel cover?", "a": "At 1.4 tons per cubic yard, a ton of gravel is about 19 cubic feet. That covers roughly 116 square feet at 2 inches deep, 77 square feet at 3 inches, or 58 square feet at 4 inches."},
+    {"q": "How deep should gravel be?", "a": "Walkways and decorative beds usually need 2 to 3 inches. Patio bases take about 4 inches of compacted base. Driveways need 4 to 6 inches of base plus 2 to 3 inches of surface gravel, and more in soft soils or where heavy trucks drive."},
+    {"q": "How many bags of gravel equal a ton?", "a": "Bagged gravel usually comes in 0.5 cubic foot bags weighing about 45 to 50 pounds. At 1.4 tons per cubic yard, a ton is about 38 bags. Bags cost far more per ton than bulk, so they only make sense for small jobs."},
+    {"q": "Should I order extra gravel?", "a": "Add about 5 to 10 percent for uneven ground and spillage. For crusher run or road base that you compact, add 10 to 15 percent because the material settles when tamped."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="length">Length</label>
+          <div class="input"><input id="length" name="length" type="number" min="0" step="0.1" value="10" inputmode="decimal"><span class="unit">ft</span></div>
+        </div>
+        <div class="field">
+          <label for="width">Width</label>
+          <div class="input"><input id="width" name="width" type="number" min="0" step="0.1" value="10" inputmode="decimal"><span class="unit">ft</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="depth">Depth</label>
+        <div class="input"><input id="depth" name="depth" type="number" min="0" step="0.5" value="3" inputmode="decimal"><span class="unit">in</span></div>
+      </div>
+      <div class="field">
+        <label for="type">Gravel type</label>
+        <select id="type" name="type">
+          <option value="1.4">Pea gravel (1.4 tons/yd³)</option>
+          <option value="1.4">Crushed stone, #57 (1.4 tons/yd³)</option>
+          <option value="1.45">River rock (1.45 tons/yd³)</option>
+          <option value="1.6">Crusher run / road base (1.6 tons/yd³)</option>
+          <option value="custom">Custom density…</option>
+        </select>
+      </div>
+      <div class="field" data-show="custom" hidden>
+        <label for="customDensity">Custom density</label>
+        <div class="input"><input id="customDensity" name="customDensity" type="number" min="0" step="0.05" value="1.5" inputmode="decimal"><span class="unit">tons/yd³</span></div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="tonPrice">Bulk price per ton</label>
+          <div class="input"><span class="unit pre">$</span><input id="tonPrice" name="tonPrice" type="number" min="0" step="0.01" value="50" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="bagPrice">Price per 0.5 cu ft bag</label>
+          <div class="input"><span class="unit pre">$</span><input id="bagPrice" name="bagPrice" type="number" min="0" step="0.01" value="5.50" inputmode="decimal"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Gravel needed</span><b data-out="tons">—</b></div>
+    <div class="result"><span>Volume</span><b data-out="yards">—</b></div>
+    <div class="result"><span>Volume in cubic feet</span><b data-out="cuft">—</b></div>
+    <div class="result"><span>Bulk cost</span><b data-out="bulkCost">—</b></div>
+    <div class="result"><span>Bulk cost per cubic yard</span><b data-out="perYard">—</b></div>
+    <div class="result"><span>0.5 cu ft bags</span><b data-out="bags">—</b></div>
+    <div class="result"><span>Cost in bags</span><b data-out="bagCost">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const custom = v.type === "custom";
+  out.show("custom", custom);
+  const density = custom ? v.customDensity : parseFloat(v.type);
+
+  const cuft = v.length * v.width * v.depth / 12;
+  const yards = cuft / 27;
+  const tons = yards * density;
+  const bags = Math.ceil(cuft / 0.5 - 1e-9);
+
+  out.set("tons", `${Calc.num(tons, 2)} tons`);
+  out.set("yards", `${Calc.num(yards, 2)} cu yd`);
+  out.set("cuft", `${Calc.num(cuft, 1)} cu ft`);
+  out.set("bulkCost", Calc.money(tons * v.tonPrice));
+  out.set("perYard", Calc.money(density * v.tonPrice));
+  out.set("bags", Calc.num(bags, 0));
+  out.set("bagCost", Calc.money(bags * v.bagPrice));
+
+  if (tons <= 0) return;
+  if (v.type === "1.6") out.note("Road base compacts when tamped. Order 10–15% more than shown.");
+  else if (tons < 1) out.note("Many yards have a 1-ton minimum or charge a small-load fee. Bags may be simpler for jobs this size.");
+  else out.note("Add 5–10% for uneven ground and spillage. Delivery is usually extra.");
+}));
+</script>
+<!-- article -->
+<h2>How gravel is measured and sold</h2>
+<p>You measure a gravel job by volume, but quarries and landscape yards usually sell by weight: the ton. So the
+calculation has two steps. First, find the volume in cubic yards from the length, width and depth. Then multiply by
+the material's density, in tons per cubic yard, to get the weight to order.</p>
+<p>Density depends on the stone and how it's graded. Figures published by suppliers and calculators such as
+CalculatorSoup and Inch Calculator put most gravel between <strong>1.4 and 1.7 tons per cubic yard</strong>. This
+calculator uses:</p>
+<table>
+  <tr><th>Material</th><th>Tons per cubic yard</th><th>Typical use</th></tr>
+  <tr><td>Pea gravel</td><td>1.4 (about 2,800 lb)</td><td>Paths, play areas, patios</td></tr>
+  <tr><td>Crushed stone, #57</td><td>1.4</td><td>Drainage, driveway top layer, under pavers</td></tr>
+  <tr><td>River rock</td><td>1.45</td><td>Decorative beds, dry creek beds</td></tr>
+  <tr><td>Crusher run / road base</td><td>1.6</td><td>Compacted base for driveways and patios</td></tr>
+</table>
+<p>If your supplier lists a different weight per yard, choose "Custom density" and enter it.</p>
+
+<h2>The formula</h2>
+<div class="formula">cubic feet = length × width × (depth in inches ÷ 12)<br>
+cubic yards = cubic feet ÷ 27<br>
+tons = cubic yards × density<br>
+bags = cubic feet ÷ 0.5, rounded up</div>
+
+<h2>Example: a 10 × 10 ft pea gravel patio, 3 inches deep</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Volume (10 × 10 × 3 ÷ 12)</td><td>25 cu ft</td></tr>
+  <tr><td>Cubic yards (25 ÷ 27)</td><td>0.93 cu yd</td></tr>
+  <tr><td><strong>Tons (0.926 × 1.4)</strong></td><td><strong>1.3 tons</strong></td></tr>
+  <tr><td>Bulk cost (1.296 tons × $50)</td><td>$64.81</td></tr>
+  <tr><td>0.5 cu ft bags (25 ÷ 0.5)</td><td>50 bags</td></tr>
+  <tr><td>Cost in bags (50 × $5.50)</td><td>$275.00</td></tr>
+</table>
+<p>The gap between bulk and bagged pricing is the main reason to buy loose gravel for anything bigger than a small
+bed. The $50 per ton default reflects typical 2026 pickup prices for pea gravel and crushed stone ($25–$50 a ton at
+the yard, more for decorative stone); delivery commonly adds $75–$150 per load.</p>
+
+<h2>Choosing the right depth</h2>
+<ul>
+  <li><strong>Decorative beds and walkways:</strong> 2–3 inches over landscape fabric.</li>
+  <li><strong>Patio or paver base:</strong> about 4 inches of compacted crusher run, plus 1 inch of sand or fine stone.</li>
+  <li><strong>Driveways:</strong> 4–6 inches of base topped with 2–3 inches of #57 or similar stone. Calculate each
+  layer separately, since they use different materials.</li>
+</ul>
+
+<h2>Tips for ordering</h2>
+<ul>
+  <li><strong>Round up.</strong> Uneven ground eats extra material. Add 5–10%, or 10–15% for material you compact.</li>
+  <li><strong>Ask how the yard sells.</strong> Some price by the cubic yard instead of the ton. Use the cubic yards figure
+  and the "cost per cubic yard" line to compare.</li>
+  <li><strong>Check the minimum.</strong> Delivery trucks often carry 10–15 tons and many suppliers have a minimum
+  charge, so small orders can cost as much to deliver as the stone itself.</li>
+  <li><strong>Moisture matters.</strong> Wet stone weighs more, so a ton of freshly washed gravel covers slightly less.</li>
+</ul>

@@ -1,0 +1,207 @@
+---
+{
+  "title": "Candle Wax Calculator: Wax, Fragrance Oil & Cost",
+  "description": "Find how much wax and fragrance oil to melt for a batch of container candles, from the water your jar holds, plus cost per candle and a retail price.",
+  "h1": "Candle Wax Calculator",
+  "short": "Candle Wax Calculator",
+  "intro": "Enter how much water your container holds (or its size), how many candles you're pouring and your fragrance load. Get the wax and fragrance to weigh out and what each candle costs.",
+  "updated": "September 2026",
+  "related": ["etsy-fee-calculator", "side-hustle-tax-calculator", "3d-print-cost-calculator", "freelance-rate-calculator"],
+  "faq": [
+    {"q": "How do I calculate how much wax I need for a candle?", "a": "Fill the container with water to where the wax will stop, weigh the water, and multiply by 0.86. Wax is lighter than water, so a jar that holds 8 ounces of water by weight holds about 6.9 ounces of soy wax and fragrance combined. Multiply by the number of candles for the batch."},
+    {"q": "How much fragrance oil do I add to soy wax?", "a": "Most candle makers use 6 to 10% fragrance, with 8% a common starting point. Many soy waxes are rated for a maximum of 10 to 12%. Going over the wax's limit can make oil seep out of the candle and does not always make it smell stronger. Check the maximum on your wax supplier's page."},
+    {"q": "Is fragrance load a percentage of the wax or of the total?", "a": "Both conventions exist. This calculator treats the load as a share of the total fill, so wax plus fragrance fits the container exactly. The other common method adds fragrance on top of the wax weight: 1 pound of wax at 8% gets 1.28 ounces of oil. The difference is small at typical loads, but stick to one method so your batches stay consistent."},
+    {"q": "How many 8 oz candles does a pound of wax make?", "a": "A jar sold as 8 oz usually holds about 8 ounces of water to the fill line, which takes about 6.3 ounces of soy wax plus 0.55 ounces of fragrance at 8%. So a pound of wax makes about 2.5 candles, and a 10 pound case makes about 25."},
+    {"q": "How should I price homemade candles?", "a": "Add up materials per candle, including wax, fragrance, jar, wick, label and packaging, then multiply by 3 to 4 for retail. Wholesale is often about half of retail. Remember your time, marketplace fees and shipping supplies, which can take a large bite out of a small order."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="mode">Container size by</label>
+        <select id="mode" name="mode">
+          <option value="water">Water it holds</option>
+          <option value="cyl">Cylinder dimensions</option>
+        </select>
+      </div>
+      <div class="row2" data-show="water">
+        <div class="field">
+          <label for="water">Water to fill line</label>
+          <input id="water" name="water" type="number" min="0" step="0.1" value="8" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="waterUnit">Unit</label>
+          <select id="waterUnit" name="waterUnit">
+            <option value="ozwt">oz, weighed</option>
+            <option value="floz">fl oz</option>
+            <option value="ml">ml</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="cyl" hidden>
+        <div class="field">
+          <label for="diameter">Inside diameter</label>
+          <div class="input"><input id="diameter" name="diameter" type="number" min="0" step="0.05" value="3" inputmode="decimal"><span class="unit">in</span></div>
+        </div>
+        <div class="field">
+          <label for="fillHeight">Fill height</label>
+          <div class="input"><input id="fillHeight" name="fillHeight" type="number" min="0" step="0.05" value="3" inputmode="decimal"><span class="unit">in</span></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="count">Number of candles</label>
+          <input id="count" name="count" type="number" min="1" step="1" value="12" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="wax">Wax type</label>
+          <select id="wax" name="wax">
+            <option value="0.86">Soy (0.86)</option>
+            <option value="0.86c">Coconut / blends (0.86)</option>
+            <option value="0.90">Paraffin (0.90)</option>
+            <option value="0.96">Beeswax (0.96)</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="load">Fragrance load</label>
+        <div class="input"><input id="load" name="load" type="number" min="0" max="20" step="0.5" value="8" inputmode="decimal"><span class="unit">%</span></div>
+        <div class="hint">Share of the total fill. Most waxes max out at 10–12%.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="waxPrice">Wax price</label>
+          <div class="input"><span class="unit pre">$</span><input id="waxPrice" name="waxPrice" type="number" min="0" step="0.01" value="4" inputmode="decimal"><span class="unit">/lb</span></div>
+        </div>
+        <div class="field">
+          <label for="foPrice">Fragrance price</label>
+          <div class="input"><span class="unit pre">$</span><input id="foPrice" name="foPrice" type="number" min="0" step="0.01" value="2" inputmode="decimal"><span class="unit">/oz</span></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="other">Jar, wick, label</label>
+          <div class="input"><span class="unit pre">$</span><input id="other" name="other" type="number" min="0" step="0.01" value="2" inputmode="decimal"></div>
+          <div class="hint">Per candle.</div>
+        </div>
+        <div class="field">
+          <label for="markup">Retail multiplier</label>
+          <div class="input"><input id="markup" name="markup" type="number" min="0" step="0.5" value="3" inputmode="decimal"><span class="unit">×</span></div>
+          <div class="hint">Enter 0 if not selling.</div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Wax to weigh out</span><b data-out="wax">—</b></div>
+    <div class="result"><span>Fragrance oil</span><b data-out="fo">—</b></div>
+    <div class="result"><span>Fill per candle (wax + oil)</span><b data-out="fill">—</b></div>
+    <div class="result"><span>Wax cost</span><b data-out="waxCost">—</b></div>
+    <div class="result"><span>Fragrance cost</span><b data-out="foCost">—</b></div>
+    <div class="result"><span>Total batch cost</span><b data-out="total">—</b></div>
+    <div class="result"><span>Cost per candle</span><b data-out="each">—</b></div>
+    <div class="result" data-show="sell"><span>Suggested retail each</span><b data-out="retail">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const OZWT_PER_FLOZ = 1.0432, G_PER_OZ = 28.3495, CUIN_PER_FLOZ = 231 / 128;
+  const cyl = v.mode === "cyl";
+  out.show("water", !cyl);
+  out.show("cyl", cyl);
+
+  // Weight of water the container holds, in ounces
+  let waterOz;
+  if (cyl) waterOz = Math.PI * (v.diameter / 2) ** 2 * v.fillHeight / CUIN_PER_FLOZ * OZWT_PER_FLOZ;
+  else if (v.waterUnit === "floz") waterOz = v.water * OZWT_PER_FLOZ;
+  else if (v.waterUnit === "ml") waterOz = v.water / G_PER_OZ;
+  else waterOz = v.water;
+
+  const sg = parseFloat(v.wax);
+  const n = Math.max(1, Math.floor(v.count));
+  const load = Math.min(v.load, 50) / 100;
+  const fill = waterOz * sg;                 // wax + fragrance per candle, oz by weight
+  const foEach = fill * load;
+  const waxTotal = (fill - foEach) * n;
+  const foTotal = foEach * n;
+  const waxCost = waxTotal / 16 * v.waxPrice;
+  const foCost = foTotal * v.foPrice;
+  const total = waxCost + foCost + v.other * n;
+  const each = total / n;
+
+  out.set("wax", `${Calc.num(waxTotal, 1)} oz (${Calc.num(waxTotal / 16, 2)} lb)`);
+  out.set("fo", `${Calc.num(foTotal, 2)} oz (${Calc.num(foTotal * G_PER_OZ, 0)} g)`);
+  out.set("fill", `${Calc.num(fill, 2)} oz (${Calc.num(fill * G_PER_OZ, 0)} g)`);
+  out.set("waxCost", Calc.money(waxCost));
+  out.set("foCost", Calc.money(foCost));
+  out.set("total", Calc.money(total));
+  out.set("each", Calc.money(each));
+  out.show("sell", v.markup > 0);
+  out.set("retail", Calc.money(each * v.markup));
+
+  if (v.load > 12) out.note("That's above the 10–12% most waxes can hold. Check your wax's maximum or oil may sweat out of the candle.");
+  else out.note(`Weights are ounces by weight, not fluid ounces. Melt a few percent extra to cover wax left in the pouring pitcher.`);
+}));
+</script>
+<!-- article -->
+<h2>How the candle wax calculation works</h2>
+<p>Candle wax is measured by weight, but containers are sold by volume, and the "8 oz" on a jar rarely tells you
+how much wax it takes. The reliable way is to fill the container with water up to where the wax will stop
+(usually about 1/2 inch below the rim), then weigh that water. Wax is lighter than water, so you multiply the
+water weight by the wax's specific gravity. Most candle waxes are 0.82 to 0.95 times as dense as water, and 0.86
+is the figure most suppliers and calculators use for soy and coconut blends.</p>
+<p>That gives the total fill: wax plus fragrance oil. The fragrance load is taken as a share of that total, and
+the rest is wax. Doing it this way means the finished candle lands exactly at your fill line.</p>
+
+<h2>The formula</h2>
+<div class="formula">fill per candle (oz) = water weight (oz) × wax density<br>
+fragrance per candle = fill × fragrance load %<br>
+wax per candle = fill − fragrance<br>
+batch = per candle × number of candles<br>
+cost per candle = (wax lb × $/lb + oil oz × $/oz) ÷ candles + jar, wick, label</div>
+<p>If you enter fluid ounces instead of a weighed amount, the calculator converts at 1.043 ounces of weight per
+fluid ounce of water. For a cylinder, it uses π × radius² × fill height, then converts cubic inches to water weight.</p>
+
+<h2>Example: a dozen 8 oz soy candles</h2>
+<p>Twelve jars that each hold 8 ounces of water (weighed) to the fill line, soy wax at 8% fragrance, wax at $4
+per pound, fragrance at $2 per ounce, and $2 per candle for the jar, wick and label:</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Fill per candle: 8 × 0.86</td><td>6.88 oz</td></tr>
+  <tr><td>Fragrance: 6.88 × 8% × 12</td><td>6.6 oz (187 g)</td></tr>
+  <tr><td>Wax: (6.88 − 0.55) × 12</td><td><strong>76 oz (4.75 lb)</strong></td></tr>
+  <tr><td>Wax cost: 4.75 lb × $4</td><td>$18.99</td></tr>
+  <tr><td>Fragrance cost: 6.6 oz × $2</td><td>$13.21</td></tr>
+  <tr><td>Jars, wicks, labels: 12 × $2</td><td>$24.00</td></tr>
+  <tr><td>Total batch / per candle</td><td>$56.20 / $4.68</td></tr>
+  <tr><td>Suggested retail at 3×</td><td>$14.05</td></tr>
+</table>
+
+<h2>Wax densities and fragrance limits</h2>
+<table>
+  <tr><th>Wax</th><th>Density used</th><th>Typical max fragrance</th></tr>
+  <tr><td>Soy container wax</td><td>0.86</td><td>10–12%</td></tr>
+  <tr><td>Coconut and coconut-soy blends</td><td>0.86</td><td>10–12%</td></tr>
+  <tr><td>Paraffin</td><td>0.90</td><td>Often 6–10%, varies by blend</td></tr>
+  <tr><td>Beeswax</td><td>0.96</td><td>Often 6% or less</td></tr>
+</table>
+<p>These are typical figures. Your wax supplier lists the exact maximum fragrance load for each wax, and that's
+the number to trust.</p>
+
+<h2>Tips for consistent batches</h2>
+<ul>
+  <li><strong>Weigh everything.</strong> Fragrance oils vary in density, so measure oil on a scale in ounces or
+  grams, not in a measuring cup.</li>
+  <li><strong>Test before scaling up.</strong> Pour one or two test candles to check wick size and scent throw.
+  More fragrance isn't always stronger; the wick and wax matter as much.</li>
+  <li><strong>Add fragrance at the right temperature.</strong> Most soy waxes call for adding oil around 185°F
+  and stirring for about two minutes to bind it.</li>
+  <li><strong>Plan for a second pour.</strong> Soy often sinks around the wick as it cools. Holding back a little
+  melted wax for a top-up is easier than melting a fresh batch.</li>
+  <li><strong>Price for the whole job.</strong> A 3–4× materials multiplier leaves room for your time,
+  marketplace fees and breakage.</li>
+</ul>

@@ -1,0 +1,190 @@
+---
+{
+  "title": "Coffee Ratio Calculator: Grams, Tablespoons & Water",
+  "description": "Find how much coffee to use for pour-over, French press, AeroPress, drip, cold brew or espresso, in grams and tablespoons, from your water or number of cups.",
+  "h1": "Coffee Ratio Calculator",
+  "short": "Coffee Ratio Calculator",
+  "intro": "Pick your brew method and enter how much water you're using or how many cups you want. Get the coffee dose in grams and tablespoons.",
+  "updated": "September 2026",
+  "related": ["3d-print-cost-calculator", "board-foot-calculator", "fabric-yardage-calculator", "dog-food-calculator"],
+  "faq": [
+    {"q": "What is the best coffee to water ratio?", "a": "For filter coffee, 1:15 to 1:17 by weight suits most people, with 1:16 a common starting point. The Specialty Coffee Association's Golden Cup standard is about 55 grams of coffee per liter of water, roughly 1:18. Immersion methods like French press often run a little stronger, and espresso is far stronger at about 1:2."},
+    {"q": "How many tablespoons of coffee per cup?", "a": "For an 8 ounce mug at about 1:16, you need around 15 grams of coffee, which is roughly 2 1/2 to 3 level tablespoons of medium-ground coffee. The classic guideline of 1 to 2 tablespoons per 6 ounces lands in a similar range. A scale is more accurate because a tablespoon of coarse grounds weighs less than a tablespoon of fine grounds."},
+    {"q": "How many grams is a tablespoon of ground coffee?", "a": "A level tablespoon of ground coffee usually weighs about 5 to 6 grams, depending on grind size and roast. Finer grinds pack more densely and weigh more per spoon; dark roasts are lighter than light roasts. This calculator uses 5.5 grams per level tablespoon."},
+    {"q": "What ratio should I use for cold brew?", "a": "For a concentrate you dilute before drinking, 1:5 is a common starting point, mixed about 1:1 with water or milk. For ready-to-drink cold brew, use about 1:8. Steep coarse grounds 12 to 24 hours in the fridge or at room temperature, then filter."},
+    {"q": "Why does my brewed coffee come out less than the water I used?", "a": "Wet coffee grounds hold on to water, roughly twice their dry weight. Brewing 30 grams of coffee with 480 grams of water leaves you with about 420 milliliters in the cup. The cups mode in this calculator adds that extra water for you."},
+    {"q": "How big is a cup of coffee in a coffee maker?", "a": "Most drip coffee makers define a cup as 5 to 6 fluid ounces, not the 8 ounce measuring cup. A 12 cup carafe holds about 60 ounces. Choose 6 oz in the cup size setting to match the markings on most machines."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="method">Brew method</label>
+        <select id="method" name="method">
+          <option value="pourover">Pour-over (1:16)</option>
+          <option value="frenchpress">French press (1:15)</option>
+          <option value="aeropress">AeroPress (1:12)</option>
+          <option value="drip">Drip coffee maker (1:17)</option>
+          <option value="coldconc">Cold brew concentrate (1:5)</option>
+          <option value="coldrtd">Cold brew, ready to drink (1:8)</option>
+          <option value="espresso">Espresso (1:2, output weight)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="mode">I know</label>
+        <select id="mode" name="mode">
+          <option value="water">How much water I'm using</option>
+          <option value="cups">How many cups I want</option>
+        </select>
+      </div>
+      <div class="row2" data-show="water">
+        <div class="field">
+          <label for="amount" data-show="notEspresso">Water</label>
+          <label for="amount" data-show="isEspresso" hidden>Drink weight (yield)</label>
+          <input id="amount" name="amount" type="number" min="0" step="1" value="480" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="unit">Unit</label>
+          <select id="unit" name="unit">
+            <option value="ml">ml / grams</option>
+            <option value="oz">fl oz</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="cups" hidden>
+        <div class="field">
+          <label for="cups" data-show="notEspresso">Cups</label>
+          <label for="cups" data-show="isEspresso" hidden>Double shots</label>
+          <input id="cups" name="cups" type="number" min="0" step="1" value="2" inputmode="numeric">
+        </div>
+        <div class="field" data-show="notEspresso">
+          <label for="cupSize">Cup size</label>
+          <select id="cupSize" name="cupSize">
+            <option value="8">8 oz mug</option>
+            <option value="6">6 oz (coffee maker cup)</option>
+            <option value="12">12 oz mug</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="ratio">Ratio override (1 : …)</label>
+        <div class="input"><span class="unit pre">1 :</span><input id="ratio" name="ratio" type="number" min="0" step="0.5" value="" placeholder="method default" inputmode="decimal"></div>
+        <div class="hint">Leave blank to use the method's default. Higher number = weaker.</div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Coffee</span><b data-out="coffee">—</b></div>
+    <div class="result"><span>Level tablespoons (approx.)</span><b data-out="tbsp">—</b></div>
+    <div class="result"><span data-out="waterLabel">Water</span><b data-out="water">—</b></div>
+    <div class="result"><span>Brewed coffee (approx.)</span><b data-out="yield">—</b></div>
+    <div class="result"><span>Ratio used</span><b data-out="ratioUsed">—</b></div>
+    <div class="result"><span>Grind</span><b data-out="grind">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const M = {
+    pourover:    { r: 16, grind: "Medium-fine" },
+    frenchpress: { r: 15, grind: "Coarse" },
+    aeropress:   { r: 12, grind: "Fine to medium-fine" },
+    drip:        { r: 17, grind: "Medium" },
+    coldconc:    { r: 5,  grind: "Extra coarse" },
+    coldrtd:     { r: 8,  grind: "Coarse" },
+    espresso:    { r: 2,  grind: "Fine" },
+  }[v.method];
+  const ML_PER_OZ = 29.5735, G_PER_TBSP = 5.5, HOLD = 2;   // grounds keep ~2 g water per g
+  const esp = v.method === "espresso";
+  const r = v.ratio > 0 ? v.ratio : M.r;
+  const cupsMode = v.mode === "cups";
+  out.show("water", !cupsMode);
+  out.show("cups", cupsMode);
+  out.show("isEspresso", esp);
+  out.show("notEspresso", !esp);
+
+  let coffee, water, brewed;
+  if (esp) {
+    // Espresso ratios are dose : drink weight, so the input is the output.
+    brewed = cupsMode ? Math.floor(v.cups) * 36 : (v.unit === "oz" ? v.amount * ML_PER_OZ : v.amount);
+    coffee = brewed / r;
+    water = null;
+  } else {
+    if (cupsMode) {
+      let target = Math.floor(v.cups) * parseFloat(v.cupSize) * ML_PER_OZ;
+      if (v.method === "coldconc") target /= 2;            // concentrate is cut 1:1
+      water = r > HOLD ? target * r / (r - HOLD) : target;  // add back what the grounds absorb
+    } else {
+      water = v.unit === "oz" ? v.amount * ML_PER_OZ : v.amount;
+    }
+    coffee = water / r;
+    brewed = Math.max(0, water - coffee * HOLD);
+  }
+
+  const ml = (x) => `${Calc.num(x, 0)} ml (${Calc.num(x / ML_PER_OZ, 1)} oz)`;
+  out.set("coffee", Calc.num(coffee, 1) + " g");
+  out.set("tbsp", Calc.num(Math.round(coffee / G_PER_TBSP * 2) / 2, 1) + " tbsp");
+  out.set("waterLabel", esp ? "Water" : "Water to brew with");
+  out.set("water", esp ? "Set by machine" : ml(water));
+  out.set("yield", esp ? `${Calc.num(brewed, 0)} g drink` : ml(brewed));
+  out.set("ratioUsed", "1 : " + Calc.num(r, 1));
+  out.set("grind", M.grind);
+
+  if (v.method === "coldconc") out.note("Dilute the concentrate about 1:1 with water or milk before drinking. Steep 12–24 hours.");
+  else if (esp) out.note("Espresso ratio is coffee dose to drink weight. A double shot is about 18 g in, 36 g out in 25–30 seconds.");
+  else out.note(`Tablespoons assume ${G_PER_TBSP} g per level tablespoon of ground coffee; a scale is more accurate.`);
+}));
+</script>
+<!-- article -->
+<h2>How coffee ratios work</h2>
+<p>A brew ratio is the weight of coffee to the weight of water. At 1:16 you use 1 gram of coffee for every
+16 grams of water. Because 1 ml of water weighs 1 gram, you can read water in milliliters or grams
+interchangeably. Weighing is the single biggest step toward consistent coffee: scoops and tablespoons vary
+with grind size and roast by 20% or more.</p>
+<p>The ratio controls strength. A lower number (1:12) gives a stronger, heavier cup; a higher number (1:18)
+gives a lighter one. Grind size and brew time control extraction, which is why each method comes with its own
+grind suggestion.</p>
+
+<h2>The formula</h2>
+<div class="formula">coffee (g) = water (g) ÷ ratio<br>
+tablespoons ≈ coffee (g) ÷ 5.5<br>
+brewed coffee ≈ water − 2 × coffee<br>
+water for a target volume = target × ratio ÷ (ratio − 2)</div>
+<p>The last line is used in cups mode. Wet grounds keep about twice their dry weight in water, so to end up
+with two full 8 oz mugs you need to start with a bit more than 16 ounces.</p>
+
+<h2>Example: pour-over for two</h2>
+<p>You're brewing a pour-over with 480 ml of water at the default 1:16 ratio.</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Coffee: 480 ÷ 16</td><td><strong>30 g</strong></td></tr>
+  <tr><td>Tablespoons: 30 ÷ 5.5 (to nearest half)</td><td>5.5 tbsp</td></tr>
+  <tr><td>Water</td><td>480 ml (16.2 oz)</td></tr>
+  <tr><td>Brewed coffee: 480 − 2 × 30</td><td>420 ml (14.2 oz)</td></tr>
+  <tr><td>Grind</td><td>Medium-fine</td></tr>
+</table>
+
+<h2>Default ratios and grind by method</h2>
+<table>
+  <tr><th>Method</th><th>Default ratio</th><th>Typical range</th><th>Grind</th></tr>
+  <tr><td>Pour-over (V60, Chemex, Kalita)</td><td>1:16</td><td>1:15–1:17</td><td>Medium-fine</td></tr>
+  <tr><td>French press</td><td>1:15</td><td>1:12–1:16</td><td>Coarse</td></tr>
+  <tr><td>AeroPress</td><td>1:12</td><td>1:6 (concentrate)–1:16</td><td>Fine to medium-fine</td></tr>
+  <tr><td>Drip coffee maker</td><td>1:17</td><td>1:15–1:18</td><td>Medium</td></tr>
+  <tr><td>Cold brew concentrate</td><td>1:5</td><td>1:4–1:6, then dilute</td><td>Extra coarse</td></tr>
+  <tr><td>Cold brew, ready to drink</td><td>1:8</td><td>1:8–1:10</td><td>Coarse</td></tr>
+  <tr><td>Espresso (dose : drink)</td><td>1:2</td><td>1:1.5–1:2.5</td><td>Fine</td></tr>
+</table>
+<p>These are common starting points drawn from roaster brew guides, not rules. The Specialty Coffee
+Association's Golden Cup standard, about 55 g per liter (roughly 1:18), sits at the light end of the filter range.</p>
+
+<h2>Dialing it in</h2>
+<ul>
+  <li><strong>Change one thing at a time.</strong> Fix the ratio first, then adjust grind until it tastes right.</li>
+  <li><strong>Sour or thin?</strong> Grind finer or brew longer. <strong>Bitter or harsh?</strong> Grind coarser or shorten the brew.</li>
+  <li><strong>Too strong or too weak?</strong> That's the ratio. Move it by one step (1:15 to 1:16) and taste again.</li>
+  <li><strong>Light roasts</strong> are denser and often taste better a little stronger, around 1:15.</li>
+</ul>

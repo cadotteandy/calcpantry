@@ -1,0 +1,140 @@
+---
+{
+  "title": "Board Foot Calculator: Lumber Volume & Cost",
+  "description": "Calculate board feet for hardwood and lumber from thickness, width and length, add a waste allowance, and see the total cost at your price per board foot.",
+  "h1": "Board Foot Calculator",
+  "short": "Board Foot Calculator",
+  "intro": "Enter your board dimensions and quantity to get total board feet, including waste, and what the lumber will cost.",
+  "updated": "September 2026",
+  "related": ["flooring-calculator", "concrete-calculator", "paint-calculator", "3d-print-cost-calculator"],
+  "faq": [
+    {"q": "How do you calculate a board foot?", "a": "Multiply thickness in inches by width in inches by length in inches, then divide by 144. If you measure length in feet, multiply thickness by width by length in feet and divide by 12. One board foot is a piece 1 inch thick, 12 inches wide and 12 inches long."},
+    {"q": "Do you use nominal or actual size for board feet?", "a": "Hardwood dealers calculate board feet on the rough (nominal) thickness, so a 4/4 board is figured at 1 inch even after it's surfaced to about 3/4 inch. Width and length are usually measured as the board actually is. Dimensional softwood like 2x4s is normally sold by the piece or linear foot, but when board feet are quoted, nominal sizes are used."},
+    {"q": "What does 4/4, 5/4 and 8/4 mean?", "a": "Hardwood thickness is sold in quarter inches of rough thickness. 4/4 (four quarter) is 1 inch rough, 5/4 is 1 1/4 inch, 6/4 is 1 1/2 inch and 8/4 is 2 inches. After surfacing both faces, 4/4 typically ends up around 13/16 to 3/4 inch."},
+    {"q": "How much waste should I add when buying lumber?", "a": "For rough hardwood, 15% to 30% is typical to cover defects, knots, checks at the ends, and cutting yield. Use the low end for clear, straight stock and simple cuts, and the high end for lower grades, figured wood, or projects with many small parts."},
+    {"q": "How many board feet are in a 2x4 that is 8 feet long?", "a": "Using nominal size, 2 × 4 × 96 ÷ 144 = 5.33 board feet. Using the actual 1.5 × 3.5 inch size it's 3.5 board feet. Lumberyards that quote board feet for dimensional lumber use the nominal figure."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="thick">Thickness</label>
+          <div class="input"><input id="thick" name="thick" type="number" min="0" step="0.25" value="1" inputmode="decimal"><span class="unit">in</span></div>
+          <div class="hint">Use rough/nominal: 4/4 = 1, 8/4 = 2.</div>
+        </div>
+        <div class="field">
+          <label for="width">Width</label>
+          <div class="input"><input id="width" name="width" type="number" min="0" step="0.25" value="6" inputmode="decimal"><span class="unit">in</span></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="length">Length</label>
+          <input id="length" name="length" type="number" min="0" step="0.25" value="8" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="lenUnit">Length unit</label>
+          <select id="lenUnit" name="lenUnit">
+            <option value="ft">Feet</option>
+            <option value="in">Inches</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="qty">Number of boards</label>
+          <div class="input"><input id="qty" name="qty" type="number" min="0" step="1" value="10" inputmode="numeric"><span class="unit">pcs</span></div>
+        </div>
+        <div class="field">
+          <label for="waste">Waste allowance</label>
+          <div class="input"><input id="waste" name="waste" type="number" min="0" max="100" step="1" value="15" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="price">Price per board foot</label>
+        <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="6" inputmode="decimal"></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Board feet to buy</span><b data-out="buy">—</b></div>
+    <div class="result"><span>Board feet (no waste)</span><b data-out="net">—</b></div>
+    <div class="result"><span>Per board</span><b data-out="each">—</b></div>
+    <div class="result"><span>Linear feet</span><b data-out="linear">—</b></div>
+    <div class="result"><span>Total cost</span><b data-out="cost">—</b></div>
+    <div class="result"><span>Cost per board (no waste)</span><b data-out="costEach">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const lenIn = v.lenUnit === "ft" ? v.length * 12 : v.length;
+  const each = v.thick * v.width * lenIn / 144;
+  const qty = Math.floor(v.qty);
+  const net = each * qty;
+  const buy = net * (1 + v.waste / 100);
+
+  out.set("buy", Calc.num(buy, 2) + " BF");
+  out.set("net", Calc.num(net, 2) + " BF");
+  out.set("each", Calc.num(each, 2) + " BF");
+  out.set("linear", Calc.num(lenIn / 12 * qty, 2) + " ft");
+  out.set("cost", Calc.money(buy * v.price));
+  out.set("costEach", Calc.money(each * v.price));
+  if (v.thick > 0 && v.thick < 1) out.note("Thickness under 1 inch: hardwood is usually billed at the rough thickness (4/4 = 1 in), even if it's surfaced thinner.");
+}));
+</script>
+<!-- article -->
+<h2>What a board foot is</h2>
+<p>A board foot is a unit of wood <em>volume</em>: 144 cubic inches, or a piece 1 inch thick, 12 inches wide and
+12 inches long. Hardwood lumberyards price almost everything this way because boards come in random widths and
+lengths. A board foot lets them charge fairly for a 5-inch-wide board and a 9-inch-wide one without a separate
+price for each.</p>
+
+<h2>The formula</h2>
+<div class="formula">board feet = thickness (in) × width (in) × length (in) ÷ 144<br>
+or: thickness (in) × width (in) × length (ft) ÷ 12<br>
+to buy = board feet × quantity × (1 + waste %)<br>
+cost = board feet to buy × price per board foot</div>
+
+<h2>Example: ten 4/4 oak boards</h2>
+<p>You need ten boards of 4/4 red oak, each 6 inches wide and 8 feet long, at $6.00 per board foot, with a 15%
+waste allowance.</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Per board: 1 × 6 × 96 ÷ 144</td><td>4 BF</td></tr>
+  <tr><td>Ten boards</td><td>40 BF</td></tr>
+  <tr><td>Plus 15% waste</td><td><strong>46 BF</strong></td></tr>
+  <tr><td>Cost: 46 × $6.00</td><td><strong>$276.00</strong></td></tr>
+  <tr><td>Cost per board, before waste</td><td>$24.00</td></tr>
+</table>
+
+<h2>Nominal vs actual lumber sizes</h2>
+<p>The size a board is sold as isn't the size you take home. Hardwood is sold by its <strong>rough</strong>
+thickness in quarter inches, then usually surfaced (planed) smooth. Softwood dimensional lumber is named by its
+size before drying and planing. Board feet are figured on the nominal (rough) numbers, so use those in the
+calculator, but plan your project around the actual dimensions.</p>
+<table>
+  <tr><th>Sold as</th><th>Nominal</th><th>Typical actual (surfaced)</th></tr>
+  <tr><td>4/4 hardwood</td><td>1 in thick</td><td>3/4 to 13/16 in</td></tr>
+  <tr><td>5/4 hardwood</td><td>1 1/4 in</td><td>1 in to 1 1/16 in</td></tr>
+  <tr><td>6/4 hardwood</td><td>1 1/2 in</td><td>1 1/4 to 1 5/16 in</td></tr>
+  <tr><td>8/4 hardwood</td><td>2 in</td><td>1 3/4 in</td></tr>
+  <tr><td>1x6 board</td><td>1 × 6 in</td><td>3/4 × 5 1/2 in</td></tr>
+  <tr><td>2x4</td><td>2 × 4 in</td><td>1 1/2 × 3 1/2 in</td></tr>
+  <tr><td>2x6</td><td>2 × 6 in</td><td>1 1/2 × 5 1/2 in</td></tr>
+  <tr><td>4x4</td><td>4 × 4 in</td><td>3 1/2 × 3 1/2 in</td></tr>
+</table>
+<p>Surfaced thicknesses vary a little between mills. If you buy rough lumber and plane it yourself, expect to
+lose about 3/16 to 1/4 inch of thickness on a 4/4 board.</p>
+
+<h2>Tips for buying hardwood</h2>
+<ul>
+  <li><strong>Buy more than your cut list.</strong> 15% is a minimum for good stock; 25–30% is safer for lower grades or many small parts.</li>
+  <li><strong>Watch the grade.</strong> FAS (firsts and seconds) yields long, clear cuts. Common grades cost less but have more defects to cut around.</li>
+  <li><strong>Confirm how widths are measured.</strong> Rough boards with uneven edges are measured at their usable width; some yards round to the nearest inch.</li>
+  <li><strong>Check thickness for thin parts.</strong> If your project needs 1-inch finished stock, 4/4 won't do. Buy 5/4.</li>
+</ul>

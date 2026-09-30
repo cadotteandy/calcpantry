@@ -1,0 +1,175 @@
+---
+{
+  "title": "Deck Calculator: Deck Boards, Joists and Screws",
+  "description": "Estimate how many deck boards to buy for a deck of any size, with board width, gap and length, plus linear feet, joist count, screws and decking cost.",
+  "h1": "Deck Calculator",
+  "short": "Deck Calculator",
+  "intro": "Enter your deck size, board width, gap and board length to see how many deck boards, joists and screws you need, and what the decking will cost.",
+  "updated": "September 2026",
+  "related": ["fence-calculator", "board-foot-calculator", "concrete-calculator", "gravel-calculator"],
+  "faq": [
+    {"q": "How many deck boards do I need for a 12x16 deck?", "a": "With 5.5 inch boards and a 3/16 inch gap running along the 16 foot side, a 16 by 12 foot deck has 26 rows of boards, or 416 linear feet. With 10 percent waste that is 29 boards 16 feet long. Changing the board length or direction changes the count."},
+    {"q": "How many screws do I need per 100 square feet of deck?", "a": "About 350 screws per 100 square feet for 6 inch boards on joists 16 inches on center, using two screws at every joist. Joists 12 inches apart need about a third more. The calculator counts rows times joists times two, which matches that rule."},
+    {"q": "How big should the gap between deck boards be?", "a": "Composite and PVC boards usually need 3/16 to 1/4 inch between boards, as specified by the manufacturer. Kiln-dried wood is typically gapped about 1/8 inch. Wet pressure-treated lumber is often installed tight, because it shrinks and opens a gap as it dries."},
+    {"q": "What joist spacing do I need?", "a": "16 inches on center is standard for most wood and composite decking laid perpendicular to the joists. Many composite boards require 12 inches for diagonal layouts or for stair treads. Check the decking manufacturer's span rating and your local building code."},
+    {"q": "Are 5/4 deck boards really 1-1/4 inches thick?", "a": "No. Lumber is named by rough size. A 5/4 by 6 pressure-treated deck board is about 1 inch thick and 5.5 inches wide, and a 2 by 6 is 1.5 by 5.5 inches. Composite boards are usually close to 5.5 inches wide as well."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="length">Deck length</label>
+          <div class="input"><input id="length" name="length" type="number" min="0" step="0.1" value="16" inputmode="decimal"><span class="unit">ft</span></div>
+          <div class="hint">The direction the boards run.</div>
+        </div>
+        <div class="field">
+          <label for="depth">Deck depth</label>
+          <div class="input"><input id="depth" name="depth" type="number" min="0" step="0.1" value="12" inputmode="decimal"><span class="unit">ft</span></div>
+          <div class="hint">The direction joists run.</div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="bw">Board width (actual)</label>
+          <div class="input"><input id="bw" name="bw" type="number" min="0.5" step="0.25" value="5.5" inputmode="decimal"><span class="unit">in</span></div>
+          <div class="hint">6 in boards are 5.5 in actual.</div>
+        </div>
+        <div class="field">
+          <label for="gap">Gap between boards</label>
+          <select id="gap" name="gap" data-num>
+            <option value="0">None (wet treated wood)</option>
+            <option value="0.125">1/8 in</option>
+            <option value="0.1875" selected>3/16 in</option>
+            <option value="0.25">1/4 in</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="boardLen">Board length</label>
+          <select id="boardLen" name="boardLen" data-num>
+            <option value="12">12 ft</option>
+            <option value="16" selected>16 ft</option>
+            <option value="20">20 ft</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="spacing">Joist spacing</label>
+          <select id="spacing" name="spacing" data-num>
+            <option value="12">12 in on center</option>
+            <option value="16" selected>16 in on center</option>
+            <option value="24">24 in on center</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="waste">Waste</label>
+          <div class="input"><input id="waste" name="waste" type="number" min="0" step="1" value="10" inputmode="numeric"><span class="unit">%</span></div>
+        </div>
+        <div class="field">
+          <label for="fastener">Fasteners</label>
+          <select id="fastener" name="fastener">
+            <option value="screws" selected>Face screws</option>
+            <option value="clips">Hidden clips</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="price">Decking price per linear foot</label>
+        <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="2" inputmode="decimal"></div>
+        <div class="hint">Treated 5/4×6 about $1.50–$2.50; composite about $3–$6.</div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Deck boards to buy</span><b data-out="boards">—</b></div>
+    <div class="result"><span>Deck area</span><b data-out="area">—</b></div>
+    <div class="result"><span>Rows of boards</span><b data-out="rows">—</b></div>
+    <div class="result"><span>Linear feet (before waste)</span><b data-out="lf">—</b></div>
+    <div class="result"><span>Joists</span><b data-out="joists">—</b></div>
+    <div class="result"><span data-out="fastLabel">Deck screws</span><b data-out="fasteners">—</b></div>
+    <div class="result"><span>Decking cost</span><b data-out="cost">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const area = v.length * v.depth;
+  const course = v.bw + v.gap;                                    // inches per row
+  const rows = course > 0 ? Math.ceil((v.depth * 12) / course - 1e-9) : 0;
+  const lf = rows * v.length;
+  const boards = v.boardLen > 0 ? Math.ceil(lf * (1 + v.waste / 100) / v.boardLen - 1e-9) : 0;
+  const boughtLf = boards * v.boardLen;
+  const joists = v.length > 0 && v.spacing > 0 ? Math.floor((v.length * 12) / v.spacing + 1e-9) + 1 : 0;
+  const crossings = rows * joists;
+  const clips = v.fastener === "clips";
+  const fasteners = clips ? crossings : crossings * 2;
+
+  out.set("boards", `${Calc.num(boards, 0)} × ${Calc.num(v.boardLen, 0)} ft`);
+  out.set("area", `${Calc.num(area, 1)} sq ft`);
+  out.set("rows", Calc.num(rows, 0));
+  out.set("lf", `${Calc.num(lf, 1)} ft`);
+  out.set("joists", `${Calc.num(joists, 0)} × ${Calc.num(v.depth, 1)} ft`);
+  out.set("fastLabel", clips ? "Hidden clips" : "Deck screws");
+  out.set("fasteners", `about ${Calc.num(fasteners, 0)}`);
+  out.set("cost", Calc.money(boughtLf * v.price));
+
+  if (area <= 0) return;
+  out.note(v.length > v.boardLen
+    ? `The deck is longer than one board, so rows need butt joints. Stagger them and land every joint on a joist (use doubled joists or blocking there).`
+    : `Buying ${Calc.num(boughtLf, 0)} linear ft. Joists exclude rim joists, beams and posts; size framing to local code.`);
+}));
+</script>
+<!-- article -->
+<h2>How the deck calculator works</h2>
+<p>Deck boards are laid in rows across the joists, so the count depends on how many rows fit across the deck and how
+long each row is. The calculator divides the deck depth by the board width plus gap to get the number of rows, rounded
+up because the last row is ripped to fit. Rows × deck length gives the linear footage of decking. It then adds your waste
+allowance and divides by the board length you plan to buy.</p>
+<p>Joists are counted across the deck length at your chosen spacing, plus one at the end. Face screws are counted at
+two per board at every joist crossing; hidden clips at one per crossing. At 16 in spacing with 6 in boards, that works
+out to about 350 screws per 100 sq ft, the figure fastener makers quote.</p>
+
+<h2>The formula</h2>
+<div class="formula">rows = depth × 12 ÷ (board width + gap), rounded up<br>
+linear feet = rows × length<br>
+boards = linear feet × (1 + waste %) ÷ board length, rounded up<br>
+joists = length × 12 ÷ joist spacing, rounded down, + 1<br>
+screws = rows × joists × 2 &nbsp;·&nbsp; hidden clips = rows × joists</div>
+
+<h2>Example: a 16 × 12 ft deck</h2>
+<p>Boards run along the 16 ft side. 5.5 in boards, 3/16 in gap, 16 ft boards, joists 16 in on center, 10% waste,
+$2.00 per linear foot.</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Deck area (16 × 12)</td><td>192 sq ft</td></tr>
+  <tr><td>Rows (144 in ÷ 5.6875 in = 25.3)</td><td>26 rows</td></tr>
+  <tr><td>Linear feet (26 × 16)</td><td>416 ft</td></tr>
+  <tr><td><strong>Boards (416 × 1.1 ÷ 16 = 28.6)</strong></td><td><strong>29 × 16 ft</strong></td></tr>
+  <tr><td>Joists (192 in ÷ 16 = 12, + 1)</td><td>13 × 12 ft</td></tr>
+  <tr><td>Deck screws (26 × 13 × 2)</td><td>about 676</td></tr>
+  <tr><td>Decking cost (464 ft × $2.00)</td><td>$928.00</td></tr>
+</table>
+<p>Because the 16 ft deck matches the 16 ft boards, there are no butt joints and the 3 extra boards are spare for
+culls and the ripped last row. Wider decks that need joints usually justify the full 10–15% waste.</p>
+
+<h2>Choosing board length and direction</h2>
+<ul>
+  <li><strong>Match board length to the deck.</strong> Boards a little longer than the deck (for example 16 ft boards
+  on a 15 ft 6 in deck) leave room to trim the ends straight. A deck slightly longer than a board forces joints in
+  every row.</li>
+  <li><strong>Stagger joints.</strong> Where boards must be joined, stagger the joints across at least two joists and
+  use a doubled joist or blocking so each board end has solid support.</li>
+  <li><strong>Picture-frame borders</strong> and diagonal layouts use more material. Diagonal decking typically needs
+  15% waste and often 12 in joist spacing.</li>
+</ul>
+
+<h2>Framing is a separate job</h2>
+<p>This calculator counts decking and joists at a chosen spacing only. It does not size joists, beams, ledgers,
+posts or footings, which depend on spans, loads, soil, frost depth and your local building code. Most decks need a
+permit, and elevated decks must be designed to code. Treat these numbers as a shopping estimate, not structural advice.</p>

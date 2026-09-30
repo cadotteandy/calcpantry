@@ -1,0 +1,154 @@
+---
+{
+  "title": "Dog Water Intake Calculator: How Much Per Day?",
+  "description": "Find out how much water your dog should drink a day in ounces, cups and ml, adjusted for weight, activity, hot weather and wet or dry food, plus warning signs.",
+  "h1": "Dog Water Intake Calculator",
+  "short": "Dog Water Calculator",
+  "intro": "Enter your dog's weight, activity level, the weather and what they eat to see roughly how much water they should drink each day, a normal range and when intake is worth a vet visit.",
+  "related": ["dog-food-calculator", "puppy-weight-calculator", "dog-age-calculator", "pet-cost-calculator"],
+  "faq": [
+    {"q": "How much water should a dog drink a day?", "a": "The usual rule of thumb is about 1 fluid ounce per pound of body weight per day, or roughly 50 to 65 ml per kg. A 30 lb dog on dry food needs about 30 oz, a little under 4 cups. Activity, heat and diet can push that up or down."},
+    {"q": "Why does my dog drink less on wet food?", "a": "Canned and fresh foods are about 70 to 80% water, while kibble is only about 10%. A dog eating mostly wet food gets a large share of its daily water from meals, so it may drink noticeably less from the bowl and still be well hydrated."},
+    {"q": "How much water is too much for a dog?", "a": "Veterinary references generally treat a total intake above about 100 ml per kg per day (roughly 1.5 oz per lb) as excessive thirst, called polydipsia. If your dog consistently drinks that much without heat or exercise to explain it, see your vet, because it can be an early sign of kidney disease, diabetes, Cushing's disease or infection."},
+    {"q": "How can I tell if my dog is dehydrated?", "a": "Check for dry or sticky gums, thick saliva, sunken eyes, lethargy and skin that is slow to spring back when you gently lift it at the shoulders. Mild cases may improve with small, frequent drinks; vomiting, diarrhea or refusal to drink need a vet promptly."},
+    {"q": "How do I measure how much my dog drinks?", "a": "Fill the bowl with a measured amount each morning, top up from a measuring jug and note every refill, then measure what is left the next morning. Do it for two or three days and average the results, and remember to account for spills and other water sources."},
+    {"q": "Should I limit my dog's water?", "a": "No, not unless your vet tells you to. Healthy dogs regulate their own intake, so fresh water should always be available. A few vets suggest picking up the bowl an hour or two before bed during house training, but never restrict water for a dog that is unwell."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="weight">Dog's weight</label>
+          <div class="input"><input id="weight" name="weight" type="number" min="0" step="0.1" value="30" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="unit">Unit</label>
+          <select id="unit" name="unit">
+            <option value="lb" selected>lb</option>
+            <option value="kg">kg</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="activity">Activity level</label>
+        <select id="activity" name="activity">
+          <option value="0.8">Low: senior or mostly resting</option>
+          <option value="1" selected>Moderate: daily walks and play</option>
+          <option value="1.25">High: runs, hikes, long play sessions</option>
+          <option value="1.5">Working or sporting dog</option>
+        </select>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="weather">Weather</label>
+          <select id="weather" name="weather">
+            <option value="0.9">Cool</option>
+            <option value="1" selected>Mild</option>
+            <option value="1.3">Hot or humid</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="diet">Main diet</label>
+          <select id="diet" name="diet">
+            <option value="1" selected>Dry kibble</option>
+            <option value="0.8">Mixed wet &amp; dry</option>
+            <option value="0.6">Wet, canned or raw</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Water to drink per day</span><b data-out="oz">—</b></div>
+    <div class="result"><span>In cups</span><b data-out="cups">—</b></div>
+    <div class="result"><span>In millilitres</span><b data-out="ml">—</b></div>
+    <div class="result"><span>Normal day-to-day range</span><b data-out="range">—</b></div>
+    <div class="result" data-show="food" hidden><span>Total need incl. water in food</span><b data-out="total">—</b></div>
+    <div class="result"><span>See a vet if regularly over</span><b data-out="high">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const OZ_ML = 29.5735;
+  const lb = v.unit === "kg" ? v.weight / 0.45359237 : v.weight;
+  const kg = lb * 0.45359237;
+  const activity = parseFloat(v.activity) || 1;
+  const weather = parseFloat(v.weather) || 1;
+  const diet = parseFloat(v.diet) || 1;   // share of total water that comes from the bowl
+
+  const totalOz = lb * 1.0 * activity * weather;   // rule of thumb: 1 fl oz per lb per day
+  const drinkOz = totalOz * diet;
+  const highOz = (kg * 100 / OZ_ML) * diet;        // polydipsia: > 100 ml/kg/day total intake
+  const fmt = (oz) => Calc.num(oz, oz < 20 ? 1 : 0);
+
+  out.set("oz", lb > 0 ? `${fmt(drinkOz)} fl oz` : "—");
+  out.set("cups", lb > 0 ? `${Calc.num(drinkOz / 8, 2)} cups` : "—");
+  out.set("ml", lb > 0 ? `${Calc.num(drinkOz * OZ_ML, 0)} ml` : "—");
+  out.set("range", lb > 0 ? `${fmt(drinkOz * 0.8)} – ${fmt(drinkOz * 1.2)} fl oz` : "—");
+  out.show("food", diet < 1);
+  out.set("total", `${fmt(totalOz)} fl oz`);
+  out.set("high", lb > 0 ? `${fmt(highOz)} fl oz (${Calc.num(highOz * OZ_ML, 0)} ml)` : "—");
+
+  if (lb > 0) out.note(weather > 1 || activity > 1
+    ? "Heat and exercise can raise needs well beyond this. Offer water before, during and after activity, and watch for heavy panting, drooling or weakness, which can signal heatstroke."
+    : "A starting estimate. Puppies, pregnant or nursing dogs and dogs on some medications drink more. A sudden change in thirst either way is worth a call to your vet.");
+}));
+</script>
+<!-- article -->
+<h2>How much water does a dog need?</h2>
+<p>The rule of thumb most vets use is about <strong>1 fluid ounce of water per pound of body weight per day</strong>. In
+metric that is roughly 65 ml per kg, and published guidance for healthy adult dogs at rest runs from about 50 to 65 ml
+per kg. Some sources give a wider range of ½ to 1 oz per pound, because a relaxed dog in a cool house needs less than
+an active dog in summer.</p>
+<p>That figure is a dog's <strong>total</strong> water need, and not all of it comes from the bowl. Dry kibble is only
+around 10% moisture, but canned and fresh foods are 70–80% water. A dog on an all-wet diet can get a large share of its
+water from meals and drink much less, so this calculator reduces the bowl amount for mixed and wet diets.</p>
+
+<h2>The formula</h2>
+<div class="formula">total need (fl oz) = weight in lb × 1 × activity factor × weather factor<br>
+water to drink = total need × diet factor<br>
+activity: low 0.8 · moderate 1.0 · high 1.25 · working 1.5<br>
+weather: cool 0.9 · mild 1.0 · hot 1.3 &nbsp; diet: dry 1.0 · mixed 0.8 · wet 0.6<br>
+cups = fl oz ÷ 8 &nbsp; ml = fl oz × 29.57<br>
+vet threshold = 100 ml × weight in kg × diet factor</div>
+<p>The adjustment factors are practical estimates, not lab measurements; real dogs vary, which is why the result comes
+with a ±20% day-to-day range.</p>
+
+<h2>Example: a 30 lb dog on kibble</h2>
+<p>A 30 lb (13.6 kg) dog with moderate activity, mild weather and a dry kibble diet:</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>30 lb × 1 oz × 1.0 × 1.0</td><td>30 fl oz total</td></tr>
+  <tr><td>Diet factor, dry kibble (× 1.0)</td><td><strong>30 fl oz to drink</strong></td></tr>
+  <tr><td>In cups (÷ 8)</td><td>3.75 cups</td></tr>
+  <tr><td>In millilitres (× 29.57)</td><td>887 ml</td></tr>
+  <tr><td>Normal range (±20%)</td><td>24 – 36 fl oz</td></tr>
+  <tr><td>Vet check if regularly over (100 ml × 13.6 kg)</td><td>46 fl oz (1,361 ml)</td></tr>
+</table>
+<p>Switch the same dog to hot weather and the target rises to 39 fl oz; switch to a wet diet in mild weather and the bowl
+amount drops to 18 fl oz, because the food supplies much of the rest.</p>
+
+<h2>Warning signs to watch for</h2>
+<h3>Drinking too much</h3>
+<p>Excessive thirst (polydipsia) is usually defined as more than about <strong>100 ml per kg per day</strong>, roughly
+1.5 oz per pound. Emptying the bowl far more often than usual, needing to go out at night or having accidents in a
+house-trained dog are common clues. Increased thirst can be an early sign of kidney disease, diabetes, Cushing's disease,
+liver disease, a urinary or uterine infection (pyometra in unspayed females), or a side effect of drugs such as steroids.
+Don't cut back the water; book a vet visit and bring a urine sample if you can.</p>
+<h3>Drinking too little</h3>
+<p>Watch for dry or tacky gums, thick saliva, sunken eyes, lethargy, dark urine and skin that is slow to spring back when
+lifted at the shoulders. A dog that refuses water for a day, or is also vomiting or has diarrhea, needs a vet promptly.</p>
+
+<h2>Practical tips</h2>
+<ul>
+  <li><strong>Measure before you worry.</strong> Pour a measured amount into the bowl each morning, log refills and measure what is left after 24 hours. Average two or three days.</li>
+  <li><strong>Never restrict water</strong> for a healthy dog unless your vet asks you to. Keep fresh water available at all times.</li>
+  <li><strong>Carry water on outings.</strong> On hot days and long walks, offer small drinks every 15–20 minutes rather than letting your dog gulp a huge amount at the end.</li>
+  <li><strong>Encourage reluctant drinkers</strong> with a clean bowl changed daily, a pet fountain, or a splash of water mixed into kibble.</li>
+</ul>
+<p><em>This calculator is an educational estimate, not veterinary advice. Ask your vet about your dog's specific needs, especially for puppies, seniors and dogs with a medical condition.</em></p>

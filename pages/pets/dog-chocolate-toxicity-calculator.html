@@ -1,0 +1,169 @@
+---
+{
+  "title": "Dog Chocolate Toxicity Calculator: Risk by Weight",
+  "description": "Estimate how dangerous the chocolate your dog ate may be, using the dog's weight, chocolate type and amount. Always call your vet or pet poison control too.",
+  "h1": "Dog Chocolate Toxicity Calculator",
+  "short": "Chocolate Toxicity Calculator",
+  "intro": "If your dog ate chocolate, call your vet or a pet poison hotline now. This calculator estimates the toxic dose from your dog's weight, the type of chocolate and how much was eaten.",
+  "updated": "September 2026",
+  "related": ["dog-food-calculator", "dog-age-calculator", "puppy-weight-calculator", "dog-pregnancy-calculator"],
+  "faq": [
+    {"q": "How much chocolate is toxic to a dog?", "a": "It depends on the dog's weight and the type of chocolate. Mild signs can appear at about 20 mg of theobromine and caffeine per kg of body weight, heart effects at 40 to 50 mg/kg, and seizures at 60 mg/kg or more. For a 20 lb dog, that first threshold is about 2.8 oz of milk chocolate but only about 1.1 oz of semi-sweet chocolate and a quarter ounce of cocoa powder."},
+    {"q": "What should I do if my dog ate chocolate?", "a": "Call your veterinarian, an emergency vet, the ASPCA Animal Poison Control Center at (888) 426-4435 or the Pet Poison Helpline at (855) 764-7661 right away, even if the amount seems small. Have your dog's weight, the product and its wrapper, and the amount and time eaten ready. Do not try to make your dog vomit unless a vet tells you to."},
+    {"q": "How long after eating chocolate will a dog show symptoms?", "a": "Signs usually appear within about 6 to 12 hours and can last up to 72 hours, because dogs clear theobromine slowly. A dog that seems fine an hour later may still become ill, which is why early vet advice matters: treatment works best before signs start."},
+    {"q": "Which chocolate is most dangerous for dogs?", "a": "The darker and more bitter, the more dangerous. Cocoa powder and unsweetened baking chocolate are the most toxic, followed by dark and semi-sweet chocolate. Milk chocolate is less concentrated, and white chocolate contains almost no theobromine, though its fat and sugar can still cause stomach upset or pancreatitis."},
+    {"q": "Is cocoa bean mulch dangerous for dogs?", "a": "Yes. Mulch made from cocoa bean hulls smells like chocolate, attracts dogs and contains theobromine. If your dog has access to your garden, choose a different mulch."},
+    {"q": "Can a dog die from eating chocolate?", "a": "Yes, although it is uncommon with prompt treatment. According to the Merck Veterinary Manual, about 1 oz of milk chocolate per pound of body weight is potentially lethal, and far smaller amounts of baking chocolate or cocoa powder can cause severe poisoning."}
+  ]
+}
+---
+<div class="calc-card">
+  <div style="grid-column: 1 / -1; border: 2px solid var(--neg); border-radius: 12px; padding: 14px 16px;">
+    <p style="margin: 0 0 6px; font-weight: 700; color: var(--neg);">If your dog ate chocolate, call a vet now, even if this says the risk is low.</p>
+    <p style="margin: 0; font-size: 15px;">Call your veterinarian or nearest emergency vet, or a 24/7 pet poison hotline:
+    <strong>ASPCA Animal Poison Control <a href="tel:+18884264435">(888) 426-4435</a></strong> or
+    <strong>Pet Poison Helpline <a href="tel:+18557647661">(855) 764-7661</a></strong> (fees may apply).
+    Do not try to make your dog vomit at home unless a vet tells you to. This tool is not a substitute for professional advice.</p>
+  </div>
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="weight">Dog's weight</label>
+          <div class="input"><input id="weight" name="weight" type="number" min="0" step="0.1" value="20" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="wUnit">Unit</label>
+          <select id="wUnit" name="wUnit">
+            <option value="lb">lb</option>
+            <option value="kg">kg</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="type">Type of chocolate</label>
+        <select id="type" name="type" data-num>
+          <option value="1.1">White chocolate (~1 mg/oz)</option>
+          <option value="64" selected>Milk chocolate (~64 mg/oz)</option>
+          <option value="160">Semi-sweet chips or sweet dark, under 70% (~160 mg/oz)</option>
+          <option value="308">Dark chocolate, 70% cocoa (~308 mg/oz)</option>
+          <option value="374">Extra dark, 85% cocoa (~374 mg/oz)</option>
+          <option value="440">Unsweetened baker's chocolate (~440 mg/oz)</option>
+          <option value="807">Dry cocoa powder (~807 mg/oz)</option>
+          <option value="255">Cocoa bean hull mulch (~255 mg/oz)</option>
+        </select>
+        <div class="hint">mg of theobromine + caffeine per ounce. Unsure? Pick the darker option.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="amount">Amount eaten</label>
+          <div class="input"><input id="amount" name="amount" type="number" min="0" step="0.1" value="3" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="aUnit">Unit</label>
+          <select id="aUnit" name="aUnit">
+            <option value="oz">oz</option>
+            <option value="g">grams</option>
+          </select>
+        </div>
+      </div>
+      <div class="hint">Check the wrapper for the weight. A standard milk chocolate bar is about 1.5 oz (43 g). Assume the most your dog could have eaten.</div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Estimated risk</span><b data-out="risk">—</b></div>
+    <div class="result"><span>Dose</span><b data-out="dose">—</b></div>
+    <div class="result"><span>Total theobromine + caffeine</span><b data-out="mg">—</b></div>
+    <div class="result"><span>Amount for mild signs (20 mg/kg)</span><b data-out="mild">—</b></div>
+    <div class="result"><span>Amount for seizure risk (60 mg/kg)</span><b data-out="seize">—</b></div>
+    <p class="note" data-note hidden></p>
+    <p class="note"><strong>Whatever the result, call your vet or poison control. Individual dogs vary and treatment works best early.</strong></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const kg = v.wUnit === "kg" ? v.weight : v.weight * 0.45359237;
+  const mgPerOz = v.type;                                   // Merck Veterinary Manual figures
+  const oz = v.aUnit === "g" ? v.amount / 28.349523 : v.amount;
+  const mg = oz * mgPerOz;
+  const dose = kg > 0 ? mg / kg : NaN;                      // mg of methylxanthines per kg
+
+  let risk, signs;
+  if (!isFinite(dose)) { risk = "—"; }
+  else if (dose < 20) { risk = "Lower risk"; signs = "Below the ~20 mg/kg level linked to signs, but upset stomach from fat and sugar is still possible, and sensitive dogs can react to less."; }
+  else if (dose < 40) { risk = "Moderate risk"; signs = "Mild to moderate signs are likely: vomiting, diarrhea, thirst, restlessness, panting."; }
+  else if (dose < 60) { risk = "High risk"; signs = "Heart effects are possible at this dose: racing or irregular heartbeat, tremors, high blood pressure. Get veterinary care now."; }
+  else { risk = "Severe risk"; signs = "Seizures and life-threatening heart rhythm problems are possible at this dose. Go to a vet or emergency clinic immediately."; }
+
+  const fmtAmt = (targetMg) => {
+    const o = targetMg / mgPerOz;
+    return v.aUnit === "g" ? Calc.num(o * 28.349523, 0) + " g" : Calc.num(o, 2) + " oz";
+  };
+  out.set("risk", risk, isFinite(dose) && dose >= 20 ? "neg" : "");
+  out.set("dose", Calc.num(dose, 1) + " mg/kg");
+  out.set("mg", Calc.num(mg, 0) + " mg");
+  out.set("mild", kg > 0 ? fmtAmt(20 * kg) : "—");
+  out.set("seize", kg > 0 ? fmtAmt(60 * kg) : "—");
+  if (signs) out.note(signs + " Signs usually start within 6–12 hours and can last up to 3 days.");
+}));
+</script>
+<!-- article -->
+<h2>Why chocolate is dangerous for dogs</h2>
+<p>Chocolate contains two related stimulants, <strong>theobromine</strong> and <strong>caffeine</strong>, known together as
+methylxanthines. Dogs break down theobromine far more slowly than people do, so it builds up and overstimulates the heart
+and nervous system. The darker and less sweet the chocolate, the more of these compounds it contains per ounce. That is
+why a few squares of baking chocolate can be more dangerous than a whole milk chocolate bar.</p>
+<p>This calculator follows the approach in the <strong>Merck Veterinary Manual</strong>: add up the total methylxanthines
+eaten, divide by the dog's weight in kilograms, and compare the dose with published thresholds. It is a rough guide
+to help you describe the situation to a vet, not a diagnosis.</p>
+
+<h2>The formula</h2>
+<div class="formula">dog weight in kg = weight in lb × 0.4536<br>
+amount in oz = grams ÷ 28.35<br>
+total mg = amount in oz × mg per oz for that chocolate<br>
+dose (mg/kg) = total mg ÷ dog weight in kg</div>
+
+<h3>Methylxanthine content and thresholds</h3>
+<table>
+  <tr><th>Chocolate type</th><th>Theobromine + caffeine</th></tr>
+  <tr><td>Dry cocoa powder</td><td>~807 mg/oz (28.5 mg/g)</td></tr>
+  <tr><td>Unsweetened baker's chocolate</td><td>~440 mg/oz (15.5 mg/g)</td></tr>
+  <tr><td>Dark chocolate, 70% / 85% cocoa</td><td>~308 / ~374 mg/oz</td></tr>
+  <tr><td>Cocoa bean hulls (mulch)</td><td>~255 mg/oz (9 mg/g)</td></tr>
+  <tr><td>Semi-sweet and sweet dark</td><td>~150–160 mg/oz</td></tr>
+  <tr><td>Milk chocolate</td><td>~64 mg/oz (2.3 mg/g)</td></tr>
+  <tr><td>White chocolate</td><td>~1.1 mg/oz</td></tr>
+</table>
+<p>Dark chocolate figures scale baker's chocolate by the cocoa percentage on the label, the method the Merck Veterinary
+Manual describes. Real products vary, so round up when unsure.</p>
+<table>
+  <tr><th>Dose</th><th>What may happen</th></tr>
+  <tr><td>About 20 mg/kg</td><td>Mild signs: vomiting, diarrhea, increased thirst, restlessness</td></tr>
+  <tr><td>40–50 mg/kg</td><td>Heart effects: fast or irregular heartbeat, tremors</td></tr>
+  <tr><td>60 mg/kg or more</td><td>Seizures; potentially fatal</td></tr>
+</table>
+
+<h2>Example: a 20 lb dog eats 3 oz of milk chocolate</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Dog weight = 20 × 0.4536</td><td>9.07 kg</td></tr>
+  <tr><td>Total = 3 oz × 64 mg/oz</td><td>192 mg</td></tr>
+  <tr><td>Dose = 192 ÷ 9.07</td><td>21.2 mg/kg</td></tr>
+  <tr><td><strong>Estimated risk</strong></td><td><strong>Moderate risk</strong> (above 20 mg/kg)</td></tr>
+  <tr><td>Amount reaching 20 mg/kg</td><td>2.83 oz</td></tr>
+  <tr><td>Amount reaching 60 mg/kg</td><td>8.5 oz</td></tr>
+</table>
+<p>The same 3 oz of semi-sweet chips would be about 53 mg/kg, in the range where heart effects are possible.</p>
+
+<h2>What to do right now</h2>
+<ul>
+  <li><strong>Call first.</strong> Your vet, an emergency clinic, ASPCA Animal Poison Control at (888) 426-4435 or the Pet Poison Helpline at (855) 764-7661. Both hotlines are staffed 24/7 and charge a consultation fee.</li>
+  <li><strong>Have details ready:</strong> your dog's weight, the product (keep the wrapper), how much is missing and roughly when it was eaten.</li>
+  <li><strong>Don't induce vomiting at home</strong> unless a vet specifically tells you to. Home remedies such as salt or hydrogen peroxide can cause serious harm, and vets use safer drugs.</li>
+  <li><strong>Don't wait for symptoms.</strong> Signs often take hours to appear, and treatment is simpler and more effective early.</li>
+  <li><strong>Watch for other hazards</strong> in the same treat: raisins, macadamia nuts, xylitol (a sweetener in some sugar-free products) and wrappers can all cause separate problems.</li>
+</ul>
+<p>Some dogs are more sensitive than the thresholds suggest, including dogs with heart disease, seniors and very small dogs,
+and a high-fat binge can trigger pancreatitis even when theobromine is low.</p>
+<p><em>This calculator is for general information and is not veterinary advice. It cannot assess your dog. Always contact a veterinarian or pet poison control after any chocolate ingestion.</em></p>

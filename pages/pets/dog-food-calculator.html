@@ -1,0 +1,174 @@
+---
+{
+  "title": "Dog Food Calculator: Calories & Cups Per Day",
+  "description": "Work out how many calories and cups of food your dog needs per day from weight and life stage, plus cups per meal and how long a bag will last.",
+  "h1": "Dog Food Calculator",
+  "short": "Dog Food Calculator",
+  "intro": "Enter your dog's weight, life stage and the calorie count on the food bag to get a daily calorie target, cups per day and per meal, and how long a bag lasts.",
+  "updated": "September 2026",
+  "related": ["cat-age-calculator", "aquarium-stocking-calculator", "side-hustle-tax-calculator", "coffee-ratio-calculator"],
+  "faq": [
+    {"q": "How many cups of food should my dog eat a day?", "a": "It depends on weight, life stage and how calorie-dense the food is. A 30 lb neutered adult needs roughly 790 calories a day, which is about 2.25 cups of a 350 kcal/cup kibble. A richer food means fewer cups, so always convert from calories rather than copying someone else's cup count."},
+    {"q": "Where do I find kcal per cup on dog food?", "a": "In the US, the calorie statement is printed on the bag or can, usually near the guaranteed analysis, as kcal/kg and kcal per cup or per can. Most dry foods fall between about 325 and 450 kcal per cup. If it is not on the label, check the brand's website."},
+    {"q": "Is the feeding chart on the bag accurate?", "a": "Bag charts are a reasonable starting range, but they are written to cover active, intact dogs and often overshoot for neutered or indoor dogs. Use the label or this calculator as a starting point, then adjust by 10% up or down based on your dog's body condition over a few weeks."},
+    {"q": "How much should I feed my dog to lose weight?", "a": "A common veterinary starting point is 1.0 times the resting energy requirement calculated at the dog's target weight, not its current weight. Enter the goal weight and choose the weight loss option, and work with your vet so the loss stays around 1-2% of body weight per week."},
+    {"q": "How many times a day should I feed my dog?", "a": "Most adult dogs do well on two meals a day. Young puppies usually eat three or four smaller meals. Splitting the daily amount does not change the total calories, only the portion size."},
+    {"q": "Do treats count toward daily calories?", "a": "Yes. Keep treats to about 10% of daily calories and reduce meals to match. For a dog that needs 800 kcal, that is roughly 80 kcal of treats per day."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="weight">Dog's weight</label>
+          <div class="input"><input id="weight" name="weight" type="number" min="0" step="0.1" value="30" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="unit">Unit</label>
+          <select id="unit" name="unit">
+            <option value="lb">lb</option>
+            <option value="kg">kg</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="stage">Life stage &amp; activity</label>
+        <select id="stage" name="stage">
+          <option value="3.0">Puppy, under 4 months (3.0 × RER)</option>
+          <option value="2.0">Puppy, 4 months to adult (2.0 × RER)</option>
+          <option value="1.6" selected>Neutered / spayed adult (1.6 × RER)</option>
+          <option value="1.8">Intact adult (1.8 × RER)</option>
+          <option value="1.4">Less active or senior (1.4 × RER)</option>
+          <option value="1.0">Weight loss (1.0 × RER at goal weight)</option>
+          <option value="2.0w">Active or light work (2.0 × RER)</option>
+          <option value="3.0w">Working dog, moderate work (3.0 × RER)</option>
+        </select>
+        <div class="hint" data-show="loss" hidden>For weight loss, enter your dog's goal weight above, not current weight.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="kcalCup">Food calories per cup</label>
+          <div class="input"><input id="kcalCup" name="kcalCup" type="number" min="1" step="1" value="350" inputmode="decimal"><span class="unit">kcal</span></div>
+        </div>
+        <div class="field">
+          <label for="meals">Meals per day</label>
+          <select id="meals" name="meals" data-num>
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="kcalKg">Food calories per kg</label>
+          <div class="input"><input id="kcalKg" name="kcalKg" type="number" min="0" step="10" value="3600" inputmode="decimal"><span class="unit">kcal/kg</span></div>
+          <div class="hint">From the label; used for the bag estimate.</div>
+        </div>
+        <div class="field">
+          <label for="bagLb">Bag size</label>
+          <div class="input"><input id="bagLb" name="bagLb" type="number" min="0" step="0.5" value="30" inputmode="decimal"><span class="unit">lb</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="bagPrice">Bag price (optional)</label>
+        <div class="input"><span class="unit pre">$</span><input id="bagPrice" name="bagPrice" type="number" min="0" step="0.01" value="60" inputmode="decimal"></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Daily calories</span><b data-out="mer">—</b></div>
+    <div class="result"><span>Cups per day</span><b data-out="cups">—</b></div>
+    <div class="result"><span>Cups per meal</span><b data-out="perMeal">—</b></div>
+    <div class="result"><span>Resting energy (RER)</span><b data-out="rer">—</b></div>
+    <div class="result"><span>One bag lasts</span><b data-out="days">—</b></div>
+    <div class="result"><span>Bags per month</span><b data-out="bags">—</b></div>
+    <div class="result" data-show="cost" hidden><span>Food cost per month</span><b data-out="cost">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const kg = v.unit === "kg" ? v.weight : v.weight * 0.45359237;
+  const factor = parseFloat(v.stage);
+  out.show("loss", v.stage === "1.0");
+
+  const rer = kg > 0 ? 70 * Math.pow(kg, 0.75) : 0;   // resting energy requirement, kcal/day
+  const mer = rer * factor;                            // daily energy requirement
+  const cups = v.kcalCup > 0 ? mer / v.kcalCup : NaN;
+  const meals = v.meals || 2;
+
+  const bagKcal = v.bagLb * 0.45359237 * v.kcalKg;
+  const days = mer > 0 && bagKcal > 0 ? bagKcal / mer : NaN;
+  const bags = days > 0 ? 30.4 / days : NaN;           // 30.4 = average days per month
+
+  out.set("mer", Calc.num(mer, 0) + " kcal");
+  out.set("cups", Calc.num(cups, 2) + " cups");
+  out.set("perMeal", Calc.num(cups / meals, 2) + " cups");
+  out.set("rer", Calc.num(rer, 0) + " kcal");
+  out.set("days", isFinite(days) ? Calc.num(days, 0) + " days" : "—");
+  out.set("bags", Calc.num(bags, 2));
+  out.show("cost", v.bagPrice > 0);
+  out.set("cost", Calc.money(bags * v.bagPrice));
+  if (mer > 0) out.note(`Starting estimate only. Weigh your dog every 2–4 weeks and adjust portions by about 10% to hold an ideal body condition. Treats count: keep them near ${Calc.num(mer * 0.1, 0)} kcal a day.`);
+}));
+</script>
+<!-- article -->
+<h2>How this dog food calculator works</h2>
+<p>Vets estimate a dog's calorie needs in two steps. First they calculate the <strong>resting energy requirement (RER)</strong>,
+the calories a dog burns lying still in a comfortable room. Then they multiply it by a <strong>life stage factor</strong> to get
+the <strong>daily energy requirement</strong>, sometimes called maintenance energy requirement (MER). This is the approach used in
+the WSAVA Global Nutrition Committee toolkit and the AAHA nutrition guidelines.</p>
+<p>Once you know calories, the cups are just division: calories per day divided by the kcal per cup printed on your food.
+That's why this calculator asks for the label value instead of assuming a "standard" cup. Dry foods range from about
+300 to over 450 kcal per cup, so the same dog can need 1.8 cups of one food and 2.6 cups of another.</p>
+
+<h2>The formula</h2>
+<div class="formula">weight in kg = weight in lb × 0.4536<br>
+RER = 70 × (weight in kg)<sup>0.75</sup><br>
+daily calories = RER × life stage factor<br>
+cups per day = daily calories ÷ kcal per cup<br>
+days per bag = (bag lb × 0.4536 × kcal per kg) ÷ daily calories</div>
+
+<h3>Life stage factors used</h3>
+<table>
+  <tr><th>Dog</th><th>Factor × RER</th></tr>
+  <tr><td>Puppy under 4 months</td><td>3.0</td></tr>
+  <tr><td>Puppy 4 months to adult size</td><td>2.0</td></tr>
+  <tr><td>Neutered or spayed adult</td><td>1.6</td></tr>
+  <tr><td>Intact adult</td><td>1.8</td></tr>
+  <tr><td>Less active, senior or weight-gain prone</td><td>1.4</td></tr>
+  <tr><td>Weight loss (at goal weight)</td><td>1.0</td></tr>
+  <tr><td>Active or light work</td><td>2.0</td></tr>
+  <tr><td>Moderate work</td><td>3.0</td></tr>
+</table>
+<p>These are the commonly published textbook factors. Heavy working dogs such as sled dogs can need 4 to 8 times RER,
+which is beyond what a general calculator should guess at.</p>
+
+<h2>Example: a 30 lb neutered adult</h2>
+<p>A 30 lb (13.6 kg) spayed dog eating a kibble with 350 kcal per cup and 3,600 kcal per kg, fed twice a day from a $60, 30 lb bag:</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>RER = 70 × 13.61<sup>0.75</sup></td><td>496 kcal</td></tr>
+  <tr><td>Daily calories = 496 × 1.6</td><td><strong>794 kcal</strong></td></tr>
+  <tr><td>Cups per day = 794 ÷ 350</td><td>2.27 cups</td></tr>
+  <tr><td>Cups per meal (2 meals)</td><td>1.13 cups</td></tr>
+  <tr><td>Bag calories = 30 × 0.4536 × 3,600</td><td>48,988 kcal</td></tr>
+  <tr><td>One bag lasts</td><td>62 days</td></tr>
+  <tr><td>Bags per month / cost per month</td><td>0.49 bags / $29.55</td></tr>
+</table>
+<p>In practice, 2.27 cups is "a generous 2¼ cups a day," or a bit over 1 cup per meal.</p>
+
+<h2>Tips for getting portions right</h2>
+<ul>
+  <li><strong>Use a real measuring cup, or better, a scale.</strong> A "cup" scooped with a coffee mug can be 30% more than a standard 8 oz cup. Weighing grams is the most accurate method.</li>
+  <li><strong>Judge by body condition, not the number.</strong> You should be able to feel the ribs easily under a thin layer of fat and see a waist from above. If not, cut portions by 10% and recheck in 2–4 weeks.</li>
+  <li><strong>Individual dogs vary a lot.</strong> Two dogs of the same weight can differ in needs by 20–30% or more. Treat the result as a starting point.</li>
+  <li><strong>Count treats and chews.</strong> Keep them to about 10% of daily calories and trim meals to match.</li>
+  <li><strong>Puppies change fast.</strong> Recalculate every couple of weeks as they grow, and use their current weight.</li>
+</ul>
+<p><em>This calculator is an educational estimate, not veterinary advice. Check your food's label and ask your vet, especially for puppies, pregnant or nursing dogs, seniors, or dogs with a medical condition.</em></p>

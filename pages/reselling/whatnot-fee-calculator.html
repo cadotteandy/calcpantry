@@ -1,0 +1,159 @@
+---
+{
+  "title": "Whatnot Fee Calculator 2026: Commission & Profit",
+  "description": "Calculate Whatnot's 8% commission and 2.9% + $0.30 processing fee, your payout and profit per sale. Supports custom rates for the new volume tiers.",
+  "h1": "Whatnot Fee Calculator",
+  "short": "Whatnot Fee Calculator",
+  "intro": "Enter what an item sold for on Whatnot, the shipping and tax the buyer paid, and your costs to see the fees, your payout and your real profit.",
+  "updated": "September 2026",
+  "related": ["ebay-fee-calculator", "tiktok-shop-fee-calculator", "mercari-fee-calculator", "flip-profit-calculator"],
+  "faq": [
+    {"q": "How much does Whatnot take from a sale in 2026?", "a": "In most US categories Whatnot charges an 8% commission on the sale price plus a payment processing fee of 2.9% + $0.30 on the total the buyer pays. On a $50 sale with $8 shipping and no tax, that's $5.98, or about 12% of the sale price."},
+    {"q": "Does Whatnot charge commission on shipping and tax?", "a": "No. Whatnot's commission is calculated on the item's sale price only. Shipping and sales tax are excluded from commission, but they are included in the 2.9% + $0.30 payment processing fee."},
+    {"q": "What are Whatnot's new commission tiers?", "a": "Since September 21, 2026, your sales over a four-week period set your commission rate for the next period. Sellers under $15,000 in four-week sales stay at the standard 8% in most US categories. Rates step down as volume grows, reaching 4% to 6.5% (depending on category) at $500,000. Pick Custom above and enter the rate shown in your seller dashboard."},
+    {"q": "Is there a lower commission on expensive items?", "a": "In select categories, Whatnot charges 0% commission on the portion of a single sale above $1,500. Payment processing still applies to the full order. Check the High-value box above if your category qualifies."},
+    {"q": "Does the seller pay for shipping on Whatnot?", "a": "Usually not. Buyers pay shipping at checkout and Whatnot uses it to generate your label. You only cover shipping if you run free or discounted shipping, which you can enter in the calculator."},
+    {"q": "Is Whatnot cheaper than eBay?", "a": "Usually. At the standard 8% plus processing, Whatnot takes about 11% to 12% of a typical sale, versus eBay's 13.6% plus $0.40 on most categories, which eBay also charges on shipping and tax."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="price">Sold price</label>
+        <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="50" inputmode="decimal"></div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="shipCharged">Shipping buyer pays</label>
+          <div class="input"><span class="unit pre">$</span><input id="shipCharged" name="shipCharged" type="number" min="0" step="0.01" value="8" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="taxRate">Buyer's sales tax</label>
+          <div class="input"><input id="taxRate" name="taxRate" type="number" min="0" max="15" step="0.1" value="0" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="tier">Commission rate</label>
+        <select id="tier" name="tier">
+          <option value="8">Standard (8%, under $15k per 4 weeks)</option>
+          <option value="custom">Custom / my tier rate…</option>
+        </select>
+      </div>
+      <div class="field" data-show="custom" hidden>
+        <label for="customRate">Your commission rate</label>
+        <div class="input"><input id="customRate" name="customRate" type="number" min="0" max="20" step="0.1" value="7" inputmode="decimal"><span class="unit">%</span></div>
+        <div class="hint">Shown in your Whatnot seller dashboard. Rates now vary by sales tier and category.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="itemCost">Item cost</label>
+          <div class="input"><span class="unit pre">$</span><input id="itemCost" name="itemCost" type="number" min="0" step="0.01" value="15" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="shipCover">Shipping you cover</label>
+          <div class="input"><span class="unit pre">$</span><input id="shipCover" name="shipCover" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div>
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" name="highValue"> High-value category (0% commission above $1,500)</label>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Profit</span><b data-out="profit">—</b></div>
+    <div class="result"><span>Total Whatnot fees</span><b data-out="fees">—</b></div>
+    <div class="result"><span>Commission</span><b data-out="commission">—</b></div>
+    <div class="result"><span>Payment processing</span><b data-out="processing">—</b></div>
+    <div class="result"><span>Payout</span><b data-out="payout">—</b></div>
+    <div class="result"><span>Profit margin</span><b data-out="margin">—</b></div>
+    <div class="result"><span>Break-even sold price</span><b data-out="breakeven">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const custom = v.tier === "custom";
+  out.show("custom", custom);
+  const c = (custom ? v.customRate : parseFloat(v.tier)) / 100;
+  const t = 1 + v.taxRate / 100;
+  const has = v.price > 0;
+
+  const commBase = v.highValue ? Math.min(v.price, 1500) : v.price;  // commission: sale price only
+  const commission = commBase * c;
+  const orderTotal = (v.price + v.shipCharged) * t;                  // processing: price + shipping + tax
+  const processing = has ? orderTotal * 0.029 + 0.30 : 0;
+  const fees = commission + processing;
+  const payout = v.price - fees - v.shipCover;   // buyer's shipping pays for the label; tax goes to the state
+  const profit = payout - v.itemCost;
+
+  // Break-even sold price, same shipping and tax (ignores the $1,500 high-value cap).
+  const breakeven = (v.itemCost + v.shipCover + 0.30 + 0.029 * v.shipCharged * t) / (1 - c - 0.029 * t);
+
+  out.set("profit", Calc.money(profit), Calc.tone(profit));
+  out.set("fees", Calc.money(fees));
+  out.set("commission", Calc.money(commission));
+  out.set("processing", Calc.money(processing));
+  out.set("payout", Calc.money(payout));
+  out.set("margin", has ? Calc.pct(profit / v.price) : "—");
+  out.set("breakeven", Calc.money(Math.max(0, breakeven)));
+  if (has) {
+    let msg = `Whatnot keeps ${Calc.pct(fees / v.price)} of the sale price.`;
+    if (v.highValue && v.price > 1500) msg += ` No commission on the ${Calc.money(v.price - 1500)} above $1,500.`;
+    out.note(msg);
+  }
+}));
+</script>
+<!-- article -->
+<h2>How Whatnot fees work in 2026</h2>
+<p>Whatnot charges two fees on every sale, whether it happens in a live show, the marketplace or your shop:</p>
+<ul>
+  <li><strong>Commission: 8%</strong> of the item's sale price in most US categories. Shipping and sales tax are
+  <em>not</em> included.</li>
+  <li><strong>Payment processing: 2.9% + $0.30</strong> per order, calculated on the total the buyer pays, which
+  <em>does</em> include shipping and tax.</li>
+</ul>
+<p>There are no listing fees or subscriptions. Buyers normally pay shipping at checkout, and Whatnot uses that money to
+generate your label, so shipping only costs you something when you offer free or discounted shipping.</p>
+
+<h3>The new volume tiers</h3>
+<p>Since September 21, 2026, Whatnot sets your commission from your sales over a four-week period. Sellers under
+$15,000 in that window pay the standard 8%. Above that, rates step down by category, reaching 6.5% for sports and
+trading cards, 5% for other collectibles, 4.5% for fashion and 4% for everything else at $500,000. If you've unlocked a
+lower tier, choose "Custom" and enter the rate from your dashboard.</p>
+<p>In select categories, Whatnot also charges 0% commission on the part of a single sale above $1,500. Processing still
+applies to the whole order.</p>
+
+<h2>The formula</h2>
+<div class="formula">commission = sold price × 8%<br>
+processing = (sold price + shipping buyer pays) × (1 + sales tax rate) × 2.9% + $0.30<br>
+Whatnot fees = commission + processing<br>
+profit = sold price − Whatnot fees − shipping you cover − item cost</div>
+
+<h2>Example: a $50 sale with $8 shipping</h2>
+<p>A trading card you bought for $15 sells for $50 in a live show. The buyer pays $8 shipping, which covers the label,
+and we'll leave sales tax out to keep the numbers clean.</p>
+<table>
+  <tr><th>Line</th><th>Amount</th></tr>
+  <tr><td>Commission (8% of $50)</td><td>$4.00</td></tr>
+  <tr><td>Payment processing (2.9% of $58 + $0.30)</td><td>$1.98</td></tr>
+  <tr><td><strong>Total Whatnot fees</strong></td><td><strong>$5.98</strong></td></tr>
+  <tr><td>Payout ($50 − $5.98)</td><td>$44.02</td></tr>
+  <tr><td>Minus item cost ($15)</td><td><strong>$29.02 profit</strong></td></tr>
+</table>
+<p>Notice that the $8 shipping still adds about $0.23 to the processing fee even though you never keep it. Sales tax
+works the same way: at 8% tax, the processing fee on this order rises by about $0.13.</p>
+
+<h2>Tips for Whatnot sellers</h2>
+<ul>
+  <li><strong>Know your auction floor.</strong> The break-even price above is the lowest a starting bid or buy-it-now
+  price can go before a sale loses money.</li>
+  <li><strong>Watch $1 starts.</strong> A $1 auction still pays $0.30 plus processing on the shipping, so low-end
+  sales can end up costing you money after the item's cost.</li>
+  <li><strong>Price in giveaways and free shipping.</strong> Anything you cover to build a show comes out of your
+  margin. Add it to "Shipping you cover" or the item cost.</li>
+  <li><strong>Track your four-week sales.</strong> Crossing $15,000 lowers your commission for the next period, which
+  can be worth timing a big show around.</li>
+  <li><strong>Check your statements.</strong> In some states Whatnot must charge tax on its commission and fees, which
+  adds a little on top of the numbers here.</li>
+</ul>

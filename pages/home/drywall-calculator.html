@@ -1,0 +1,185 @@
+---
+{
+  "title": "Drywall Calculator: Sheets, Screws, Mud and Tape",
+  "description": "Estimate drywall sheets for a room's walls and ceiling, minus doors and windows, plus screws, joint compound, tape and total material cost.",
+  "h1": "Drywall Calculator",
+  "short": "Drywall Calculator",
+  "intro": "Enter your room size, openings and sheet size to see how many sheets of drywall to buy, plus screws, joint compound, tape and cost.",
+  "updated": "September 2026",
+  "related": ["paint-calculator", "tile-calculator", "wallpaper-calculator", "flooring-calculator"],
+  "faq": [
+    {"q": "How many sheets of drywall do I need for a 12x12 room?", "a": "A 12 by 12 foot room with 8 foot walls has 384 square feet of wall. Subtracting one door and two windows leaves 334 square feet, and the ceiling adds 144. With 10 percent waste that is about 526 square feet, or 17 sheets of 4 by 8 drywall. Walls only would need 12 sheets."},
+    {"q": "Should I use 4x8 or 4x12 drywall sheets?", "a": "Longer sheets mean fewer butt joints, which are the hardest seams to finish flat. Pros often hang 4 by 12 sheets horizontally on walls and ceilings. But a 4 by 12 sheet of 1/2 inch drywall weighs roughly 75 to 80 pounds, so 4 by 8 sheets are easier for one person and fit in most vehicles."},
+    {"q": "How many screws per sheet of drywall?", "a": "About 32 screws per 4 by 8 sheet on walls with studs 16 inches on center, spaced roughly every 12 inches along each stud. Ceilings need closer spacing, around 40 screws per 4 by 8 sheet. Use 1-1/4 inch coarse-thread screws for 1/2 inch drywall on wood studs."},
+    {"q": "How much joint compound do I need?", "a": "USG, the maker of Sheetrock, estimates about 10 gallons of all-purpose compound per 1,000 square feet of drywall for a standard three-coat finish, or roughly 1 gallon per 100 square feet. Heavy texture, skim coats or a Level 5 finish can use twice as much."},
+    {"q": "Do you subtract windows and doors when estimating drywall?", "a": "Many pros do not, because the offcuts are rarely usable and the extra covers mistakes. Subtracting gives a tighter number. This calculator subtracts 20 square feet per door and 15 per window, then adds your waste percentage back on top, which balances both approaches."},
+    {"q": "What thickness of drywall should I use?", "a": "1/2 inch is standard for interior walls. Ceilings with joists 24 inches apart need 5/8 inch or sag-resistant 1/2 inch board. Walls between a garage and living space usually need 5/8 inch Type X fire-rated board by code, and bathrooms benefit from moisture-resistant board."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="length">Room length</label>
+          <div class="input"><input id="length" name="length" type="number" min="0" step="0.1" value="12" inputmode="decimal"><span class="unit">ft</span></div>
+        </div>
+        <div class="field">
+          <label for="width">Room width</label>
+          <div class="input"><input id="width" name="width" type="number" min="0" step="0.1" value="12" inputmode="decimal"><span class="unit">ft</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="height">Wall height</label>
+        <div class="input"><input id="height" name="height" type="number" min="0" step="0.1" value="8" inputmode="decimal"><span class="unit">ft</span></div>
+      </div>
+      <label class="check"><input type="checkbox" name="ceiling" checked> Include the ceiling</label>
+      <div class="row2">
+        <div class="field">
+          <label for="doors">Doors</label>
+          <div class="input"><input id="doors" name="doors" type="number" min="0" step="1" value="1" inputmode="numeric"></div>
+          <div class="hint">About 20 sq ft each.</div>
+        </div>
+        <div class="field">
+          <label for="windows">Windows</label>
+          <div class="input"><input id="windows" name="windows" type="number" min="0" step="1" value="2" inputmode="numeric"></div>
+          <div class="hint">About 15 sq ft each.</div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="sheet">Sheet size</label>
+          <select id="sheet" name="sheet" data-num>
+            <option value="32" selected>4 × 8 ft</option>
+            <option value="40">4 × 10 ft</option>
+            <option value="48">4 × 12 ft</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="waste">Waste</label>
+          <div class="input"><input id="waste" name="waste" type="number" min="0" step="1" value="10" inputmode="numeric"><span class="unit">%</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="price">Drywall price per sq ft</label>
+        <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="0.50" inputmode="decimal"></div>
+        <div class="hint">$0.50 per sq ft is about $16 for a 4 × 8 sheet of 1/2 in board.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="mudPrice">Compound, 4.5 gal pail</label>
+          <div class="input"><span class="unit pre">$</span><input id="mudPrice" name="mudPrice" type="number" min="0" step="0.01" value="20" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="tapePrice">Tape, 500 ft roll</label>
+          <div class="input"><span class="unit pre">$</span><input id="tapePrice" name="tapePrice" type="number" min="0" step="0.01" value="7" inputmode="decimal"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Sheets to buy</span><b data-out="sheets">—</b></div>
+    <div class="result"><span>Wall area</span><b data-out="wallArea">—</b></div>
+    <div data-show="ceil"><div class="result"><span>Ceiling area</span><b data-out="ceilArea">—</b></div></div>
+    <div class="result"><span>Area with waste</span><b data-out="needed">—</b></div>
+    <div class="result"><span>Drywall screws</span><b data-out="screws">—</b></div>
+    <div class="result"><span>Joint compound</span><b data-out="mud">—</b></div>
+    <div class="result"><span>Joint tape</span><b data-out="tape">—</b></div>
+    <div class="result"><span>Drywall cost</span><b data-out="boardCost">—</b></div>
+    <div class="result"><span>Total materials cost</span><b data-out="total">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  out.show("ceil", v.ceiling);
+  const perimeter = 2 * (v.length + v.width);
+  const wallArea = Math.max(0, perimeter * v.height - v.doors * 20 - v.windows * 15);
+  const ceilArea = v.ceiling ? v.length * v.width : 0;
+  const area = wallArea + ceilArea;
+  const factor = 1 + v.waste / 100;
+  const needed = area * factor;
+  const sheets = v.sheet > 0 ? Math.ceil(needed / v.sheet - 1e-9) : 0;
+
+  // 32 screws per 4x8 on walls (1 per sq ft), ~40 on ceilings (1.25 per sq ft), plus the waste allowance.
+  const screws = Math.ceil((wallArea * 1 + ceilArea * 1.25) * factor - 1e-9);
+  const mudGal = area * 10 / 1000;                  // USG: ~10 gal per 1,000 sq ft
+  const pails = Math.ceil(mudGal / 4.5 - 1e-9);
+  const tapeFt = area * 370 / 1000;                 // USG: ~370 ft per 1,000 sq ft
+  const rolls = Math.ceil(tapeFt / 500 - 1e-9);
+
+  const boardCost = sheets * v.sheet * v.price;
+  const total = boardCost + pails * v.mudPrice + rolls * v.tapePrice;
+
+  out.set("sheets", sheets === 1 ? "1 sheet" : `${Calc.num(sheets, 0)} sheets`);
+  out.set("wallArea", `${Calc.num(wallArea, 0)} sq ft`);
+  out.set("ceilArea", `${Calc.num(ceilArea, 0)} sq ft`);
+  out.set("needed", `${Calc.num(needed, 1)} sq ft`);
+  out.set("screws", `about ${Calc.num(screws, 0)}`);
+  out.set("mud", `${Calc.num(mudGal, 1)} gal (${pails} pail${pails === 1 ? "" : "s"})`);
+  out.set("tape", `${Calc.num(tapeFt, 0)} ft (${rolls} roll${rolls === 1 ? "" : "s"})`);
+  out.set("boardCost", Calc.money(boardCost));
+  out.set("total", Calc.money(total));
+
+  if (area <= 0) return;
+  const extra = pails * 4.5 - mudGal;
+  out.note(extra > 2.25
+    ? `The last pail is mostly spare. A 1 or 3.5 gal container of compound may cover the remaining ${Calc.num(mudGal - (pails - 1) * 4.5, 1)} gal. Screws, corner bead and sanding supplies are not in the total.`
+    : "Screws, corner bead and sanding supplies are not included in the total.");
+}));
+</script>
+<!-- article -->
+<h2>How much drywall a room needs</h2>
+<p>Drywall is hung in whole sheets, so the estimate starts with surface area and ends with a sheet count. The calculator
+multiplies the room's perimeter by the wall height, subtracts <strong>20 sq ft per door</strong> and
+<strong>15 sq ft per window</strong>, and adds the ceiling (length × width) if you include it. It then adds your waste
+percentage and divides by the area of one sheet: 32 sq ft for 4 × 8, 40 for 4 × 10 and 48 for 4 × 12.</p>
+<p>Ten percent waste suits most rectangular rooms. Use 12–15% for rooms with many openings, soffits, angled ceilings
+or short wall sections, where offcuts are too small to reuse.</p>
+
+<h2>The formula</h2>
+<div class="formula">wall area = 2 × (length + width) × height − doors × 20 − windows × 15<br>
+sheets = (wall area + ceiling area) × (1 + waste %) ÷ sheet area, rounded up<br>
+screws = (wall area × 1 + ceiling area × 1.25) × (1 + waste %)<br>
+joint compound = area × 10 gal ÷ 1,000 &nbsp;·&nbsp; tape = area × 370 ft ÷ 1,000</div>
+
+<h3>Where the finishing figures come from</h3>
+<ul>
+  <li><strong>Screws:</strong> about 32 per 4 × 8 sheet on walls with studs 16 in on center (roughly one per sq ft) and
+  about 40 per sheet on ceilings, where spacing is tighter.</li>
+  <li><strong>Joint compound:</strong> USG estimates about 10 gallons of ready-mixed all-purpose compound per 1,000 sq ft
+  for tape plus two finish coats. A standard pail holds 4.5 gallons.</li>
+  <li><strong>Tape:</strong> USG's figure for paper tape is about 370 ft per 1,000 sq ft of board. Rolls come in 250 and
+  500 ft.</li>
+</ul>
+
+<h2>Example: a 12 × 12 ft room with the ceiling</h2>
+<p>8 ft walls, one door, two windows, 4 × 8 sheets, 10% waste, $0.50 per sq ft for board, $20 per pail and $7 per roll of tape.</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Walls (48 ft × 8 ft − 50 sq ft openings)</td><td>334 sq ft</td></tr>
+  <tr><td>Ceiling (12 × 12)</td><td>144 sq ft</td></tr>
+  <tr><td>Total plus 10% waste</td><td>525.8 sq ft</td></tr>
+  <tr><td><strong>Sheets (525.8 ÷ 32 = 16.4)</strong></td><td><strong>17 sheets</strong></td></tr>
+  <tr><td>Screws ((334 + 180) × 1.1)</td><td>about 566</td></tr>
+  <tr><td>Joint compound (478 × 10 ÷ 1,000)</td><td>4.8 gal (2 pails)</td></tr>
+  <tr><td>Tape (478 × 0.37)</td><td>177 ft (1 roll)</td></tr>
+  <tr><td>Drywall cost (17 × 32 sq ft × $0.50)</td><td>$272.00</td></tr>
+  <tr><td>Total with compound and tape</td><td>$319.00</td></tr>
+</table>
+<p>Here 4.8 gallons is just over one pail, so a 4.5 gal pail plus a small 1 gal tub would do the job for less.</p>
+
+<h2>Tips for hanging and finishing</h2>
+<ul>
+  <li><strong>Hang the ceiling first,</strong> then the walls, so the wall sheets support the ceiling edges.</li>
+  <li><strong>Run sheets horizontally</strong> on walls up to about 8 ft 1 in: two 4 ft sheets span the height and you
+  get fewer, easier seams at a comfortable working height.</li>
+  <li><strong>Use longer sheets to cut butt joints.</strong> A 12 ft wall covered with 4 × 12 sheets has no end joints at all.</li>
+  <li><strong>Pick the right board.</strong> 1/2 in for standard walls, 5/8 in or sag-resistant board for ceilings on
+  24 in framing, Type X where code calls for fire separation such as garages.</li>
+  <li><strong>Buy corner bead too.</strong> Outside corners need metal or paper-faced bead, sold in 8 and 10 ft lengths.</li>
+  <li><strong>Use setting compound for the first coat</strong> in damp or cold conditions; it hardens chemically and
+  lets you recoat the same day.</li>
+</ul>

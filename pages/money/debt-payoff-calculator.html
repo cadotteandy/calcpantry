@@ -1,0 +1,259 @@
+---
+{
+  "title": "Debt Payoff Calculator: Snowball vs Avalanche",
+  "description": "Compare debt snowball and avalanche for up to 5 debts. See your debt-free date, total interest for each method, interest saved and the order debts get paid.",
+  "h1": "Debt Payoff Calculator",
+  "short": "Debt Payoff Calculator",
+  "intro": "Enter each debt's balance, APR and minimum payment plus any extra you can pay each month to see when you'll be debt-free and whether snowball or avalanche costs less.",
+  "updated": "September 2026",
+  "related": ["credit-card-payoff-calculator", "emergency-fund-calculator", "savings-goal-calculator", "hourly-to-salary-calculator"],
+  "faq": [
+    {"q": "What is the difference between the debt snowball and debt avalanche?", "a": "Both pay the minimum on every debt and put all extra money on one target. Snowball targets the smallest balance first for quick wins. Avalanche targets the highest interest rate first, which always costs the same or less in total interest."},
+    {"q": "Which method saves more money?", "a": "The avalanche method, because every extra dollar goes to the debt charging the most interest. How much it saves depends on how different your rates are. If your smallest debt also has the highest rate, the two methods are identical."},
+    {"q": "Why would anyone choose the snowball method?", "a": "Motivation. Clearing a whole account in the first few months is a visible win, and research from Northwestern's Kellogg School found people who concentrate on closing out individual accounts are more likely to stick with repayment. A plan you finish beats a cheaper plan you abandon."},
+    {"q": "What does rolling over the minimum payment mean?", "a": "When a debt is paid off, you keep paying the same total each month. The minimum you were paying on the finished debt is added to the next target, so the payment on each new target keeps growing like a snowball."},
+    {"q": "Should I include my mortgage or car loan?", "a": "You can include any debt with a balance, rate and fixed payment. Many people leave the mortgage out and focus on credit cards, personal loans and car loans, since low-rate mortgage debt usually comes last under either method."},
+    {"q": "Why does the calculator say my debts will never be paid off?", "a": "Your total monthly payment is less than or close to the interest your debts build each month, so the balances cannot shrink. Add an extra amount, or check that each minimum payment is entered as a monthly dollar figure."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="count">Number of debts</label>
+          <select id="count" name="count">
+            <option value="1">1</option><option value="2">2</option><option value="3" selected>3</option>
+            <option value="4">4</option><option value="5">5</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="strategy">Strategy</label>
+          <select id="strategy" name="strategy">
+            <option value="avalanche">Avalanche (highest APR first)</option>
+            <option value="snowball">Snowball (smallest balance first)</option>
+          </select>
+        </div>
+      </div>
+
+      <div data-show="d1">
+        <label><b>Debt 1</b></label>
+        <div class="row2">
+          <div class="field"><label for="b1">Balance</label><div class="input"><span class="unit pre">$</span><input id="b1" name="b1" type="number" min="0" step="100" value="1200" inputmode="decimal"></div></div>
+          <div class="field"><label for="a1">APR</label><div class="input"><input id="a1" name="a1" type="number" min="0" max="60" step="0.1" value="18" inputmode="decimal"><span class="unit">%</span></div></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label for="m1">Minimum payment</label><div class="input"><span class="unit pre">$</span><input id="m1" name="m1" type="number" min="0" step="5" value="40" inputmode="decimal"><span class="unit">/mo</span></div></div>
+      </div>
+
+      <div data-show="d2">
+        <label><b>Debt 2</b></label>
+        <div class="row2">
+          <div class="field"><label for="b2">Balance</label><div class="input"><span class="unit pre">$</span><input id="b2" name="b2" type="number" min="0" step="100" value="4500" inputmode="decimal"></div></div>
+          <div class="field"><label for="a2">APR</label><div class="input"><input id="a2" name="a2" type="number" min="0" max="60" step="0.1" value="27" inputmode="decimal"><span class="unit">%</span></div></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label for="m2">Minimum payment</label><div class="input"><span class="unit pre">$</span><input id="m2" name="m2" type="number" min="0" step="5" value="135" inputmode="decimal"><span class="unit">/mo</span></div></div>
+      </div>
+
+      <div data-show="d3">
+        <label><b>Debt 3</b></label>
+        <div class="row2">
+          <div class="field"><label for="b3">Balance</label><div class="input"><span class="unit pre">$</span><input id="b3" name="b3" type="number" min="0" step="100" value="9000" inputmode="decimal"></div></div>
+          <div class="field"><label for="a3">APR</label><div class="input"><input id="a3" name="a3" type="number" min="0" max="60" step="0.1" value="8" inputmode="decimal"><span class="unit">%</span></div></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label for="m3">Minimum payment</label><div class="input"><span class="unit pre">$</span><input id="m3" name="m3" type="number" min="0" step="5" value="220" inputmode="decimal"><span class="unit">/mo</span></div></div>
+      </div>
+
+      <div data-show="d4" hidden>
+        <label><b>Debt 4</b></label>
+        <div class="row2">
+          <div class="field"><label for="b4">Balance</label><div class="input"><span class="unit pre">$</span><input id="b4" name="b4" type="number" min="0" step="100" value="3000" inputmode="decimal"></div></div>
+          <div class="field"><label for="a4">APR</label><div class="input"><input id="a4" name="a4" type="number" min="0" max="60" step="0.1" value="22" inputmode="decimal"><span class="unit">%</span></div></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label for="m4">Minimum payment</label><div class="input"><span class="unit pre">$</span><input id="m4" name="m4" type="number" min="0" step="5" value="90" inputmode="decimal"><span class="unit">/mo</span></div></div>
+      </div>
+
+      <div data-show="d5" hidden>
+        <label><b>Debt 5</b></label>
+        <div class="row2">
+          <div class="field"><label for="b5">Balance</label><div class="input"><span class="unit pre">$</span><input id="b5" name="b5" type="number" min="0" step="100" value="15000" inputmode="decimal"></div></div>
+          <div class="field"><label for="a5">APR</label><div class="input"><input id="a5" name="a5" type="number" min="0" max="60" step="0.1" value="11" inputmode="decimal"><span class="unit">%</span></div></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label for="m5">Minimum payment</label><div class="input"><span class="unit pre">$</span><input id="m5" name="m5" type="number" min="0" step="5" value="325" inputmode="decimal"><span class="unit">/mo</span></div></div>
+      </div>
+
+      <div class="field">
+        <label for="extra">Extra payment each month</label>
+        <div class="input"><span class="unit pre">$</span><input id="extra" name="extra" type="number" min="0" step="25" value="200" inputmode="decimal"><span class="unit">/mo</span></div>
+        <div class="hint">On top of all the minimums. Freed-up minimums roll over automatically.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="startMonth">First payment</label>
+          <select id="startMonth" name="startMonth">
+            <option value="0">January</option><option value="1">February</option><option value="2">March</option>
+            <option value="3">April</option><option value="4">May</option><option value="5">June</option>
+            <option value="6">July</option><option value="7">August</option><option value="8">September</option>
+            <option value="9" selected>October</option><option value="10">November</option><option value="11">December</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="startYear">Year</label>
+          <div class="input"><input id="startYear" name="startYear" type="number" min="2000" max="2100" step="1" value="2026" inputmode="numeric"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your debt-free plan</h2>
+    <div class="result big"><span data-out="headLabel">Debt-free in</span><b data-out="headline">—</b></div>
+    <div class="result"><span>Last payment</span><b data-out="date">—</b></div>
+    <div class="result"><span>Total monthly payment</span><b data-out="budget">—</b></div>
+    <div class="result"><span>Snowball: total interest</span><b data-out="snowInt">—</b></div>
+    <div class="result"><span>Snowball: months</span><b data-out="snowMonths">—</b></div>
+    <div class="result"><span>Avalanche: total interest</span><b data-out="avaInt">—</b></div>
+    <div class="result"><span>Avalanche: months</span><b data-out="avaMonths">—</b></div>
+    <div class="result"><span data-out="savedLabel">Interest saved</span><b data-out="saved">—</b></div>
+    <div data-show="order">
+      <h2 style="margin-top:14px">Payoff order</h2>
+      <div data-order></div>
+    </div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+const MAX_MONTHS = 600;
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+function span(m) {
+  const y = Math.floor(m / 12), mo = m % 12;
+  const parts = [];
+  if (y) parts.push(y + (y === 1 ? " year" : " years"));
+  if (mo || !y) parts.push(mo + (mo === 1 ? " month" : " months"));
+  return parts.join(" ");
+}
+
+function monthName(startMonth, startYear, n) {
+  const idx = startMonth + n - 1;
+  return `${MONTHS[((idx % 12) + 12) % 12]} ${startYear + Math.floor(idx / 12)}`;
+}
+
+// Month-by-month simulation. The total payment (all minimums + extra) stays fixed, so a paid-off
+// debt's minimum rolls over to the next target. Interest accrues at APR ÷ 12 before each payment.
+function simulate(input, extra, strategy) {
+  const ds = input.map((d) => ({ ...d, bal: d.balance, r: d.apr / 100 / 12, done: 0 }));
+  const budget = ds.reduce((s, d) => s + d.min, 0) + extra;
+  const order = ds.slice().sort(strategy === "snowball"
+    ? (a, b) => a.bal - b.bal || b.r - a.r
+    : (a, b) => b.r - a.r || a.bal - b.bal);
+  let month = 0, interest = 0;
+  while (ds.some((d) => d.bal > 0.005) && month < MAX_MONTHS) {
+    month++;
+    for (const d of ds) if (d.bal > 0.005) { const i = d.bal * d.r; d.bal += i; interest += i; }
+    let left = budget;
+    for (const d of ds) if (d.bal > 0.005) { const p = Math.min(d.min, d.bal, left); d.bal -= p; left -= p; }
+    for (const d of order) if (d.bal > 0.005 && left > 0) { const p = Math.min(d.bal, left); d.bal -= p; left -= p; }
+    for (const d of order) if (d.bal <= 0.005 && !d.done) d.done = month;
+  }
+  if (ds.some((d) => d.bal > 0.005)) return null;
+  const payoff = ds.slice().sort((a, b) => a.done - b.done || order.indexOf(a) - order.indexOf(b));
+  return { months: month, interest, budget, payoff };
+}
+
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const count = Math.min(5, Math.max(1, Number(v.count) || 3));
+  for (let k = 1; k <= 5; k++) out.show("d" + k, k <= count);
+  const orderEl = document.querySelector("[data-order]");
+  const snow = v.strategy === "snowball";
+  out.set("headLabel", snow ? "Debt-free in (snowball)" : "Debt-free in (avalanche)");
+
+  const debts = [];
+  for (let k = 1; k <= count; k++) {
+    const balance = v["b" + k], apr = v["a" + k], min = v["m" + k];
+    if (balance > 0) debts.push({ n: k, balance, apr, min: Math.max(0, min) });
+  }
+  const extra = Math.max(0, v.extra);
+  const keys = ["headline", "date", "budget", "snowInt", "snowMonths", "avaInt", "avaMonths", "saved"];
+  const blank = () => { keys.forEach((k) => out.set(k, "—")); out.show("order", false); };
+
+  if (!debts.length) { blank(); out.note("Enter a balance for at least one debt."); return; }
+
+  const budget = debts.reduce((s, d) => s + d.min, 0) + extra;
+  const firstInterest = debts.reduce((s, d) => s + d.balance * d.apr / 1200, 0);
+  const s = simulate(debts, extra, "snowball");
+  const a = simulate(debts, extra, "avalanche");
+  const plan = snow ? s : a;
+  out.set("budget", Calc.money(budget));
+
+  if (!plan) {
+    blank();
+    out.set("budget", Calc.money(budget));
+    out.note(budget <= firstInterest
+      ? `Your total payment of ${Calc.money(budget)} doesn't cover the ${Calc.money(firstInterest)} of interest your debts build in the first month, so they will never be paid off. Add an extra payment above that amount.`
+      : `At this payment the debts take more than ${MAX_MONTHS / 12} years to clear. Add to the extra payment to see a realistic plan.`);
+    return;
+  }
+
+  out.set("headline", span(plan.months));
+  out.set("date", monthName(v.startMonth, v.startYear, plan.months));
+  out.set("snowInt", Calc.money(s.interest));
+  out.set("snowMonths", Calc.num(s.months, 0));
+  out.set("avaInt", Calc.money(a.interest));
+  out.set("avaMonths", Calc.num(a.months, 0));
+  const diff = s.interest - a.interest;
+  if (Math.abs(diff) < 0.005) {
+    out.set("savedLabel", "Interest saved");
+    out.set("saved", "Same either way");
+  } else {
+    out.set("savedLabel", diff > 0 ? "Avalanche saves" : "Snowball saves");
+    out.set("saved", Calc.money(Math.abs(diff)), "pos");
+  }
+
+  out.show("order", true);
+  orderEl.innerHTML = plan.payoff.map((d, k) =>
+    `<div class="result"><span>${k + 1}. Debt ${d.n} (${Calc.money(d.balance, 0)} at ${Calc.num(d.apr, 2)}%)</span><b>${monthName(v.startMonth, v.startYear, d.done)}</b></div>`).join("");
+
+  const underwater = debts.filter((d) => d.min <= d.balance * d.apr / 1200).map((d) => "Debt " + d.n);
+  if (underwater.length) out.note(`${underwater.join(", ")}: the minimum doesn't cover the monthly interest, so that balance grows until it becomes the target. Check the minimum on your statement.`);
+  else out.note(`Uses APR ÷ 12 each month and assumes no new charges. ${snow ? "Snowball" : "Avalanche"} order is set by the starting balances and rates. Not financial advice.`);
+}));
+</script>
+<!-- article -->
+<p><strong>This is an estimate, not financial advice.</strong> It assumes fixed rates, no new charges and no fees. Promotional rates, variable APRs and daily interest will shift the numbers a little.</p>
+
+<h2>How the calculator works</h2>
+<p>Your total monthly payment is every minimum added together plus your extra amount, and it stays the same until everything is paid off. Each month the calculator adds interest to every balance at its APR divided by 12, pays each debt its minimum, then puts everything left over on one target debt.</p>
+<p>When a debt reaches zero, its minimum does not disappear from your budget. It rolls over to the next target, so the payment on each new target keeps getting bigger. That rollover is what makes both methods work.</p>
+<ul>
+  <li><strong>Avalanche</strong> targets the highest APR first (ties go to the smaller balance).</li>
+  <li><strong>Snowball</strong> targets the smallest balance first (ties go to the higher APR).</li>
+</ul>
+<div class="formula">total payment = sum of minimums + extra<br>
+each month: balance = balance × (1 + APR ÷ 12) − payment<br>
+extra to target = total payment − minimums on remaining debts</div>
+
+<h2>Example: three debts, $200 extra</h2>
+<p>A household has a $1,200 store card at 18% ($40 minimum), a $4,500 credit card at 27% ($135 minimum) and a $9,000 car loan at 8% ($220 minimum). They add $200 a month on top, for a total of $595, with the first payment in October 2026.</p>
+<table>
+  <tr><th>Result</th><th>Snowball</th><th>Avalanche</th></tr>
+  <tr><td>First target</td><td>$1,200 card</td><td>$4,500 card</td></tr>
+  <tr><td>First debt gone</td><td>March 2027</td><td>February 2028</td></tr>
+  <tr><td>Debt-free</td><td>February 2029 (29 months)</td><td>February 2029 (29 months)</td></tr>
+  <tr><td>Total interest</td><td>$2,471.02</td><td>$2,334.71</td></tr>
+</table>
+<p>Avalanche saves $136.31 here. Snowball clears the small card in 6 months, while avalanche takes 17 months to clear its first account. Both finish the same month because the car loan, the last debt in both plans, sets the finish line.</p>
+
+<h2>Which method should you pick?</h2>
+<h3>Choose avalanche if the rate gap is big</h3>
+<p>Avalanche is mathematically cheapest every time. The savings grow when a large balance carries a much higher rate than the others, such as a 29% card next to a 7% car loan. If the calculator shows avalanche saving hundreds or thousands, that is real money.</p>
+<h3>Choose snowball if you need early wins</h3>
+<p>If the savings are small, or you have tried and quit before, snowball's quick payoffs can keep you going. Northwestern's Kellogg School found people who focus on closing out individual accounts are more likely to finish paying off debt. The best plan is the one you finish.</p>
+
+<h2>Tips to get debt-free faster</h2>
+<ul>
+  <li><strong>Keep the total payment fixed.</strong> Set autopay for the minimums and schedule the extra to the current target, then move it when that debt is gone.</li>
+  <li><strong>Stop adding new charges</strong> to the cards you are paying down, or the plan never ends.</li>
+  <li><strong>Keep a small emergency fund</strong>, often $1,000 or one month of expenses, so a surprise bill doesn't land back on a card.</li>
+  <li><strong>Ask for lower rates.</strong> A lower APR on your biggest balance helps under either method. A 0% balance transfer can help too, though most charge a 3% to 5% fee.</li>
+  <li><strong>Put windfalls on the target.</strong> Tax refunds and bonuses shorten the plan more than almost anything else.</li>
+</ul>

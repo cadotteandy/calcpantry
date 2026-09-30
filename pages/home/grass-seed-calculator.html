@@ -1,0 +1,178 @@
+---
+{
+  "title": "Grass Seed Calculator: How Much Seed Do I Need?",
+  "description": "Find how many pounds and bags of grass seed your lawn needs for a new lawn or overseeding, by grass type and area, with cost and starter fertilizer.",
+  "h1": "Grass Seed Calculator",
+  "short": "Grass Seed Calculator",
+  "intro": "Enter your lawn area, grass type and whether you're starting a new lawn or overseeding to see how many pounds and bags of seed to buy.",
+  "updated": "September 2026",
+  "related": ["mulch-calculator", "gravel-calculator", "fence-calculator", "deck-calculator"],
+  "faq": [
+    {"q": "How much grass seed do I need per 1,000 square feet?", "a": "It depends on seed size. For a new lawn, Kentucky bluegrass needs about 2 to 3 pounds per 1,000 square feet, fine fescue 4 to 5, tall fescue 6 to 8, perennial ryegrass 5 to 9 and hulled bermudagrass 1 to 2. Overseeding an existing lawn uses about half those rates."},
+    {"q": "How much seed do I need for overseeding?", "a": "Overseeding a thin but living lawn usually takes about half the new-lawn rate, for example 3 to 4 pounds of tall fescue or 1 to 1.5 pounds of Kentucky bluegrass per 1,000 square feet. If more than half the lawn is bare, use the new-lawn rate instead."},
+    {"q": "Is it bad to put down too much grass seed?", "a": "Yes. Seeding far above the recommended rate makes seedlings compete for light, water and nutrients, which leads to thin, weak grass and more disease. Stick close to the label rate and focus on good seed-to-soil contact and steady moisture instead."},
+    {"q": "When is the best time to plant grass seed?", "a": "Plant cool-season grasses such as tall fescue, bluegrass and ryegrass in late summer to early fall, when soil is warm and air is cooling, with spring as a second choice. Plant warm-season grasses such as bermuda, zoysia and centipede in late spring to early summer once soil is consistently above about 65 degrees F."},
+    {"q": "How do I measure my lawn's square footage?", "a": "Break the lawn into rectangles, multiply length by width for each, and add them up, subtracting the house, driveway and beds. For a circle, multiply the radius squared by 3.14. Many online map tools can also measure an area from satellite imagery."},
+    {"q": "Do I need starter fertilizer when seeding?", "a": "It helps on new lawns and poor soil. Starter fertilizers are higher in phosphorus, which supports root growth in seedlings. Check local rules first, since some states and towns restrict phosphorus fertilizer unless a soil test shows a need or you are establishing new turf."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="area">Lawn area</label>
+        <div class="input"><input id="area" name="area" type="number" min="0" step="10" value="5000" inputmode="decimal"><span class="unit">sq ft</span></div>
+        <div class="hint">Length × width of each section, added up.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="grass">Grass type</label>
+          <select id="grass" name="grass">
+            <option value="tf" selected>Tall fescue</option>
+            <option value="kbg">Kentucky bluegrass</option>
+            <option value="prg">Perennial ryegrass</option>
+            <option value="ff">Fine fescue</option>
+            <option value="mix">Sun &amp; shade mix</option>
+            <option value="berm">Bermuda (hulled)</option>
+            <option value="zoy">Zoysia</option>
+            <option value="cent">Centipede</option>
+            <option value="custom">Custom rate</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="mode">Project</label>
+          <select id="mode" name="mode">
+            <option value="new" selected>New lawn / bare soil</option>
+            <option value="over">Overseeding</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" data-show="custom" hidden>
+        <label for="customRate">Seeding rate</label>
+        <div class="input"><input id="customRate" name="customRate" type="number" min="0" step="0.25" value="5" inputmode="decimal"><span class="unit">lb / 1,000 sq ft</span></div>
+        <div class="hint">From the seed bag's label.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="bag">Bag size</label>
+          <div class="input"><input id="bag" name="bag" type="number" min="0.5" step="0.5" value="20" inputmode="decimal"><span class="unit">lb</span></div>
+        </div>
+        <div class="field">
+          <label for="price">Price per bag</label>
+          <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="55" inputmode="decimal"></div>
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" name="fert"> Add starter fertilizer</label>
+      <div data-show="fert" hidden>
+        <div class="row2">
+          <div class="field">
+            <label for="fertCover">Bag covers</label>
+            <div class="input"><input id="fertCover" name="fertCover" type="number" min="1" step="100" value="5000" inputmode="numeric"><span class="unit">sq ft</span></div>
+          </div>
+          <div class="field">
+            <label for="fertPrice">Price per bag</label>
+            <div class="input"><span class="unit pre">$</span><input id="fertPrice" name="fertPrice" type="number" min="0" step="0.01" value="30" inputmode="decimal"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Seed needed</span><b data-out="lbs">—</b></div>
+    <div class="result"><span>Seeding rate</span><b data-out="rate">—</b></div>
+    <div class="result"><span>Bags to buy</span><b data-out="bags">—</b></div>
+    <div class="result"><span>Seed cost</span><b data-out="seedCost">—</b></div>
+    <div data-show="fert" hidden>
+      <div class="result"><span>Starter fertilizer</span><b data-out="fertBags">—</b></div>
+      <div class="result"><span>Fertilizer cost</span><b data-out="fertCost">—</b></div>
+    </div>
+    <div class="result"><span>Total cost</span><b data-out="total">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  // New-lawn rates in lb per 1,000 sq ft (midpoints of extension ranges); overseeding uses half.
+  const RATES = { tf: 7, kbg: 2.5, prg: 6, ff: 4.5, mix: 5, berm: 1.5, zoy: 1.5, cent: 0.5 };
+  const WARM = { berm: 1, zoy: 1, cent: 1 };
+  out.show("custom", v.grass === "custom");
+  out.show("fert", v.fert);
+
+  const over = v.mode === "over";
+  const rate = v.grass === "custom" ? v.customRate : RATES[v.grass] * (over ? 0.5 : 1);
+  const lbs = v.area * rate / 1000;
+  const bags = v.bag > 0 ? Math.ceil(lbs / v.bag - 1e-9) : 0;
+  const seedCost = bags * v.price;
+  const fertBags = v.fert && v.fertCover > 0 ? Math.ceil(v.area / v.fertCover - 1e-9) : 0;
+  const fertCost = fertBags * v.fertPrice;
+
+  out.set("lbs", `${Calc.num(lbs, 1)} lb`);
+  out.set("rate", `${Calc.num(rate, 2)} lb per 1,000 sq ft`);
+  out.set("bags", `${Calc.num(bags, 0)} × ${Calc.num(v.bag, 1)} lb`);
+  out.set("seedCost", Calc.money(seedCost));
+  out.set("fertBags", `${Calc.num(fertBags, 0)} bag${fertBags === 1 ? "" : "s"}`);
+  out.set("fertCost", Calc.money(fertCost));
+  out.set("total", Calc.money(seedCost + fertCost));
+
+  if (lbs <= 0) return;
+  const spare = bags * v.bag - lbs;
+  if (WARM[v.grass]) {
+    out.note(`Warm-season grass: sow in late spring once soil stays above about 65°F.${over ? " Overseeding warm-season lawns with the same grass is uncommon; many lawns are plugged or sodded instead." : ""}`);
+  } else {
+    out.note(`You'll have about ${Calc.num(spare, 1)} lb left over, handy for patching bare spots next season.`);
+  }
+}));
+</script>
+<!-- article -->
+<h2>How much grass seed to buy</h2>
+<p>Seed labels and university extension services give seeding rates in <strong>pounds per 1,000 square feet</strong>.
+The rate depends mostly on seed size: Kentucky bluegrass has roughly 1 to 2 million seeds per pound, while tall fescue
+has only about 200,000, so fescue needs about three times the weight to put the same number of seeds on the ground.
+The calculator multiplies your lawn area by the rate for your grass type, divides by 1,000, and rounds up to whole bags.</p>
+
+<h3>Seeding rates used</h3>
+<table>
+  <tr><th>Grass</th><th>Typical range, new lawn</th><th>Calculator: new</th><th>Overseed</th></tr>
+  <tr><td>Tall fescue</td><td>6–8 lb</td><td>7</td><td>3.5</td></tr>
+  <tr><td>Kentucky bluegrass</td><td>2–3 lb</td><td>2.5</td><td>1.25</td></tr>
+  <tr><td>Perennial ryegrass</td><td>5–9 lb</td><td>6</td><td>3</td></tr>
+  <tr><td>Fine fescue</td><td>4–5 lb</td><td>4.5</td><td>2.25</td></tr>
+  <tr><td>Sun &amp; shade mix</td><td>4–6 lb</td><td>5</td><td>2.5</td></tr>
+  <tr><td>Bermuda (hulled)</td><td>1–2 lb</td><td>1.5</td><td>0.75</td></tr>
+  <tr><td>Zoysia</td><td>1–2 lb</td><td>1.5</td><td>0.75</td></tr>
+  <tr><td>Centipede</td><td>0.25–0.5 lb</td><td>0.5</td><td>0.25</td></tr>
+</table>
+<p>Ranges follow extension recommendations such as Penn State's, and overseeding uses about half the new-lawn rate.
+Seed blends vary, so if your bag lists its own rate, choose "Custom rate" and enter it.</p>
+
+<h2>The formula</h2>
+<div class="formula">rate = new-lawn rate × (0.5 if overseeding)<br>
+seed (lb) = lawn area × rate ÷ 1,000<br>
+bags = seed ÷ bag size, rounded up<br>
+cost = bags × price per bag</div>
+
+<h2>Example: a new 5,000 sq ft tall fescue lawn</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Seeding rate (tall fescue, new lawn)</td><td>7 lb per 1,000 sq ft</td></tr>
+  <tr><td><strong>Seed needed (5,000 × 7 ÷ 1,000)</strong></td><td><strong>35 lb</strong></td></tr>
+  <tr><td>Bags (35 ÷ 20 = 1.75)</td><td>2 × 20 lb</td></tr>
+  <tr><td>Seed cost (2 × $55)</td><td>$110.00</td></tr>
+</table>
+<p>Overseeding the same lawn needs 17.5 lb, so a single 20 lb bag covers it. Adding starter fertilizer at one
+5,000 sq ft bag for $30 brings the new-lawn total to $140.</p>
+
+<h2>Tips for a thick lawn</h2>
+<ul>
+  <li><strong>Seed-to-soil contact matters most.</strong> Loosen bare soil with a rake, or core-aerate or slit-seed an
+  existing lawn before overseeding. Seed sitting on thatch rarely survives.</li>
+  <li><strong>Split the seed in half.</strong> Spread half walking one direction and half at right angles for even coverage.</li>
+  <li><strong>Keep it damp, not soaked.</strong> Water lightly once or twice a day until seedlings are about 2 in tall,
+  then water deeper and less often. Tall fescue and ryegrass sprout in 7–14 days; bluegrass can take 3–4 weeks.</li>
+  <li><strong>Buy quality seed.</strong> Check the label for weed seed (ideally under 0.5%) and "other crop" content,
+  and pick named turf-type varieties over cheap "contractor" mixes.</li>
+  <li><strong>Wait to mow and treat.</strong> Mow for the first time when grass reaches about one third above its target
+  height, and skip most pre-emergent weed killers, which also stop grass seed from germinating.</li>
+</ul>

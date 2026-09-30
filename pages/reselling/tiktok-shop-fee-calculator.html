@@ -1,0 +1,154 @@
+---
+{
+  "title": "TikTok Shop Fee Calculator 2026: Fees & Profit",
+  "description": "Calculate TikTok Shop's referral fee, affiliate creator commission, payout and profit per order. Includes the new-seller 3% rate and a custom rate option.",
+  "h1": "TikTok Shop Fee Calculator",
+  "short": "TikTok Shop Fee Calculator",
+  "intro": "Enter your product price, shipping, creator commission and costs to see TikTok Shop's referral fee, your payout and your profit per order.",
+  "updated": "September 2026",
+  "related": ["whatnot-fee-calculator", "etsy-fee-calculator", "ebay-fee-calculator", "flip-profit-calculator"],
+  "faq": [
+    {"q": "What is the TikTok Shop referral fee in 2026?", "a": "TikTok Shop's published US category table lists a 6% referral fee for most categories, with 5% for certain jewelry and pre-owned categories. Several seller guides report an increase to 8% for most non-food categories from August 4, 2026, so check the rate shown in your Seller Center and use the custom option if it differs."},
+    {"q": "What is the TikTok Shop fee charged on?", "a": "The referral fee is calculated on what the customer pays, including buyer-paid shipping and any platform-funded discount, minus sales tax. Seller-funded discounts lower the amount the fee is charged on."},
+    {"q": "Does TikTok Shop have a new seller discount?", "a": "Yes. New US sellers who make their first sale within 60 days of finishing onboarding get a 3% referral fee for 30 days. After that, the normal category rate applies."},
+    {"q": "How do affiliate commissions work on TikTok Shop?", "a": "If a creator's video or live stream drives the sale, you pay the commission rate you set in your affiliate plan, often 10% to 20%, on top of the referral fee. It's charged on the product price, not shipping or tax. Sales without an affiliate pay no commission."},
+    {"q": "What happens to fees when an order is refunded?", "a": "TikTok returns the referral fee on an eligible refund but keeps a refund administration fee of 20% of the referral fee, capped at $5 per item."},
+    {"q": "Is there a fixed per-order fee on TikTok Shop US?", "a": "TikTok's published US referral fee table does not list one, though some third-party guides mention $0.30 per order. If your settlement statements show a fixed charge, add it to your product cost field to include it."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="price">Product price</label>
+          <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="25" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="shipCharged">Shipping buyer pays</label>
+          <div class="input"><span class="unit pre">$</span><input id="shipCharged" name="shipCharged" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="category">Referral fee rate</label>
+        <select id="category" name="category">
+          <option value="6">Most categories (6%, TikTok's published table)</option>
+          <option value="8">Most categories after reported Aug 2026 increase (8%)</option>
+          <option value="5">Select jewelry &amp; pre-owned (5%)</option>
+          <option value="3">New seller promo (3%, first 30 days)</option>
+          <option value="custom">Custom rate…</option>
+        </select>
+      </div>
+      <div class="field" data-show="custom" hidden>
+        <label for="customRate">Custom referral fee</label>
+        <div class="input"><input id="customRate" name="customRate" type="number" min="0" max="30" step="0.1" value="7" inputmode="decimal"><span class="unit">%</span></div>
+      </div>
+      <div class="field">
+        <label for="affRate">Affiliate creator commission</label>
+        <div class="input"><input id="affRate" name="affRate" type="number" min="0" max="80" step="0.5" value="10" inputmode="decimal"><span class="unit">%</span></div>
+        <div class="hint">Enter 0 if the sale didn't come through a creator.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="itemCost">Product cost</label>
+          <div class="input"><span class="unit pre">$</span><input id="itemCost" name="itemCost" type="number" min="0" step="0.01" value="6" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="shipCost">Shipping label cost</label>
+          <div class="input"><span class="unit pre">$</span><input id="shipCost" name="shipCost" type="number" min="0" step="0.01" value="5" inputmode="decimal"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Profit per order</span><b data-out="profit">—</b></div>
+    <div class="result"><span>Total fees &amp; commission</span><b data-out="fees">—</b></div>
+    <div class="result"><span>Referral fee</span><b data-out="referral">—</b></div>
+    <div class="result" data-show="aff"><span>Affiliate commission</span><b data-out="aff">—</b></div>
+    <div class="result"><span>Payout</span><b data-out="payout">—</b></div>
+    <div class="result"><span>Profit margin</span><b data-out="margin">—</b></div>
+    <div class="result"><span>Break-even product price</span><b data-out="breakeven">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const custom = v.category === "custom";
+  out.show("custom", custom);
+  const r = (custom ? v.customRate : parseFloat(v.category)) / 100;
+  const a = v.affRate / 100;
+
+  const sale = v.price + v.shipCharged;       // customer payment before tax
+  const referral = sale * r;                  // referral fee: price + buyer shipping, excludes tax
+  const aff = v.price * a;                    // creator commission: product price only
+  const fees = referral + aff;
+  const payout = sale - fees;
+  const profit = payout - v.itemCost - v.shipCost;
+
+  const breakeven = (v.itemCost + v.shipCost - v.shipCharged * (1 - r)) / (1 - r - a);
+
+  out.set("profit", Calc.money(profit), Calc.tone(profit));
+  out.set("fees", Calc.money(fees));
+  out.set("referral", Calc.money(referral));
+  out.show("aff", a > 0);
+  out.set("aff", Calc.money(aff));
+  out.set("payout", Calc.money(payout));
+  out.set("margin", sale > 0 ? Calc.pct(profit / sale) : "—");
+  out.set("breakeven", 1 - r - a > 0 ? Calc.money(Math.max(0, breakeven)) : "—");
+  if (sale > 0) out.note(`TikTok and the creator take ${Calc.pct(fees / sale)} of what the customer pays (before tax).`);
+}));
+</script>
+<!-- article -->
+<h2>How TikTok Shop fees work in 2026</h2>
+<p>TikTok Shop's main seller charge is the <strong>referral fee</strong>, a percentage of each completed order. There
+are no listing fees and no monthly subscription for US sellers.</p>
+<ul>
+  <li><strong>Most categories: 6%</strong> in TikTok's published US category table.</li>
+  <li><strong>Select jewelry and pre-owned categories: 5%</strong>. Qualifying pre-owned and collectible sales pay 3%
+  on the portion above $10,000.</li>
+  <li><strong>New sellers: 3% for 30 days</strong> if the first sale happens within 60 days of finishing
+  onboarding.</li>
+</ul>
+<p>A caution on the headline rate: several seller guides report that TikTok raised the rate for most non-food
+categories to 8% on August 4, 2026, with some beauty and electronics sub-categories higher still, while TikTok's public
+table continues to show 6%. Your Seller Center and settlement statements are the final word. The calculator includes
+both rates and a custom option.</p>
+<p>The referral fee is charged on what the customer pays, including buyer-paid shipping and platform-funded discounts,
+minus sales tax. If a creator drove the sale, you also pay the <strong>affiliate commission</strong> you set,
+calculated on the product price. For many shops, that commission is a bigger cost than the referral fee.</p>
+
+<h2>The formula</h2>
+<div class="formula">referral fee = (product price + shipping buyer pays) × referral rate<br>
+affiliate commission = product price × commission rate<br>
+payout = product price + shipping buyer pays − referral fee − affiliate commission<br>
+profit = payout − product cost − shipping label cost</div>
+
+<h2>Example: a $25 product sold through a creator</h2>
+<p>A creator's video sells your $25 phone stand with free shipping. It costs you $6 to make, the label costs $5, and
+your affiliate plan pays creators 10%. The category rate is 6%.</p>
+<table>
+  <tr><th>Line</th><th>Amount</th></tr>
+  <tr><td>Referral fee (6% of $25)</td><td>$1.50</td></tr>
+  <tr><td>Affiliate commission (10% of $25)</td><td>$2.50</td></tr>
+  <tr><td><strong>Total fees and commission</strong></td><td><strong>$4.00</strong></td></tr>
+  <tr><td>Payout ($25 − $4.00)</td><td>$21.00</td></tr>
+  <tr><td>Minus product cost ($6) and label ($5)</td><td><strong>$10.00 profit</strong></td></tr>
+</table>
+<p>At the reported 8% rate, the referral fee becomes $2.00 and profit drops to $9.50. Without a creator involved, the
+same sale at 6% would make $12.50.</p>
+
+<h2>Tips for TikTok Shop sellers</h2>
+<ul>
+  <li><strong>Set affiliate rates from your margin, not your competitors.</strong> Use the break-even price to see how
+  much commission a product can carry before it stops paying.</li>
+  <li><strong>Use the new-seller window.</strong> Thirty days at 3% is worth planning a launch around, since the clock
+  starts with your first sale.</li>
+  <li><strong>Plan for refunds.</strong> TikTok keeps 20% of the referral fee (up to $5 per item) as a refund
+  administration fee, and you usually lose the shipping label too.</li>
+  <li><strong>Read your settlement statements.</strong> Rates vary by category and change often. Compare the fees you
+  were actually charged with this calculator once a month.</li>
+  <li><strong>Count samples and ads.</strong> Free samples sent to creators and paid promotion aren't in the referral
+  fee, but they're real costs per order.</li>
+</ul>

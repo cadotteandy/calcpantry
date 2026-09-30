@@ -1,0 +1,163 @@
+---
+{
+  "title": "Etsy Fee Calculator 2026: Fees, Payout & Profit",
+  "description": "Calculate Etsy's listing, 6.5% transaction, 3% + $0.25 processing and Offsite Ads fees, plus your payout and profit after materials and shipping.",
+  "h1": "Etsy Fee Calculator",
+  "short": "Etsy Fee Calculator",
+  "intro": "Enter your item price, shipping and costs to see every Etsy fee, what you'll be paid, and your real profit per order.",
+  "updated": "September 2026",
+  "related": ["ebay-fee-calculator", "3d-print-cost-calculator", "freelance-rate-calculator", "side-hustle-tax-calculator"],
+  "faq": [
+    {"q": "How much does Etsy take from a sale in 2026?", "a": "For a US seller, Etsy charges a $0.20 listing fee, a 6.5% transaction fee on the item price plus shipping and gift wrap, and a payment processing fee of 3% + $0.25. On a $32 item with $6 shipping, that's $4.06, or about 10.7% of the order."},
+    {"q": "Does Etsy charge fees on shipping?", "a": "Yes. The 6.5% transaction fee and the 3% processing fee both apply to the shipping you charge the buyer, not just the item price. Offering free shipping and raising your price costs about the same in fees."},
+    {"q": "Does Etsy charge fees on sales tax?", "a": "The 6.5% transaction fee is not charged on sales tax, but the 3% payment processing fee is calculated on the full order total including tax. Etsy collects and remits the tax itself, so you never receive it."},
+    {"q": "What is the Etsy Offsite Ads fee?", "a": "When a buyer clicks an Etsy ad on another site and buys from you within 30 days, Etsy charges 15% of the order total. Sellers who made over $10,000 in the past 12 months pay 12%, and for them the program is mandatory. The fee is capped at $100 per order."},
+    {"q": "Do I pay the $0.20 listing fee again when an item sells?", "a": "Yes, in effect. A listing costs $0.20 and lasts four months or until the item sells. If you have more quantity and auto-renew is on, Etsy charges another $0.20 to renew the listing after each sale."},
+    {"q": "Can I avoid Etsy Offsite Ads fees?", "a": "Sellers under $10,000 in yearly sales can opt out in their shop settings. Once you pass $10,000, you can't opt out, but your rate drops to 12%. Some sellers build the possible fee into their prices."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="price">Item price</label>
+        <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="32" inputmode="decimal"></div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="shipCharged">Shipping charged</label>
+          <div class="input"><span class="unit pre">$</span><input id="shipCharged" name="shipCharged" type="number" min="0" step="0.01" value="6" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="giftWrap">Gift wrap charged</label>
+          <div class="input"><span class="unit pre">$</span><input id="giftWrap" name="giftWrap" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="itemCost">Materials / item cost</label>
+          <div class="input"><span class="unit pre">$</span><input id="itemCost" name="itemCost" type="number" min="0" step="0.01" value="8" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="labelCost">Shipping label cost</label>
+          <div class="input"><span class="unit pre">$</span><input id="labelCost" name="labelCost" type="number" min="0" step="0.01" value="6" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="taxRate">Buyer's sales tax</label>
+        <div class="input"><input id="taxRate" name="taxRate" type="number" min="0" max="15" step="0.1" value="0" inputmode="decimal"><span class="unit">%</span></div>
+        <div class="hint">Optional. Etsy's 3% processing fee is charged on tax too.</div>
+      </div>
+      <div class="field">
+        <label for="offsite">Offsite Ads</label>
+        <select id="offsite" name="offsite">
+          <option value="0">Not from an Offsite Ad</option>
+          <option value="15">Offsite Ads sale (15%)</option>
+          <option value="12">Offsite Ads sale, $10k+ seller (12%)</option>
+        </select>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Profit</span><b data-out="profit">—</b></div>
+    <div class="result"><span>Total Etsy fees</span><b data-out="fees">—</b></div>
+    <div class="result"><span>Listing fee</span><b data-out="listing">—</b></div>
+    <div class="result"><span>Transaction fee (6.5%)</span><b data-out="transaction">—</b></div>
+    <div class="result"><span>Payment processing</span><b data-out="processing">—</b></div>
+    <div class="result" data-show="ads" hidden><span>Offsite Ads fee</span><b data-out="adFee">—</b></div>
+    <div class="result"><span>Payout from Etsy</span><b data-out="payout">—</b></div>
+    <div class="result"><span>Profit margin</span><b data-out="margin">—</b></div>
+    <div class="result"><span>Break-even item price</span><b data-out="breakeven">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const sale = v.price + v.shipCharged + v.giftWrap;   // what the buyer pays you, before tax
+  const t = 1 + v.taxRate / 100;
+  const a = parseFloat(v.offsite) / 100;
+  const has = sale > 0;
+
+  const listing = has ? 0.20 : 0;
+  const transaction = sale * 0.065;
+  const processing = has ? sale * t * 0.03 + 0.25 : 0; // processing includes sales tax
+  const adFee = Math.min(sale * a, 100);                // Offsite Ads capped at $100 per order
+  const fees = listing + transaction + processing + adFee;
+  const payout = sale - fees;                           // tax passes through to the state
+  const profit = payout - v.itemCost - v.labelCost;
+
+  // Break-even item price, same shipping/gift wrap/tax (ignores the $100 ad cap).
+  const k = 1 - 0.065 - 0.03 * t - a;
+  const breakeven = (0.45 + v.itemCost + v.labelCost) / k - v.shipCharged - v.giftWrap;
+
+  out.set("profit", Calc.money(profit), Calc.tone(profit));
+  out.set("fees", Calc.money(fees));
+  out.set("listing", Calc.money(listing));
+  out.set("transaction", Calc.money(transaction));
+  out.set("processing", Calc.money(processing));
+  out.show("ads", a > 0);
+  out.set("adFee", Calc.money(adFee));
+  out.set("payout", Calc.money(payout));
+  out.set("margin", has ? Calc.pct(profit / sale) : "—");
+  out.set("breakeven", Calc.money(Math.max(0, breakeven)));
+  if (has) {
+    let msg = `Etsy keeps ${Calc.pct(fees / sale)} of what the buyer pays you (before tax).`;
+    if (a > 0 && sale * a > 100) msg += " The Offsite Ads fee hit its $100 cap.";
+    out.note(msg);
+  }
+}));
+</script>
+<!-- article -->
+<h2>How Etsy fees work in 2026</h2>
+<p>Etsy stacks several small fees rather than charging one big one. For a US shop selling to a US buyer, every order
+pays three:</p>
+<ul>
+  <li><strong>Listing fee: $0.20</strong> per listing. It lasts four months or until the item sells. With auto-renew
+  on, Etsy charges another $0.20 each time a multi-quantity listing sells.</li>
+  <li><strong>Transaction fee: 6.5%</strong> of the item price plus the shipping and gift wrap you charge. It is not
+  charged on sales tax.</li>
+  <li><strong>Payment processing: 3% + $0.25</strong> per order through Etsy Payments. This one is calculated on the
+  full order total, <em>including</em> sales tax.</li>
+</ul>
+<p>Some orders carry a fourth. If a buyer clicks one of Etsy's ads on another site (Google, Instagram, Pinterest and
+others) and buys within 30 days, you pay an <strong>Offsite Ads fee of 15%</strong> of the order total. Shops with
+over $10,000 in sales in the past 12 months pay <strong>12%</strong> and can't opt out. The fee is capped at $100
+per order.</p>
+
+<h2>The formula</h2>
+<div class="formula">sale = item price + shipping charged + gift wrap<br>
+transaction fee = sale × 6.5%<br>
+processing fee = sale × (1 + sales tax rate) × 3% + $0.25<br>
+Etsy fees = $0.20 + transaction fee + processing fee + Offsite Ads fee<br>
+profit = sale − Etsy fees − materials − shipping label</div>
+
+<h2>Example: a $32 order with $6 shipping</h2>
+<p>You sell a handmade candle for $32 and charge $6 shipping. Materials cost $8 and the label costs $6. No Offsite
+Ad was involved, and we'll leave sales tax out to keep the numbers clean.</p>
+<table>
+  <tr><th>Line</th><th>Amount</th></tr>
+  <tr><td>Listing fee</td><td>$0.20</td></tr>
+  <tr><td>Transaction fee (6.5% of $38)</td><td>$2.47</td></tr>
+  <tr><td>Payment processing (3% of $38 + $0.25)</td><td>$1.39</td></tr>
+  <tr><td><strong>Total Etsy fees</strong></td><td><strong>$4.06</strong></td></tr>
+  <tr><td>Payout ($38 − $4.06)</td><td>$33.94</td></tr>
+  <tr><td>Minus materials ($8) and label ($6)</td><td><strong>$19.94 profit</strong></td></tr>
+</table>
+<p>If that same order came through an Offsite Ad at 15%, add $5.70 in fees and profit drops to $14.24. That's the
+single biggest swing in Etsy pricing, so it's worth knowing whether your shop is enrolled.</p>
+
+<h2>Pricing tips for Etsy sellers</h2>
+<ul>
+  <li><strong>Charge for your time.</strong> Materials are only part of the cost. Put your hourly labor into the item
+  cost field to see whether the price actually pays you.</li>
+  <li><strong>Plan for Offsite Ads.</strong> If you're over $10,000 a year, a share of your orders will carry the 12%
+  fee. Price so those orders still make money.</li>
+  <li><strong>Free shipping doesn't avoid fees.</strong> Etsy charges the same percentages whether shipping is
+  a separate line or built into the price.</li>
+  <li><strong>Buy labels through Etsy.</strong> Etsy's discounted labels are often cheaper than retail postage, which
+  lowers your label cost without touching the buyer's price.</li>
+  <li><strong>Watch small orders.</strong> The fixed $0.45 ($0.20 listing + $0.25 processing) is 9% of a $5 sale
+  before any percentage fees.</li>
+</ul>

@@ -1,0 +1,222 @@
+---
+{
+  "title": "Epoxy Resin Calculator: Tables, Coasters & River Tables",
+  "description": "Work out how much epoxy resin you need for a table top, coasters or a river table, split into part A and part B, with kits to buy and total cost.",
+  "h1": "Epoxy Resin Calculator",
+  "short": "Epoxy Resin Calculator",
+  "intro": "Choose your project shape, enter the size and pour depth, and get the mixed resin volume in fluid ounces, milliliters and gallons, split by your kit's mix ratio.",
+  "updated": "September 2026",
+  "related": ["board-foot-calculator", "3d-print-cost-calculator", "concrete-calculator", "etsy-fee-calculator"],
+  "faq": [
+    {"q": "How much epoxy do I need for a table top?", "a": "Multiply length by width by pour depth in inches to get cubic inches, then divide by 1.805 to get fluid ounces. A 48 by 24 inch top with a 1/8 inch flood coat is 144 cubic inches, about 80 fluid ounces, or roughly 88 ounces once you add 10% for drips and the film left in the cup."},
+    {"q": "How much area does a gallon of epoxy cover?", "a": "A gallon is 231 cubic inches. At 1/8 inch deep it covers about 1,848 square inches, or roughly 12.8 square feet. At 1/16 inch it covers about 25 square feet, and at 1/4 inch about 6.4 square feet."},
+    {"q": "How deep can I pour epoxy in one layer?", "a": "It depends on the product. Tabletop and coating resins are usually limited to about 1/8 inch per coat, art resins to about 1/4 inch, and deep-pour or casting resins to anywhere from 1 to 4 inches per layer. Pouring deeper than the label allows traps heat, which can cause yellowing, cracking, bubbles or smoking."},
+    {"q": "Is the 2:1 mix ratio by volume or by weight?", "a": "This calculator treats every ratio as a volume ratio, which is how most hobby kits are written. Part A and Part B often have different densities, so a 2:1 volume ratio is not 2:1 by weight. If your label gives a weight ratio, mix by weight on a scale using the numbers on the label."},
+    {"q": "How much extra epoxy should I mix?", "a": "Add 10% for flat coats and coasters to cover drips over the edge, resin left in the cup and uneven surfaces. For river tables with porous live edges, bark voids or a mold that may leak, 15 to 20% is safer. Wood soaks up resin, so seal the wood with a thin coat first."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="shape">Project shape</label>
+        <select id="shape" name="shape">
+          <option value="rect">Rectangle (table top, tray, bar top)</option>
+          <option value="circle">Circle (coasters, round table)</option>
+          <option value="river">River table channel</option>
+        </select>
+      </div>
+      <div class="row2" data-show="rectDims">
+        <div class="field">
+          <label for="length">Length</label>
+          <div class="input"><input id="length" name="length" type="number" min="0" step="0.25" value="48" inputmode="decimal"><span class="unit">in</span></div>
+        </div>
+        <div class="field">
+          <label for="width">Width</label>
+          <div class="input"><input id="width" name="width" type="number" min="0" step="0.25" value="24" inputmode="decimal"><span class="unit">in</span></div>
+        </div>
+      </div>
+      <div class="field" data-show="circleDims" hidden>
+        <label for="diameter">Diameter</label>
+        <div class="input"><input id="diameter" name="diameter" type="number" min="0" step="0.25" value="4" inputmode="decimal"><span class="unit">in</span></div>
+      </div>
+      <div class="row2" data-show="riverDims" hidden>
+        <div class="field">
+          <label for="riverBy">River size by</label>
+          <select id="riverBy" name="riverBy">
+            <option value="width">Average river width</option>
+            <option value="pct">% of table area</option>
+          </select>
+        </div>
+        <div class="field" data-show="riverWidth">
+          <label for="riverWidth">Average width</label>
+          <div class="input"><input id="riverWidth" name="riverWidth" type="number" min="0" step="0.25" value="8" inputmode="decimal"><span class="unit">in</span></div>
+        </div>
+        <div class="field" data-show="riverPct" hidden>
+          <label for="voidPct">River (void) area</label>
+          <div class="input"><input id="voidPct" name="voidPct" type="number" min="0" max="100" step="1" value="25" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="depth">Pour depth</label>
+          <div class="input"><input id="depth" name="depth" type="number" min="0" step="0.0625" value="0.125" inputmode="decimal"><span class="unit">in</span></div>
+          <div class="hint">1/8 in = 0.125, 1/4 in = 0.25.</div>
+        </div>
+        <div class="field">
+          <label for="qty">Number of pieces</label>
+          <input id="qty" name="qty" type="number" min="1" step="1" value="1" inputmode="numeric">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="ratio">Mix ratio (A : B by volume)</label>
+          <select id="ratio" name="ratio">
+            <option value="1:1">1 : 1</option>
+            <option value="2:1">2 : 1</option>
+            <option value="3:1">3 : 1</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="waste">Extra for waste</label>
+          <div class="input"><input id="waste" name="waste" type="number" min="0" step="1" value="10" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+      </div>
+      <div class="row2" data-show="customRatio" hidden>
+        <div class="field">
+          <label for="partsA">Part A (resin) parts</label>
+          <input id="partsA" name="partsA" type="number" min="0" step="0.5" value="2" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="partsB">Part B (hardener) parts</label>
+          <input id="partsB" name="partsB" type="number" min="0" step="0.5" value="1" inputmode="decimal">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="kitSize">Kit size (A + B)</label>
+          <div class="input"><input id="kitSize" name="kitSize" type="number" min="0" step="1" value="128" inputmode="decimal"><span class="unit">fl oz</span></div>
+          <div class="hint">1 gallon kit = 128 fl oz.</div>
+        </div>
+        <div class="field">
+          <label for="kitPrice">Kit price</label>
+          <div class="input"><span class="unit pre">$</span><input id="kitPrice" name="kitPrice" type="number" min="0" step="0.01" value="100" inputmode="decimal"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Mixed resin needed</span><b data-out="total">—</b></div>
+    <div class="result"><span>In milliliters</span><b data-out="ml">—</b></div>
+    <div class="result"><span>In gallons</span><b data-out="gal">—</b></div>
+    <div class="result"><span>Part A (resin)</span><b data-out="partA">—</b></div>
+    <div class="result"><span>Part B (hardener)</span><b data-out="partB">—</b></div>
+    <div class="result"><span>Pour volume (before waste)</span><b data-out="cuin">—</b></div>
+    <div class="result"><span>Kits to buy</span><b data-out="kits">—</b></div>
+    <div class="result"><span>Resin cost</span><b data-out="cost">—</b></div>
+    <div class="result"><span>Pours at label limits</span><b data-out="layers">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const CUIN_PER_FLOZ = 231 / 128, ML_PER_FLOZ = 29.5735;
+  out.show("rectDims", v.shape !== "circle");
+  out.show("circleDims", v.shape === "circle");
+  out.show("riverDims", v.shape === "river");
+  out.show("riverWidth", v.riverBy === "width");
+  out.show("riverPct", v.riverBy === "pct");
+  out.show("customRatio", v.ratio === "custom");
+
+  let area;
+  if (v.shape === "circle") area = Math.PI * (v.diameter / 2) ** 2;
+  else if (v.shape === "river") area = v.riverBy === "pct"
+    ? v.length * v.width * Math.min(v.voidPct, 100) / 100
+    : v.length * Math.min(v.riverWidth, v.width || Infinity);
+  else area = v.length * v.width;
+
+  const qty = Math.max(1, Math.floor(v.qty));
+  const cuin = area * v.depth * qty;
+  const flozNet = cuin / CUIN_PER_FLOZ;
+  const floz = flozNet * (1 + v.waste / 100);
+  const [a, b] = v.ratio === "custom" ? [v.partsA, v.partsB] : v.ratio.split(":").map(Number);
+  const partA = a + b > 0 ? floz * a / (a + b) : 0;
+  const kits = v.kitSize > 0 ? Math.ceil(floz / v.kitSize - 1e-9) : 0;
+
+  const oz = (x) => x >= 128 ? `${Calc.num(x / 128, 2)} gal` : `${Calc.num(x, 1)} fl oz`;
+  out.set("total", oz(floz));
+  out.set("ml", Calc.num(floz * ML_PER_FLOZ, 0) + " ml");
+  out.set("gal", Calc.num(floz / 128, 3) + " gal");
+  out.set("partA", `${Calc.num(partA, 1)} fl oz`);
+  out.set("partB", `${Calc.num(floz - partA, 1)} fl oz`);
+  out.set("cuin", `${Calc.num(cuin, 1)} cu in (${Calc.num(flozNet, 1)} fl oz)`);
+  out.set("kits", v.kitSize > 0 ? `${kits} × ${Calc.num(v.kitSize, 0)} fl oz` : "—");
+  out.set("cost", Calc.money(kits * v.kitPrice));
+  out.set("layers", v.depth > 0
+    ? `${Math.ceil(v.depth / 0.125 - 1e-9)} coat(s) tabletop / ${Math.ceil(v.depth / 2 - 1e-9)} layer(s) deep pour` : "—");
+
+  if (v.depth > 0.25) out.note("Deeper than 1/4 in: use a deep-pour (casting) resin, often 2:1 or 3:1, and never exceed the per-layer depth on its label. Tabletop resin would overheat.");
+  else if (v.depth > 0.125) out.note("Between 1/8 and 1/4 in suits most art resins in one pour. Tabletop coating resin is usually limited to about 1/8 in per coat.");
+  else out.note("A 1/8 in flood coat is the usual limit per coat for tabletop resin. Seal porous wood with a thin coat first so it doesn't drink the flood coat.");
+}));
+</script>
+<!-- article -->
+<h2>How much epoxy resin you need</h2>
+<p>Epoxy is sold by volume, so the job is to work out the volume of the space you're filling. For a flat coat
+that's the surface area times the pour depth. For coasters it's the area of a circle times the depth, times the
+number of pieces. For a river table only the channel between the slabs gets filled, so you use the river's
+length times its average width, or a share of the whole table area if you've sketched it out that way. The
+calculator converts cubic inches to fluid ounces, adds a waste allowance, and splits the total by your kit's
+mix ratio.</p>
+
+<h2>The formula</h2>
+<div class="formula">rectangle volume = length × width × depth (cu in)<br>
+circle volume = π × (diameter ÷ 2)² × depth × pieces<br>
+river volume = length × average river width × depth<br>
+fluid ounces = cubic inches ÷ 1.805<br>
+total to mix = fluid ounces × (1 + waste %)<br>
+part A = total × A ÷ (A + B), part B = total − part A</div>
+<p>The 1.805 comes from the US gallon: 231 cubic inches divided by 128 fluid ounces. Mix ratios here are by
+volume, which is how most hobby kits are labeled. If your kit gives a ratio by weight, measure on a scale
+using the label's numbers, because resin and hardener rarely have the same density.</p>
+
+<h2>Example: a 48 × 24 inch table top</h2>
+<p>A single flood coat 1/8 inch deep on a 48 × 24 inch top, with a 1:1 resin, 10% extra, and a $100 one-gallon kit:</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Volume: 48 × 24 × 0.125</td><td>144 cu in</td></tr>
+  <tr><td>Fluid ounces: 144 ÷ 1.805</td><td>79.8 fl oz</td></tr>
+  <tr><td>With 10% waste</td><td><strong>87.8 fl oz</strong> (2,596 ml, 0.686 gal)</td></tr>
+  <tr><td>Part A / Part B at 1:1</td><td>43.9 fl oz each</td></tr>
+  <tr><td>Kits: 87.8 ÷ 128</td><td>1 kit, $100.00</td></tr>
+</table>
+
+<h2>Pour depth: coating resin vs deep-pour resin</h2>
+<p>Epoxy gives off heat as it cures, and a thick mass traps that heat. Too much in one pour can yellow, crack,
+ripple, trap bubbles or even smoke. Manufacturers design products around a maximum layer depth:</p>
+<table>
+  <tr><th>Resin type</th><th>Typical mix</th><th>Max per layer</th></tr>
+  <tr><td>Tabletop / coating</td><td>1:1</td><td>About 1/8 in</td></tr>
+  <tr><td>Art resin</td><td>1:1</td><td>About 1/4 in</td></tr>
+  <tr><td>Deep pour / casting</td><td>2:1 or 3:1</td><td>1–4 in, depending on product</td></tr>
+</table>
+<p>The "pours at label limits" line assumes 1/8 inch per tabletop coat and 2 inches per deep-pour layer. Your
+label wins, especially for deep-pour resins, where some allow only 1 inch and others 4 inches. Wait for each layer
+to cool and firm up as directed before pouring the next.</p>
+
+<h2>Tips for estimating accurately</h2>
+<ul>
+  <li><strong>Measure a river channel in several places.</strong> Live edges wander. Measure the width every
+  foot or so and average the numbers, and use the deepest point of the mold for depth.</li>
+  <li><strong>Seal the wood first.</strong> Bare wood absorbs resin and releases air bubbles. A thin seal coat,
+  worked in with a brush or spreader, uses roughly a quarter of what a flood coat does.</li>
+  <li><strong>Raise waste for river tables.</strong> Bark pockets, cracks and a mold that may seep easily eat
+  15–20% extra. Running short partway through a deep pour is far worse than having leftover resin.</li>
+  <li><strong>Mix in batches you can pour in time.</strong> Working time drops as the batch gets bigger. Deep-pour
+  resins give you longer, but check the label's maximum batch size too.</li>
+  <li><strong>Work at room temperature.</strong> Most resins want about 70–80°F for pouring and curing. Cold
+  resin is thick and holds bubbles.</li>
+</ul>

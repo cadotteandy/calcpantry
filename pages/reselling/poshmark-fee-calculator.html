@@ -1,0 +1,135 @@
+---
+{
+  "title": "Poshmark Fee Calculator 2026: Earnings & Profit",
+  "description": "Calculate Poshmark's fee ($2.95 under $15, 20% at $15 and up), your earnings and real profit after item cost and any shipping discount you cover.",
+  "h1": "Poshmark Fee Calculator",
+  "short": "Poshmark Fee Calculator",
+  "intro": "Enter your sale price and costs to see Poshmark's cut, what you'll earn, and your profit after what you paid for the item.",
+  "updated": "September 2026",
+  "related": ["mercari-fee-calculator", "ebay-fee-calculator", "etsy-fee-calculator", "side-hustle-tax-calculator"],
+  "faq": [
+    {"q": "How much does Poshmark take from a sale in 2026?", "a": "Poshmark charges a flat $2.95 on sales under $15 and 20% on sales of $15 or more. On a $40 sale, the fee is $8.00 and you earn $32.00. There are no listing fees or separate payment processing fees."},
+    {"q": "Does Poshmark charge fees on shipping?", "a": "No. The buyer pays for shipping through Poshmark's prepaid label, and the commission is calculated on the sale price only. You pay part of shipping only if you offer a shipping discount or need a heavier label than the standard one."},
+    {"q": "Is it better to price an item at $14 or $15 on Poshmark?", "a": "At $14 you pay $2.95 and keep $11.05. At $15 you pay $3.00 and keep $12.00. Once you're near the line, going up to $15 almost always nets you more, since the fee only rises by five cents."},
+    {"q": "Who pays for shipping on Poshmark?", "a": "The buyer pays the flat shipping rate at checkout, and Poshmark emails you a prepaid label. If you offer discounted or free shipping, the discount is taken out of your earnings. Packages over 5 lb need an upgraded label, and the seller pays the difference."},
+    {"q": "When do I get paid on Poshmark?", "a": "Your earnings are released after the buyer accepts the order, or automatically three days after delivery if they don't report a problem. You can then transfer the balance to your bank or spend it on Poshmark."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="price">Sold price</label>
+        <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="40" inputmode="decimal"></div>
+        <div class="hint">The price the buyer paid for the item, after any offer or bundle discount.</div>
+      </div>
+      <div class="field">
+        <label for="itemCost">Item cost</label>
+        <div class="input"><span class="unit pre">$</span><input id="itemCost" name="itemCost" type="number" min="0" step="0.01" value="10" inputmode="decimal"></div>
+      </div>
+      <div class="field">
+        <label for="shipCover">Shipping you cover</label>
+        <div class="input"><span class="unit pre">$</span><input id="shipCover" name="shipCover" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div>
+        <div class="hint">Usually 0: the buyer pays for the prepaid label. Enter the discount if you offered reduced or free shipping, or the upgrade cost for a package over 5 lb.</div>
+      </div>
+      <div class="field">
+        <label for="otherCost">Other costs (packaging, etc.)</label>
+        <div class="input"><span class="unit pre">$</span><input id="otherCost" name="otherCost" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Profit</span><b data-out="profit">—</b></div>
+    <div class="result"><span>Poshmark fee</span><b data-out="fee">—</b></div>
+    <div class="result"><span>Fee type</span><b data-out="feeType">—</b></div>
+    <div class="result"><span>Your earnings</span><b data-out="earnings">—</b></div>
+    <div class="result"><span>Profit margin</span><b data-out="margin">—</b></div>
+    <div class="result"><span>Break-even sold price</span><b data-out="breakeven">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const p = v.price;
+  const flat = p > 0 && p < 15;
+  const fee = p <= 0 ? 0 : (flat ? 2.95 : p * 0.20);
+  const earnings = p - fee - v.shipCover;          // shipping discount comes out of earnings
+  const profit = earnings - v.itemCost - v.otherCost;
+
+  // Break-even: under $15 you need costs + $2.95; at $15+ you need costs / 0.8.
+  const costs = v.itemCost + v.shipCover + v.otherCost;
+  const underLine = costs + 2.95;
+  const breakeven = underLine < 15 ? underLine : costs / 0.8;
+
+  out.set("profit", Calc.money(profit), Calc.tone(profit));
+  out.set("fee", Calc.money(fee));
+  out.set("feeType", p <= 0 ? "—" : (flat ? "Flat $2.95 (under $15)" : "20% commission"));
+  out.set("earnings", Calc.money(earnings));
+  out.set("margin", p > 0 ? Calc.pct(profit / p) : "—");
+  out.set("breakeven", Calc.money(breakeven));
+
+  if (p >= 14 && p < 15) {
+    out.note(`Pricing at $15 instead would cost $3.00 in fees and leave you ${Calc.money(15 - 3 - p + 2.95)} more.`);
+  } else if (p > 0 && p < 14) {
+    out.note(`The flat $2.95 fee is ${Calc.pct(fee / p)} of this sale. Bundling low-priced items helps.`);
+  } else if (p > 0) {
+    out.note("Poshmark keeps 20% of the sale price. The buyer pays for shipping separately.");
+  }
+}));
+</script>
+<!-- article -->
+<h2>How Poshmark fees work in 2026</h2>
+<p>Poshmark has one of the simplest fee structures of any resale marketplace. There's no listing fee, no monthly
+subscription and no separate payment processing fee. When something sells, Poshmark takes one of two amounts:</p>
+<ul>
+  <li><strong>Sales under $15:</strong> a flat <strong>$2.95</strong>.</li>
+  <li><strong>Sales of $15 or more:</strong> <strong>20%</strong> of the sale price.</li>
+</ul>
+<p>The fee is based on the price the buyer pays for the item, after any accepted offer or bundle discount. It is not
+charged on shipping or on the sales tax Poshmark collects.</p>
+
+<h3>Who pays shipping</h3>
+<p>The buyer pays a flat shipping rate at checkout, and Poshmark emails you a prepaid label for packages up to 5 lb.
+In the normal case shipping costs you nothing. You pay part of it in two situations: when you offer a
+<strong>shipping discount</strong> (reduced or free shipping) to close a sale, or when a heavy package needs an
+<strong>upgraded label</strong>. Either way the amount comes out of your earnings, so enter it in the "Shipping you
+cover" field.</p>
+
+<h2>The formula</h2>
+<div class="formula">Poshmark fee = $2.95 if sold price &lt; $15, otherwise sold price × 20%<br>
+earnings = sold price − Poshmark fee − shipping you cover<br>
+profit = earnings − item cost − other costs</div>
+
+<h2>Example: a $40 sale</h2>
+<p>You sell a pair of jeans you bought for $10 at a thrift store. The buyer pays $40 plus shipping, and you don't
+offer a shipping discount.</p>
+<table>
+  <tr><th>Line</th><th>Amount</th></tr>
+  <tr><td>Sold price</td><td>$40.00</td></tr>
+  <tr><td>Poshmark fee (20% of $40)</td><td>$8.00</td></tr>
+  <tr><td>Shipping you cover</td><td>$0.00</td></tr>
+  <tr><td><strong>Your earnings</strong></td><td><strong>$32.00</strong></td></tr>
+  <tr><td>Minus item cost ($10)</td><td><strong>$22.00 profit</strong></td></tr>
+</table>
+<p>That's a 55% margin on the sale price. The lowest price you could accept without losing money is $12.95,
+because below $15 the fee is a flat $2.95 on top of your $10 cost.</p>
+
+<h2>The $15 line</h2>
+<p>Because the fee switches from flat to percentage at $15, prices just under the line are a bad deal. A $14 sale
+pays $2.95 and nets $11.05; a $15 sale pays $3.00 and nets $12.00. If an item is worth around $14, list it at $15
+or bundle it with something else. At the bottom end, the flat fee is brutal: on a $5 item it's 59% of the sale.</p>
+
+<h2>Tips for keeping more on Poshmark</h2>
+<ul>
+  <li><strong>List high enough to leave room for offers.</strong> Most Poshmark buyers make an offer, so price
+  10–20% above what you'll accept and use the break-even figure as your floor.</li>
+  <li><strong>Count shipping discounts as a cost.</strong> A discount that looks small can wipe out the profit on a
+  cheap item.</li>
+  <li><strong>Weigh heavy items before you list.</strong> Coats, boots and bundles can go over 5 lb, and the label
+  upgrade is on you.</li>
+  <li><strong>Bundle low-priced pieces.</strong> Three $8 tops sold together pay one 20% fee ($4.80) instead of three
+  $2.95 fees ($8.85).</li>
+  <li><strong>Keep records.</strong> Poshmark may send you a 1099-K, so track what you paid for each item.</li>
+</ul>

@@ -1,0 +1,153 @@
+---
+{
+  "title": "StockX Fee Calculator 2026: Seller Payout by Level",
+  "description": "Calculate your StockX payout after the 7%–9% transaction fee by seller level, 3% payment processing, the $5 minimum and $5 shipping fee, plus your profit.",
+  "h1": "StockX Fee Calculator",
+  "short": "StockX Fee Calculator",
+  "intro": "Enter your ask price and seller level to see StockX's fees, the payout you'll receive, and your profit on the pair.",
+  "updated": "September 2026",
+  "related": ["flip-profit-calculator", "ebay-fee-calculator", "whatnot-fee-calculator", "markup-margin-calculator"],
+  "faq": [
+    {"q": "How much does StockX take from sellers in 2026?", "a": "On the Verified Marketplace, US sellers pay a transaction fee of 9% at Level 1 down to 7% at Level 5, plus a 3% payment processing fee and a $5 shipping fee. A Level 1 seller selling a $200 pair pays $29 in total and receives $171."},
+    {"q": "Is there a minimum fee on StockX?", "a": "Yes. StockX lists a $5.00 minimum seller fee for US sellers, which matters on low-priced items. On anything above about $56 at Level 1, the percentage fee is already higher than $5, so the minimum doesn't come into play."},
+    {"q": "Do sellers pay for shipping on StockX?", "a": "StockX gives you a prepaid label, but US sellers pay a $5 seller shipping fee per standard sale, deducted from the payout. It rose from $4 to $5 on March 1, 2026. StockX says free shipping may be available through some drop-off locations."},
+    {"q": "How do I reach a higher StockX seller level?", "a": "Seller levels are based on your recent sales volume and seller performance, such as shipping on time and passing verification. Each level lowers your transaction fee by 0.5 percentage points, from 9% at Level 1 to 7% at Level 5. Check your current level in your StockX seller profile."},
+    {"q": "Does the Listings Marketplace have the same fees?", "a": "No. StockX says it charges sellers no standard selling, processing or shipping fees on the Listings Marketplace; the buyer pays those. This calculator covers the Verified Marketplace, where StockX authenticates each item."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="price">Sale price (your ask)</label>
+        <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="1" value="200" inputmode="decimal"></div>
+      </div>
+      <div class="field">
+        <label for="level">Seller level</label>
+        <select id="level" name="level">
+          <option value="9">Level 1 (9%)</option>
+          <option value="8.5">Level 2 (8.5%)</option>
+          <option value="8">Level 3 (8%)</option>
+          <option value="7.5">Level 4 (7.5%)</option>
+          <option value="7">Level 5 (7%)</option>
+          <option value="custom">Custom rate…</option>
+        </select>
+      </div>
+      <div class="field" data-show="custom" hidden>
+        <label for="customRate">Custom transaction fee</label>
+        <div class="input"><input id="customRate" name="customRate" type="number" min="0" max="30" step="0.1" value="9" inputmode="decimal"><span class="unit">%</span></div>
+        <div class="hint">For a promotion or a non-standard rate. The 3% processing fee is added separately.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="shipFee">Seller shipping fee</label>
+          <div class="input"><span class="unit pre">$</span><input id="shipFee" name="shipFee" type="number" min="0" step="0.01" value="5" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="itemCost">What you paid</label>
+          <div class="input"><span class="unit pre">$</span><input id="itemCost" name="itemCost" type="number" min="0" step="0.01" value="120" inputmode="decimal"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Payout</span><b data-out="payout">—</b></div>
+    <div class="result"><span>Total StockX fees</span><b data-out="fees">—</b></div>
+    <div class="result"><span>Transaction fee</span><b data-out="txn">—</b></div>
+    <div class="result"><span>Payment processing (3%)</span><b data-out="proc">—</b></div>
+    <div class="result"><span>Shipping fee</span><b data-out="ship">—</b></div>
+    <div class="result"><span>Profit</span><b data-out="profit">—</b></div>
+    <div class="result"><span>ROI (on what you paid)</span><b data-out="roi">—</b></div>
+    <div class="result"><span>Break-even ask</span><b data-out="breakeven">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const custom = v.level === "custom";
+  out.show("custom", custom);
+  const rate = (custom ? v.customRate : parseFloat(v.level)) / 100;
+  const MIN = 5;   // US minimum seller fee, applied to the transaction fee
+
+  const sold = v.price > 0;
+  const txnRaw = v.price * rate;
+  const txn = sold ? Math.max(txnRaw, MIN) : 0;
+  const proc = sold ? v.price * 0.03 : 0;
+  const ship = sold ? v.shipFee : 0;
+  const fees = txn + proc + ship;
+  const payout = v.price - fees;
+  const profit = payout - v.itemCost;
+
+  // Break-even ask: price where payout = cost (percentage branch, then check the minimum).
+  let breakeven = (v.itemCost + v.shipFee) / (1 - rate - 0.03);
+  if (breakeven * rate < MIN) breakeven = (v.itemCost + v.shipFee + MIN) / 0.97;
+
+  out.set("payout", Calc.money(payout), Calc.tone(payout));
+  out.set("fees", Calc.money(fees));
+  out.set("txn", Calc.money(txn));
+  out.set("proc", Calc.money(proc));
+  out.set("ship", Calc.money(ship));
+  out.set("profit", Calc.money(profit), Calc.tone(profit));
+  out.set("roi", v.itemCost > 0 ? Calc.pct(profit / v.itemCost) : "—");
+  out.set("breakeven", Calc.money(Math.max(0, breakeven)));
+
+  if (!sold) return;
+  if (txnRaw < MIN) out.note(`The $5 minimum applies: ${Calc.pct(rate)} of this price is only ${Calc.money(txnRaw)}. StockX keeps ${Calc.pct(fees / v.price)} of the sale.`);
+  else out.note(`StockX keeps ${Calc.pct(fees / v.price)} of the sale price, including shipping.`);
+}));
+</script>
+<!-- article -->
+<h2>How StockX seller fees work in 2026</h2>
+<p>On StockX's Verified Marketplace, where every item is checked before it reaches the buyer, a US seller's payout is
+the sale price minus three charges:</p>
+<ul>
+  <li><strong>Transaction fee</strong>, set by your seller level: <strong>9%</strong> at Level 1, 8.5% at Level 2,
+  8% at Level 3, 7.5% at Level 4 and <strong>7%</strong> at Level 5. StockX lists a <strong>$5.00 minimum</strong>
+  seller fee for US sellers.</li>
+  <li><strong>Payment processing fee</strong> of <strong>3%</strong> of the sale price at every level.</li>
+  <li><strong>Seller shipping fee</strong> of <strong>$5</strong> per standard sale. StockX provides the prepaid
+  label, and the fee comes out of your payout. It went up from $4 on March 1, 2026.</li>
+</ul>
+<p>Authentication is built into these fees; there's no separate verification charge. If an item fails verification,
+though, expect to cover the cost of getting it back.</p>
+
+<h2>The formula</h2>
+<div class="formula">transaction fee = max(sale price × level rate, $5)<br>
+processing fee = sale price × 3%<br>
+StockX fees = transaction fee + processing fee + $5 shipping<br>
+payout = sale price − StockX fees<br>
+profit = payout − what you paid</div>
+
+<h2>Example: a $200 pair at Level 1</h2>
+<p>You bought a pair of sneakers for $120 and sell them on StockX for $200 as a new Level 1 seller.</p>
+<table>
+  <tr><th>Line</th><th>Amount</th></tr>
+  <tr><td>Transaction fee (9% of $200)</td><td>$18.00</td></tr>
+  <tr><td>Payment processing (3% of $200)</td><td>$6.00</td></tr>
+  <tr><td>Seller shipping fee</td><td>$5.00</td></tr>
+  <tr><td><strong>Total StockX fees</strong></td><td><strong>$29.00</strong></td></tr>
+  <tr><td><strong>Payout ($200 − $29)</strong></td><td><strong>$171.00</strong></td></tr>
+  <tr><td>Profit ($171 − $120)</td><td>$51.00</td></tr>
+  <tr><td>ROI ($51 ÷ $120)</td><td>42.5%</td></tr>
+</table>
+<p>StockX keeps 14.5% of this sale. At Level 5 the transaction fee drops to $14.00, raising the payout to $175.00.</p>
+
+<h3>Why cheap items cost more</h3>
+<p>The $5 minimum and $5 shipping fee are fixed, so they hit low prices hardest. On a $40 item at Level 1, 9% would be
+$3.60, but the minimum lifts it to $5; with $1.20 processing and $5 shipping, StockX keeps $11.20, or 28% of the sale.
+Above roughly $56, the percentage fee exceeds the minimum and total fees settle near 12% plus $5.</p>
+
+<h2>Tips for selling on StockX</h2>
+<ul>
+  <li><strong>Price from the payout back.</strong> Decide the payout you need, then use the break-even ask as your
+  floor. Undercutting the lowest ask by a few dollars costs you less than you think after fees.</li>
+  <li><strong>Compare with eBay.</strong> eBay's authenticity guarantee covers sneakers above certain prices with
+  different fees; check both before listing expensive pairs.</li>
+  <li><strong>Ship on time.</strong> Late or failed shipments bring penalties and can hold back your seller level.</li>
+  <li><strong>Keep the box perfect.</strong> Damaged or missing boxes can fail verification, which costs you the sale
+  and return shipping.</li>
+  <li><strong>Watch for fee promotions.</strong> StockX runs occasional seller-fee discounts; enter the promotional rate
+  with the custom option.</li>
+</ul>

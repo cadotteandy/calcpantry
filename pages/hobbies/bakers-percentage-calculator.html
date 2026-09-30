@@ -1,0 +1,236 @@
+---
+{
+  "title": "Baker's Percentage Calculator for Bread & Pizza Dough",
+  "description": "Turn baker's percentages into gram weights for bread, sourdough and pizza. Start from flour weight or from dough balls, with starter and effective hydration.",
+  "h1": "Baker's Percentage Calculator",
+  "short": "Baker's Percentage Calculator",
+  "intro": "Pick a preset or enter your own percentages. Start from how much flour you have, or from how many dough balls you want, and get every ingredient in grams.",
+  "updated": "September 2026",
+  "related": ["coffee-ratio-calculator", "3d-print-cost-calculator", "candle-wax-calculator", "fabric-yardage-calculator"],
+  "faq": [
+    {"q": "What is baker's percentage?", "a": "Baker's percentage expresses every ingredient as a percentage of the total flour weight, with flour always 100%. A dough with 1,000 g of flour, 650 g of water and 20 g of salt is 65% hydration and 2% salt. The percentages add up to more than 100, which is normal."},
+    {"q": "How do I work out flour from the total dough weight?", "a": "Add up all the percentages, including flour at 100, and divide the dough weight by that total over 100. For 1,000 g of Neapolitan dough at 100% flour, 62% water, 3% salt and 0.2% yeast, the total is 165.2%, so flour is 1,000 ÷ 1.652 = 605 g."},
+    {"q": "How does sourdough starter affect hydration?", "a": "Starter is part flour and part water. A 100% hydration starter is half of each by weight, so 100 g of starter adds 50 g of flour and 50 g of water. Effective hydration counts that flour and water in the totals, which is why a dough with 72% added water and 20% starter is really about 74.5% hydration."},
+    {"q": "How do I convert instant yeast to active dry or fresh yeast?", "a": "Use about 1.25 times as much active dry yeast as instant yeast, and about 3 times as much fresh (cake) yeast. This calculator takes the yeast percentage as instant dry yeast and converts it to the type you choose."},
+    {"q": "What hydration should I use for pizza dough?", "a": "Neapolitan pizza usually runs 58 to 65% hydration with Tipo 00 flour, and New York style about 60 to 65% with bread flour, plus a little oil and sugar for home ovens. Higher hydration gives a lighter, more open crust but is stickier to shape. Focaccia goes much higher, around 75 to 85%."},
+    {"q": "How much dough do I need per pizza?", "a": "A 10 to 12 inch Neapolitan pizza uses a 230 to 280 g ball, with 250 g a common choice. A 14 inch New York pie takes about 280 to 340 g, and an 18 inch pie roughly 500 to 600 g. Add a few percent to cover dough that sticks to the bowl."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="preset">Preset</label>
+          <select id="preset" name="preset">
+            <option value="neapolitan">Neapolitan pizza</option>
+            <option value="ny">New York pizza</option>
+            <option value="sandwich">Sandwich loaf</option>
+            <option value="sourdough">Sourdough loaf</option>
+            <option value="focaccia">Focaccia</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="mode">Start from</label>
+          <select id="mode" name="mode">
+            <option value="balls">Dough balls</option>
+            <option value="flour">Flour weight</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="balls">
+        <div class="field">
+          <label for="balls">Number of balls</label>
+          <input id="balls" name="balls" type="number" min="1" step="1" value="4" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="ballWeight">Weight each</label>
+          <div class="input"><input id="ballWeight" name="ballWeight" type="number" min="0" step="5" value="250" inputmode="decimal"><span class="unit">g</span></div>
+        </div>
+      </div>
+      <div class="field" data-show="flour" hidden>
+        <label for="flour">Flour weight</label>
+        <div class="input"><input id="flour" name="flour" type="number" min="0" step="10" value="500" inputmode="decimal"><span class="unit">g</span></div>
+        <div class="hint">Flour you add, not counting flour inside the starter.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="hydration">Water (hydration)</label>
+          <div class="input"><input id="hydration" name="hydration" type="number" min="0" step="1" value="62" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+        <div class="field">
+          <label for="salt">Salt</label>
+          <div class="input"><input id="salt" name="salt" type="number" min="0" step="0.1" value="3" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="yeast">Yeast (as instant)</label>
+          <div class="input"><input id="yeast" name="yeast" type="number" min="0" step="0.05" value="0.2" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+        <div class="field">
+          <label for="yeastType">Yeast you're using</label>
+          <select id="yeastType" name="yeastType">
+            <option value="1">Instant dry</option>
+            <option value="1.25">Active dry (×1.25)</option>
+            <option value="3">Fresh / cake (×3)</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="starter">Sourdough starter</label>
+          <div class="input"><input id="starter" name="starter" type="number" min="0" step="1" value="0" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+        <div class="field">
+          <label for="starterHyd">Starter hydration</label>
+          <div class="input"><input id="starterHyd" name="starterHyd" type="number" min="0" step="5" value="100" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="oil">Oil or butter</label>
+          <div class="input"><input id="oil" name="oil" type="number" min="0" step="0.5" value="0" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+        <div class="field">
+          <label for="sugar">Sugar or honey</label>
+          <div class="input"><input id="sugar" name="sugar" type="number" min="0" step="0.5" value="0" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="headLabel">Flour</span><b data-out="head">—</b></div>
+    <div class="result"><span>Flour</span><b data-out="flourG">—</b></div>
+    <div class="result"><span>Water</span><b data-out="water">—</b></div>
+    <div class="result"><span>Salt</span><b data-out="saltG">—</b></div>
+    <div class="result" data-show="hasYeast"><span data-out="yeastLabel">Instant yeast</span><b data-out="yeastG">—</b></div>
+    <div class="result" data-show="hasStarter" hidden><span>Starter</span><b data-out="starterG">—</b></div>
+    <div class="result" data-show="hasOil" hidden><span>Oil or butter</span><b data-out="oilG">—</b></div>
+    <div class="result" data-show="hasSugar" hidden><span>Sugar or honey</span><b data-out="sugarG">—</b></div>
+    <div class="result"><span>Total dough</span><b data-out="total">—</b></div>
+    <div class="result"><span>Effective hydration</span><b data-out="effHyd">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const PRESETS = {
+    neapolitan: { hydration: 62, salt: 3,   yeast: 0.2, starter: 0,  starterHyd: 100, oil: 0, sugar: 0 },
+    ny:         { hydration: 63, salt: 2.5, yeast: 0.4, starter: 0,  starterHyd: 100, oil: 2, sugar: 2 },
+    sandwich:   { hydration: 62, salt: 2,   yeast: 1,   starter: 0,  starterHyd: 100, oil: 6, sugar: 5 },
+    sourdough:  { hydration: 72, salt: 2,   yeast: 0,   starter: 20, starterHyd: 100, oil: 0, sugar: 0 },
+    focaccia:   { hydration: 80, salt: 2.5, yeast: 1,   starter: 0,  starterHyd: 100, oil: 5, sugar: 0 },
+  };
+  const form = document.querySelector("form.calc");
+  const preset = document.getElementById("preset");
+  // Runs before the form's own change handler, so the calculator sees the new values.
+  preset.addEventListener("change", () => {
+    const p = PRESETS[preset.value];
+    if (p) for (const k in p) form.elements[k].value = p[k];
+  });
+  // Editing a percentage by hand switches the preset label to Custom.
+  form.addEventListener("input", (e) => {
+    if (e.target.name in PRESETS.neapolitan) preset.value = "custom";
+  }, true);
+
+  Calc.run((v, out) => {
+    const ballsMode = v.mode === "balls";
+    out.show("balls", ballsMode);
+    out.show("flour", !ballsMode);
+
+    const sh = v.starterHyd / 100;
+    const pct = 100 + v.hydration + v.salt + v.yeast + v.starter + v.oil + v.sugar;
+    const flour = ballsMode ? Math.max(0, Math.floor(v.balls)) * v.ballWeight / (pct / 100) : v.flour;
+    const g = (p) => flour * p / 100;
+    const water = g(v.hydration), starter = g(v.starter);
+    const stFlour = starter / (1 + sh), stWater = starter - stFlour;
+    const total = flour * pct / 100;
+    const effHyd = flour + stFlour > 0 ? (water + stWater) / (flour + stFlour) : 0;
+    const yType = parseFloat(v.yeastType);
+    const yeastG = g(v.yeast) * yType;
+    const grams = (x, d = 0) => Calc.num(x, d) + " g";
+
+    out.set("headLabel", ballsMode ? "Flour to use" : "Total dough weight");
+    out.set("head", grams(ballsMode ? flour : total));
+    out.set("flourG", grams(flour));
+    out.set("water", grams(water));
+    out.set("saltG", grams(g(v.salt), 1));
+    out.show("hasYeast", v.yeast > 0);
+    out.set("yeastLabel", { 1: "Instant yeast", 1.25: "Active dry yeast", 3: "Fresh yeast" }[yType]);
+    out.set("yeastG", grams(yeastG, yeastG < 10 ? 2 : 1));
+    out.show("hasStarter", v.starter > 0);
+    out.set("starterG", grams(starter));
+    out.show("hasOil", v.oil > 0);
+    out.set("oilG", grams(g(v.oil), 1));
+    out.show("hasSugar", v.sugar > 0);
+    out.set("sugarG", grams(g(v.sugar), 1));
+    out.set("total", ballsMode && v.balls >= 1
+      ? `${grams(total)} (${Calc.num(Math.floor(v.balls), 0)} × ${grams(v.ballWeight)})` : grams(total));
+    out.set("effHyd", Calc.pct(effHyd, 1));
+
+    if (v.starter > 0) out.note(`Starter adds ${grams(stFlour)} flour and ${grams(stWater)} water, which is why effective hydration is higher than the water percentage.`);
+    else if (ballsMode) out.note("Make 2–3% extra if you lose dough to the bowl and bench, by raising the ball weight slightly.");
+    else out.note("Percentages are of flour weight, with flour as 100%.");
+  });
+});
+</script>
+<!-- article -->
+<h2>How baker's percentages work</h2>
+<p>Bakers write recipes with flour as 100% and every other ingredient as a percentage of the flour weight. A dough
+with 62% hydration has 62 grams of water for every 100 grams of flour, no matter how big the batch. That makes a
+formula easy to scale, easy to compare with other recipes, and easy to adjust one thing at a time. The
+percentages add up to more than 100; that's expected.</p>
+<p>This calculator works both ways. Start from a flour weight to get each ingredient and the total dough. Or, for
+pizza, start from how many dough balls you want and how heavy each one should be, and it works backward to the
+flour.</p>
+
+<h2>The formula</h2>
+<div class="formula">ingredient (g) = flour (g) × ingredient % ÷ 100<br>
+total % = 100 + water % + salt % + yeast % + starter % + oil % + sugar %<br>
+flour (g) = balls × ball weight ÷ (total % ÷ 100)<br>
+starter flour = starter ÷ (1 + starter hydration); starter water = starter − starter flour<br>
+effective hydration = (water + starter water) ÷ (flour + starter flour)</div>
+<p>Yeast is entered as instant dry yeast. If you use active dry, the calculator multiplies by 1.25; for fresh
+(cake) yeast, by 3. Those are the usual substitution rules; exact strength varies by brand.</p>
+
+<h2>Example: four Neapolitan pizzas</h2>
+<p>Four 250 g dough balls with the Neapolitan preset: 62% water, 3% salt, 0.2% instant yeast. The total is
+165.2%, so the flour is 1,000 ÷ 1.652.</p>
+<table>
+  <tr><th>Ingredient</th><th>Percent</th><th>Grams</th></tr>
+  <tr><td>Flour (Tipo 00)</td><td>100%</td><td><strong>605 g</strong></td></tr>
+  <tr><td>Water</td><td>62%</td><td>375 g</td></tr>
+  <tr><td>Salt</td><td>3%</td><td>18.2 g</td></tr>
+  <tr><td>Instant yeast</td><td>0.2%</td><td>1.21 g</td></tr>
+  <tr><td>Total dough</td><td>165.2%</td><td>1,000 g</td></tr>
+</table>
+
+<h2>Preset formulas</h2>
+<table>
+  <tr><th>Preset</th><th>Water</th><th>Salt</th><th>Instant yeast</th><th>Other</th></tr>
+  <tr><td>Neapolitan pizza</td><td>62%</td><td>3%</td><td>0.2%</td><td>None</td></tr>
+  <tr><td>New York pizza</td><td>63%</td><td>2.5%</td><td>0.4%</td><td>2% oil, 2% sugar</td></tr>
+  <tr><td>Sandwich loaf</td><td>62%</td><td>2%</td><td>1%</td><td>6% butter or oil, 5% sugar</td></tr>
+  <tr><td>Sourdough loaf</td><td>72%</td><td>2%</td><td>0</td><td>20% starter at 100% hydration</td></tr>
+  <tr><td>Focaccia</td><td>80%</td><td>2.5%</td><td>1%</td><td>5% olive oil in the dough</td></tr>
+</table>
+<p>These are common starting points from pizza and bread formulas, not fixed rules. Neapolitan dough usually
+sits at 58–65% water and 2.5–3% salt with a very small amount of yeast for a long ferment. New York style uses
+bread flour at 60–65% hydration with a little oil and sugar to help browning in a home oven. The sourdough
+preset works out to about 74.5% effective hydration once the starter's water and flour are counted.</p>
+
+<h2>Tips</h2>
+<ul>
+  <li><strong>Use a scale that reads 0.1 g</strong> for yeast and salt. At pizza quantities, a gram of yeast is
+  the difference between a 24-hour and an 8-hour dough.</li>
+  <li><strong>Adjust yeast for time and temperature.</strong> Less yeast for long cold ferments, more for
+  same-day dough. Change the yeast percentage, not the rest of the formula.</li>
+  <li><strong>Raise hydration gradually.</strong> Flours absorb water differently. Go up 2% at a time and hold
+  back some water until you see how the dough feels.</li>
+  <li><strong>Count all the flour.</strong> When a recipe says "20% starter," check whether its percentages
+  include the starter's flour. This calculator doesn't; the effective hydration line shows the full picture.</li>
+</ul>

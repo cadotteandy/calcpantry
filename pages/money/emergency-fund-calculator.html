@@ -1,0 +1,156 @@
+---
+{
+  "title": "Emergency Fund Calculator: How Much Do You Need?",
+  "description": "Add up your essential monthly expenses to find your emergency fund target for 3 to 12 months, the gap from your savings, and how long it will take to get there.",
+  "h1": "Emergency Fund Calculator",
+  "short": "Emergency Fund Calculator",
+  "intro": "Total up the bills you'd still have to pay if your income stopped, choose how many months to cover, and see your target, your gap and when you'll reach it.",
+  "updated": "September 2026",
+  "related": ["savings-goal-calculator", "credit-card-payoff-calculator", "hourly-to-salary-calculator", "side-hustle-tax-calculator"],
+  "faq": [
+    {"q": "How much should I have in an emergency fund?", "a": "The usual guideline is three to six months of essential expenses. Aim for the higher end, or more, if you're the only earner, have dependents, work in an unstable industry, or are self-employed with irregular income. Two-income households with secure jobs can often manage with three months."},
+    {"q": "Should I base it on my income or my expenses?", "a": "Expenses, and only essential ones: housing, utilities, groceries, transportation, insurance and minimum debt payments. In a real emergency you'd cut restaurants, subscriptions and extra savings, so your fund can be smaller than months of full take-home pay."},
+    {"q": "Where should I keep my emergency fund?", "a": "In an FDIC or NCUA insured high-yield savings account or money market account that you can reach within a day or two. It should be separate from checking so you don't spend it by accident, and not in stocks, which can drop right when you need the money."},
+    {"q": "Should I pay off debt or build an emergency fund first?", "a": "Many planners suggest a small starter fund first, often $1,000 or one month of expenses, then aggressively paying down high-interest credit cards, then finishing the full fund. Without any cushion, the next surprise bill tends to go right back on a card."},
+    {"q": "Do self-employed people need a bigger emergency fund?", "a": "Usually yes. Irregular income, no unemployment insurance in most cases, and quarterly tax bills make six to twelve months a common target for freelancers and gig workers. Keep money set aside for taxes separate from the emergency fund."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="housing">Rent or mortgage</label>
+          <div class="input"><span class="unit pre">$</span><input id="housing" name="housing" type="number" min="0" step="50" value="1500" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="utilities">Utilities &amp; phone</label>
+          <div class="input"><span class="unit pre">$</span><input id="utilities" name="utilities" type="number" min="0" step="10" value="250" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="food">Groceries</label>
+          <div class="input"><span class="unit pre">$</span><input id="food" name="food" type="number" min="0" step="25" value="500" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="transport">Transportation</label>
+          <div class="input"><span class="unit pre">$</span><input id="transport" name="transport" type="number" min="0" step="25" value="350" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="insurance">Insurance</label>
+          <div class="input"><span class="unit pre">$</span><input id="insurance" name="insurance" type="number" min="0" step="25" value="300" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="debt">Debt minimums</label>
+          <div class="input"><span class="unit pre">$</span><input id="debt" name="debt" type="number" min="0" step="25" value="200" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="other">Other essentials</label>
+        <div class="input"><span class="unit pre">$</span><input id="other" name="other" type="number" min="0" step="25" value="150" inputmode="decimal"></div>
+        <div class="hint">Childcare, medications, pet food. All amounts are per month.</div>
+      </div>
+      <div class="field">
+        <label for="months">Months of coverage</label>
+        <select id="months" name="months">
+          <option value="3">3 months: two stable incomes, no dependents</option>
+          <option value="6" selected>6 months: most households</option>
+          <option value="9">9 months: single income or dependents</option>
+          <option value="12">12 months: self-employed or unstable job</option>
+        </select>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="saved">Current savings</label>
+          <div class="input"><span class="unit pre">$</span><input id="saved" name="saved" type="number" min="0" step="100" value="5000" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="monthly">Can save per month</label>
+          <div class="input"><span class="unit pre">$</span><input id="monthly" name="monthly" type="number" min="0" step="25" value="500" inputmode="decimal"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your emergency fund</h2>
+    <div class="result big"><span>Target emergency fund</span><b data-out="target">—</b></div>
+    <div class="result"><span>Essential expenses per month</span><b data-out="monthlyTotal">—</b></div>
+    <div class="result"><span>Still to save</span><b data-out="gap">—</b></div>
+    <div class="result"><span>Months to reach goal</span><b data-out="toGoal">—</b></div>
+    <div class="result"><span>Progress</span><b data-out="progress">—</b></div>
+    <div class="result"><span>Months covered today</span><b data-out="covered">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+const CATEGORIES = ["housing", "utilities", "food", "transport", "insurance", "debt", "other"];
+
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const monthlyTotal = CATEGORIES.reduce((sum, k) => sum + Math.max(0, v[k]), 0);
+  const months = Number(v.months) || 6;
+  const target = monthlyTotal * months;
+  const gap = Math.max(0, target - v.saved);
+  const toGoal = gap === 0 ? 0 : (v.monthly > 0 ? Math.ceil(gap / v.monthly) : Infinity);
+  const progress = target > 0 ? Math.min(1, v.saved / target) : NaN;
+
+  out.set("target", Calc.money(target));
+  out.set("monthlyTotal", Calc.money(monthlyTotal));
+  out.set("gap", Calc.money(gap));
+  out.set("toGoal", gap === 0 ? "Done" : (isFinite(toGoal) ? `${Calc.num(toGoal, 0)} month${toGoal === 1 ? "" : "s"}` : "—"));
+  out.set("progress", Calc.pct(progress), progress >= 1 ? "pos" : "");
+  out.set("covered", monthlyTotal > 0 ? Calc.num(v.saved / monthlyTotal, 1) : "—");
+
+  if (monthlyTotal <= 0) out.note("Enter your essential monthly expenses to see a target.");
+  else if (gap === 0) out.note("You've hit your target. Keep it in a high-yield savings account and top it back up after you use it.");
+  else if (v.monthly <= 0) out.note("Add a monthly savings amount to see how long it will take to reach your goal.");
+  else if (v.saved < monthlyTotal) out.note(`First milestone: one month of expenses (${Calc.money(monthlyTotal)}). A general guideline, not financial advice.`);
+  else out.note(`Saving ${Calc.money(v.monthly)} a month closes the gap in about ${Calc.num(toGoal / 12, 1)} years. A general guideline, not financial advice.`);
+}));
+</script>
+<!-- article -->
+<p><strong>This is a general guideline, not financial advice.</strong> The right size depends on your job, health, family and other resources such as a partner's income or unemployment benefits.</p>
+
+<h2>How the calculator works</h2>
+<p>An emergency fund pays the bills you can't stop if your income stops or a big expense hits: a job loss, a medical bill, a car repair. The calculator adds up your <em>essential</em> monthly costs, multiplies by the months of cover you choose, and compares that to what you already have.</p>
+<div class="formula">monthly essentials = housing + utilities + groceries + transport + insurance + debt minimums + other<br>
+target = monthly essentials × months of coverage<br>
+gap = target − current savings<br>
+months to goal = gap ÷ monthly savings, rounded up<br>
+progress = current savings ÷ target</div>
+
+<h2>How many months should you cover?</h2>
+<h3>3 months</h3>
+<p>Two steady incomes, secure jobs, no dependents and good insurance. If one earner loses a job, the other still covers part of the bills.</p>
+<h3>6 months</h3>
+<p>The standard target for most households. It covers a typical job search with room for a surprise expense along the way.</p>
+<h3>9 months</h3>
+<p>Single-income households, anyone supporting children or relatives, homeowners with older houses, or people in specialized fields where jobs take longer to find.</p>
+<h3>12 months</h3>
+<p>Self-employed people, freelancers and gig workers with irregular income, commission-heavy jobs, or anyone with a health condition that could affect work.</p>
+
+<h2>Example: $3,250 a month of essentials</h2>
+<table>
+  <tr><th>Item</th><th>Amount</th></tr>
+  <tr><td>Rent $1,500 + utilities $250 + groceries $500</td><td>$2,250.00</td></tr>
+  <tr><td>Transport $350 + insurance $300 + debt $200 + other $150</td><td>$1,000.00</td></tr>
+  <tr><td>Essential expenses per month</td><td>$3,250.00</td></tr>
+  <tr><td><strong>Target (6 months)</strong></td><td><strong>$19,500.00</strong></td></tr>
+  <tr><td>Current savings</td><td>$5,000.00</td></tr>
+  <tr><td>Still to save</td><td>$14,500.00</td></tr>
+  <tr><td>Months to goal at $500 a month</td><td>29 months</td></tr>
+  <tr><td>Progress / months covered today</td><td>25.6% / 1.5</td></tr>
+</table>
+<p>Almost two and a half years sounds long, but the fund starts protecting you from the first dollar. Keeping it in a high-yield account paying around 4% would shave a month or two off the timeline.</p>
+
+<h2>Tips for building it faster</h2>
+<ul>
+  <li><strong>Use essentials only.</strong> Leave out dining out, streaming and retirement contributions you'd pause in a crisis. A smaller, honest target is easier to reach.</li>
+  <li><strong>Automate a transfer on payday</strong> into a separate high-yield savings account, so the money is out of sight but still reachable in a day or two.</li>
+  <li><strong>Send windfalls straight in.</strong> Tax refunds, bonuses and side income can close months of the gap at once.</li>
+  <li><strong>Set milestones.</strong> One month of expenses, then three, then your full target. Each one makes a surprise bill less likely to end up on a credit card.</li>
+  <li><strong>Refill after you use it.</strong> Spending the fund on a real emergency is what it's for. Restart the automatic transfers right away.</li>
+</ul>

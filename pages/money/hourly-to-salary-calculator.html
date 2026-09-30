@@ -1,0 +1,153 @@
+---
+{
+  "title": "Hourly to Salary Calculator: Annual, Monthly, Weekly",
+  "description": "Convert an hourly wage to annual, monthly, biweekly, weekly and daily pay, or a salary to an hourly rate, with overtime, unpaid time off and rough take-home.",
+  "h1": "Hourly to Salary Calculator",
+  "short": "Hourly to Salary Calculator",
+  "intro": "Turn an hourly wage into a yearly salary and paychecks, or work out the hourly rate behind a salary offer, including overtime and unpaid weeks off.",
+  "updated": "September 2026",
+  "related": ["freelance-rate-calculator", "gig-driver-earnings-calculator", "savings-goal-calculator", "side-hustle-tax-calculator"],
+  "faq": [
+    {"q": "How much is $25 an hour per year?", "a": "$25 an hour is $52,000 a year at 40 hours a week for 52 paid weeks. That works out to about $4,333 a month, $2,000 every two weeks and $1,000 a week before tax."},
+    {"q": "What's the quick way to convert hourly pay to salary?", "a": "Double the hourly rate and add three zeros: $20 an hour is roughly $40,000 a year. It works because a full-time year is 2,080 hours (40 × 52), close to 2,000. Going the other way, halve the salary and drop three zeros."},
+    {"q": "How many work hours are in a year?", "a": "A standard full-time year is 2,080 hours: 40 hours a week for 52 weeks. Paid holidays and vacation are included in that figure. If you take unpaid time off, subtract those weeks, which is what the weeks-off field does."},
+    {"q": "How is overtime pay calculated?", "a": "Under the federal Fair Labor Standards Act, non-exempt employees earn at least 1.5 times their regular rate for hours over 40 in a workweek. Some states, like California, also require overtime after 8 hours in a day. Most salaried exempt employees don't get overtime."},
+    {"q": "How accurate is the take-home estimate?", "a": "It's rough. It applies one flat rate to your gross pay. Real take-home depends on federal brackets, state and local tax, Social Security and Medicare (7.65%), and pre-tax deductions like health insurance and 401(k). Your pay stub or a paycheck calculator gives a precise figure."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="mode">Convert</label>
+        <select id="mode" name="mode">
+          <option value="hourly">Hourly wage → salary</option>
+          <option value="salary">Salary → hourly wage</option>
+        </select>
+      </div>
+      <div class="field" data-show="hourly">
+        <label for="rate">Hourly wage</label>
+        <div class="input"><span class="unit pre">$</span><input id="rate" name="rate" type="number" min="0" step="0.25" value="25" inputmode="decimal"><span class="unit">/ hour</span></div>
+      </div>
+      <div class="field" data-show="salary" hidden>
+        <label for="salary">Annual salary</label>
+        <div class="input"><span class="unit pre">$</span><input id="salary" name="salary" type="number" min="0" step="1000" value="52000" inputmode="decimal"><span class="unit">/ year</span></div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="hours">Hours per week</label>
+          <div class="input"><input id="hours" name="hours" type="number" min="0" max="100" step="1" value="40" inputmode="decimal"><span class="unit">h</span></div>
+        </div>
+        <div class="field">
+          <label for="weeksOff">Unpaid weeks off</label>
+          <div class="input"><input id="weeksOff" name="weeksOff" type="number" min="0" max="52" step="1" value="0" inputmode="decimal"><span class="unit">wk</span></div>
+          <div class="hint">Paid vacation doesn't count.</div>
+        </div>
+      </div>
+      <div class="field" data-show="hourly">
+        <label for="ot">Overtime hours per week (1.5×)</label>
+        <div class="input"><input id="ot" name="ot" type="number" min="0" max="60" step="1" value="0" inputmode="decimal"><span class="unit">h</span></div>
+      </div>
+      <div class="field">
+        <label for="taxRate">Flat tax rate for rough take-home</label>
+        <div class="input"><input id="taxRate" name="taxRate" type="number" min="0" max="60" step="1" value="22" inputmode="decimal"><span class="unit">%</span></div>
+        <div class="hint">All income, payroll and state tax combined, as one rough percentage.</div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your pay</h2>
+    <div class="result big"><span data-out="headLabel">Annual salary</span><b data-out="head">—</b></div>
+    <div class="result"><span data-out="otherLabel">Effective hourly rate</span><b data-out="other">—</b></div>
+    <div class="result"><span>Monthly</span><b data-out="month">—</b></div>
+    <div class="result"><span>Biweekly (26 paychecks)</span><b data-out="biweek">—</b></div>
+    <div class="result"><span>Weekly</span><b data-out="week">—</b></div>
+    <div class="result"><span>Daily (260 workdays)</span><b data-out="day">—</b></div>
+    <div class="result"><span>Paid hours per year</span><b data-out="paidHours">—</b></div>
+    <div class="result"><span>Rough take-home per year</span><b data-out="thYear">—</b></div>
+    <div class="result"><span>Rough take-home per month</span><b data-out="thMonth">—</b></div>
+    <div class="result"><span>Rough take-home per biweekly check</span><b data-out="thBiweek">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+const WEEKS_PER_YEAR = 52, OT_MULTIPLIER = 1.5, WORKDAYS_PER_YEAR = 260;
+
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const salaryMode = v.mode === "salary";
+  out.show("hourly", !salaryMode);
+  out.show("salary", salaryMode);
+
+  const weeks = Math.max(0, WEEKS_PER_YEAR - v.weeksOff);
+  const ot = salaryMode ? 0 : v.ot;
+  const paidHours = (v.hours + ot) * weeks;
+  let annual, hourly;
+  if (salaryMode) {
+    annual = v.salary;
+    hourly = v.hours * weeks > 0 ? annual / (v.hours * weeks) : NaN;
+  } else {
+    hourly = v.rate;
+    annual = v.rate * (v.hours + OT_MULTIPLIER * ot) * weeks;
+  }
+  const keep = 1 - Math.min(v.taxRate, 100) / 100;
+
+  out.set("headLabel", salaryMode ? "Hourly rate" : "Annual salary");
+  out.set("head", Calc.money(salaryMode ? hourly : annual));
+  out.set("otherLabel", salaryMode ? "Annual salary" : (ot > 0 ? "Average per hour incl. overtime" : "Hourly rate"));
+  out.set("other", salaryMode ? Calc.money(annual) : Calc.money(paidHours > 0 ? annual / paidHours : NaN));
+  out.set("month", Calc.money(annual / 12));
+  out.set("biweek", Calc.money(annual / 26));
+  out.set("week", Calc.money(annual / WEEKS_PER_YEAR));
+  out.set("day", Calc.money(annual / WORKDAYS_PER_YEAR));
+  out.set("paidHours", Calc.num(paidHours, 0));
+  out.set("thYear", Calc.money(annual * keep));
+  out.set("thMonth", Calc.money(annual * keep / 12));
+  out.set("thBiweek", Calc.money(annual * keep / 26));
+
+  if (weeks <= 0 || v.hours <= 0) out.note("Enter hours per week and fewer than 52 unpaid weeks off.");
+  else if (v.weeksOff > 0) out.note(`Pay periods are averaged over the full year, including your ${Calc.num(v.weeksOff, 0)} unpaid week${v.weeksOff === 1 ? "" : "s"} off. Take-home is a rough flat-rate estimate, not tax advice.`);
+  else out.note("Take-home uses one flat tax rate and is only a rough estimate. Your actual withholding depends on brackets, state tax and pre-tax deductions. Not tax advice.");
+}));
+</script>
+<!-- article -->
+<h2>How hourly pay converts to a salary</h2>
+<p>A full-time year is 2,080 paid hours: 40 hours a week for 52 weeks. Paid holidays and vacation are already inside that number, because you're paid for those hours. Unpaid time off is not, so the calculator subtracts those weeks. Overtime hours are paid at 1.5 times your rate, the federal minimum for non-exempt workers over 40 hours a week.</p>
+<p>Going the other way, a salary is divided by the hours you work in a year to give the hourly rate that salary is worth. That's the number to compare against an hourly job offer.</p>
+
+<h2>The formula</h2>
+<div class="formula">paid weeks = 52 − unpaid weeks off<br>
+annual = hourly × (hours + 1.5 × overtime hours) × paid weeks<br>
+hourly = salary ÷ (hours per week × paid weeks)<br>
+monthly = annual ÷ 12 · biweekly = annual ÷ 26 · weekly = annual ÷ 52 · daily = annual ÷ 260<br>
+rough take-home = gross × (1 − flat tax %)</div>
+<p>Every pay period is an average across the whole year. A month isn't four weeks: it's 4.33 weeks, which is why monthly pay is annual ÷ 12, not weekly × 4.</p>
+
+<h2>Example: $25 an hour, full time</h2>
+<table>
+  <tr><th>Period</th><th>Gross</th><th>Take-home at 22%</th></tr>
+  <tr><td>Year ($25 × 40 × 52)</td><td>$52,000.00</td><td>$40,560.00</td></tr>
+  <tr><td>Month</td><td>$4,333.33</td><td>$3,380.00</td></tr>
+  <tr><td>Biweekly</td><td>$2,000.00</td><td>$1,560.00</td></tr>
+  <tr><td>Week</td><td>$1,000.00</td><td>$780.00</td></tr>
+  <tr><td>Day</td><td>$200.00</td><td>$156.00</td></tr>
+</table>
+<p>Switch to salary mode and a $52,000 salary comes back to $25.00 an hour. Add 5 overtime hours a week and the annual figure rises to $61,750, because each overtime hour pays $37.50.</p>
+
+<h2>Common conversions at 2,080 hours</h2>
+<table>
+  <tr><th>Hourly</th><th>Annual</th><th>Monthly</th></tr>
+  <tr><td>$15</td><td>$31,200</td><td>$2,600</td></tr>
+  <tr><td>$20</td><td>$41,600</td><td>$3,467</td></tr>
+  <tr><td>$30</td><td>$62,400</td><td>$5,200</td></tr>
+  <tr><td>$40</td><td>$83,200</td><td>$6,933</td></tr>
+  <tr><td>$50</td><td>$104,000</td><td>$8,667</td></tr>
+</table>
+
+<h2>Comparing hourly and salaried offers</h2>
+<ul>
+  <li><strong>Count real hours.</strong> A $60,000 salary that needs 50 hours a week is $23.08 an hour, less than a $25 hourly job at 40 hours.</li>
+  <li><strong>Price the benefits.</strong> Paid time off, health insurance and a 401(k) match can be worth 20–30% of salary. A contract or gig role without them needs a higher rate to match.</li>
+  <li><strong>Check overtime rules.</strong> Hourly and non-exempt salaried workers get overtime; exempt salaried workers usually don't, however long the week.</li>
+  <li><strong>Treat take-home as rough.</strong> The flat rate here is a sanity check. Around 20–25% is typical for a single filer at this income once payroll and state taxes are counted, but it varies widely.</li>
+</ul>

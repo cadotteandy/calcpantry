@@ -1,0 +1,142 @@
+---
+{
+  "title": "Cat Age Calculator: Cat Years to Human Years",
+  "description": "Convert your cat's age to human years using the AAHA/AAFP chart (15 at one, 24 at two, then 4 per year) and see which veterinary life stage your cat is in.",
+  "h1": "Cat Age Calculator",
+  "short": "Cat Age Calculator",
+  "intro": "Enter your cat's age in years and months to see the human-equivalent age and which of the veterinary life stages your cat is in.",
+  "updated": "September 2026",
+  "related": ["dog-food-calculator", "aquarium-stocking-calculator", "coffee-ratio-calculator", "fabric-yardage-calculator"],
+  "faq": [
+    {"q": "How old is my cat in human years?", "a": "Using the chart from the AAHA/AAFP feline life stage guidelines, a 1-year-old cat is about 15 in human years, a 2-year-old is about 24, and each year after that adds roughly 4 human years. So a 5-year-old cat is about 36 and a 10-year-old is about 56."},
+    {"q": "Is one cat year equal to seven human years?", "a": "No. The seven-to-one rule is a myth. Cats mature very quickly in their first two years, reaching adulthood by about age 2, then age at a slower, steadier pace of about 4 human years per cat year."},
+    {"q": "At what age is a cat considered a senior?", "a": "The 2021 AAHA/AAFP Feline Life Stage Guidelines define senior cats as those over 10 years old. Mature adults are 7 to 10 years, young adults 1 to 6 years, and kittens are under 1 year. Individual cats vary, and a healthy 11-year-old may be treated like a mature adult by your vet."},
+    {"q": "How long do indoor cats live?", "a": "Many indoor cats live into their mid-teens, and it is common for well-cared-for cats to reach 18 to 20 years. Outdoor cats face more risks from traffic, predators and disease and tend to have shorter lives on average."},
+    {"q": "How can I tell how old a cat is if I don't know its birthday?", "a": "A vet can estimate age from teeth, eyes, coat and muscle tone. Kittens can be aged fairly precisely by tooth eruption, while adult age estimates are rougher, often a range of several years."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="years">Cat's age</label>
+          <div class="input"><input id="years" name="years" type="number" min="0" max="35" step="1" value="4" inputmode="numeric"><span class="unit">years</span></div>
+        </div>
+        <div class="field">
+          <label for="months">Plus</label>
+          <div class="input"><input id="months" name="months" type="number" min="0" max="11" step="1" value="0" inputmode="numeric"><span class="unit">months</span></div>
+        </div>
+      </div>
+      <div class="hint">For a kitten, enter 0 years and its age in months.</div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Human-equivalent age</span><b data-out="human">—</b></div>
+    <div class="result"><span>Life stage</span><b data-out="stage">—</b></div>
+    <div class="result"><span>Next life stage</span><b data-out="next">—</b></div>
+    <div class="result"><span>Recommended vet visits</span><b data-out="visits">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const m = Math.max(0, v.years * 12 + v.months);    // age in months
+
+  // AAHA/AAFP chart points for the first two years (cat months -> human years).
+  const pts = [[0, 0], [1, 1], [3, 4], [6, 10], [12, 15], [18, 21], [24, 24]];
+  let human;
+  if (m >= 24) human = 24 + (m - 24) / 12 * 4;       // then about 4 human years per cat year
+  else {
+    for (let i = 1; i < pts.length; i++) {
+      const [x0, y0] = pts[i - 1], [x1, y1] = pts[i];
+      if (m <= x1) { human = y0 + (y1 - y0) * (m - x0) / (x1 - x0); break; }
+    }
+  }
+
+  // 2021 AAHA/AAFP life stages: kitten < 1 yr, young adult 1-6, mature adult 7-10, senior over 10.
+  let stage, next, nextAt;
+  if (m < 12) { stage = "Kitten"; next = "Young adult"; nextAt = 12; }
+  else if (m < 84) { stage = "Young adult"; next = "Mature adult"; nextAt = 84; }
+  else if (m <= 120) { stage = "Mature adult"; next = "Senior"; nextAt = 121; }
+  else { stage = "Senior"; }
+
+  const fmt = (mo) => {
+    const y = Math.floor(mo / 12), r = mo % 12;
+    return [y ? `${y} yr` : "", r ? `${r} mo` : ""].filter(Boolean).join(" ") || "0 mo";
+  };
+
+  out.set("human", Calc.num(human, 0) + " years");
+  out.set("stage", stage);
+  out.set("next", next ? `${next} in ${fmt(nextAt - m)}` : "—");
+  out.set("visits", m < 12 ? "Every 3–4 weeks until ~16 weeks" : m > 120 ? "Every 6 months" : "At least once a year");
+  if (m > 300) out.note("Beyond about 25 years there's little data; the 4-years-per-year line is only an extrapolation.");
+  else if (stage === "Senior") out.note("Senior cats benefit from twice-yearly checkups with bloodwork, blood pressure and weight checks.");
+}));
+</script>
+<!-- article -->
+<h2>How cat years convert to human years</h2>
+<p>The old "multiply by seven" rule doesn't fit cats at all. Cats grow up fast: by their first birthday they're roughly
+as developed as a 15-year-old person, and by two they're comparable to a 24-year-old adult. After that, aging slows to
+a steady pace of about <strong>4 human years for every cat year</strong>.</p>
+<p>This calculator uses the age-equivalence chart published with the <strong>2021 AAHA/AAFP Feline Life Stage
+Guidelines</strong>, the reference most vets use. For kittens under two, it interpolates between the chart's points
+(about 1 human year at 1 month, 4 at 3 months, 10 at 6 months, 15 at 12 months and 21 at 18 months).</p>
+
+<h2>The formula</h2>
+<div class="formula">age 1 year = 15 human years<br>
+age 2 years = 24 human years<br>
+over 2: human age = 24 + 4 × (cat age in years − 2)</div>
+
+<h2>Example: a 4-year-old cat</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>First two years</td><td>24</td></tr>
+  <tr><td>Two more years × 4</td><td>+8</td></tr>
+  <tr><td><strong>Human-equivalent age</strong></td><td><strong>32 years</strong></td></tr>
+  <tr><td>Life stage</td><td>Young adult (mature adult in 3 years)</td></tr>
+</table>
+
+<h2>Cat age chart, 1 to 20 years</h2>
+<table>
+  <tr><th>Cat age</th><th>Human age</th><th>Life stage</th></tr>
+  <tr><td>1</td><td>15</td><td>Young adult</td></tr>
+  <tr><td>2</td><td>24</td><td>Young adult</td></tr>
+  <tr><td>3</td><td>28</td><td>Young adult</td></tr>
+  <tr><td>4</td><td>32</td><td>Young adult</td></tr>
+  <tr><td>5</td><td>36</td><td>Young adult</td></tr>
+  <tr><td>6</td><td>40</td><td>Young adult</td></tr>
+  <tr><td>7</td><td>44</td><td>Mature adult</td></tr>
+  <tr><td>8</td><td>48</td><td>Mature adult</td></tr>
+  <tr><td>9</td><td>52</td><td>Mature adult</td></tr>
+  <tr><td>10</td><td>56</td><td>Mature adult</td></tr>
+  <tr><td>11</td><td>60</td><td>Senior</td></tr>
+  <tr><td>12</td><td>64</td><td>Senior</td></tr>
+  <tr><td>13</td><td>68</td><td>Senior</td></tr>
+  <tr><td>14</td><td>72</td><td>Senior</td></tr>
+  <tr><td>15</td><td>76</td><td>Senior</td></tr>
+  <tr><td>16</td><td>80</td><td>Senior</td></tr>
+  <tr><td>17</td><td>84</td><td>Senior</td></tr>
+  <tr><td>18</td><td>88</td><td>Senior</td></tr>
+  <tr><td>19</td><td>92</td><td>Senior</td></tr>
+  <tr><td>20</td><td>96</td><td>Senior</td></tr>
+</table>
+
+<h2>The four feline life stages</h2>
+<ul>
+  <li><strong>Kitten (birth to 1 year):</strong> rapid growth, vaccinations, spay or neuter, and learning to accept handling and carriers.</li>
+  <li><strong>Young adult (1 through 6 years):</strong> the time to set healthy habits: a lean body weight, dental care and yearly exams.</li>
+  <li><strong>Mature adult (7 through 10 years):</strong> weight gain and dental disease become more common; some vets start routine bloodwork.</li>
+  <li><strong>Senior (over 10 years):</strong> watch for kidney disease, hyperthyroidism, arthritis and weight loss. Twice-yearly checkups are recommended.</li>
+</ul>
+<p>The guidelines also describe an <strong>end-of-life</strong> stage, which can happen at any age and focuses on comfort and
+quality of life. Where exactly a cat turns "senior" is a guideline, not a switch: the source says "over 10 years," so this
+calculator starts the senior stage just after the 10th birthday, and your vet may treat a fit 11-year-old like a mature adult.</p>
+
+<h2>Keep in mind</h2>
+<p>Human-year equivalents are a comparison tool, not a biological measurement. Genetics, diet, weight and indoor versus
+outdoor life all change how a particular cat ages. Changes in appetite, thirst, litter box habits or weight are worth
+a vet visit at any age.</p>
+<p><em>This calculator is for general information and is not veterinary advice.</em></p>

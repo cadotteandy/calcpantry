@@ -1,0 +1,169 @@
+---
+{
+  "title": "Electricity Cost Calculator: What Does It Cost to Run?",
+  "description": "Find what any appliance costs to run per day, month and year from its wattage, hours of use and your electricity rate, with typical watts for common devices.",
+  "h1": "Electricity Cost Calculator",
+  "short": "Electricity Cost",
+  "intro": "Pick an appliance or enter its wattage, then set how long it runs and your electricity rate to see the cost per day, month and year.",
+  "updated": "September 2026",
+  "related": ["paint-calculator", "3d-print-cost-calculator", "savings-goal-calculator", "emergency-fund-calculator"],
+  "faq": [
+    {"q": "How do I calculate the cost to run an appliance?", "a": "Multiply the wattage by the hours it runs and divide by 1,000 to get kilowatt-hours (kWh). Multiply kWh by your rate per kWh. A 1,500 watt heater running 8 hours uses 12 kWh, which costs $2.16 at 18 cents per kWh."},
+    {"q": "What is the average electricity rate in the US?", "a": "The US average residential price has been about 18 cents per kWh in 2026, according to US Energy Information Administration data. Rates range from about 13 cents in the cheapest states to over 40 cents in Hawaii, so use the rate on your own bill for the best estimate."},
+    {"q": "Where do I find an appliance's wattage?", "a": "Look for a label on the back or bottom of the appliance, or in the manual. If it lists only amps, multiply amps by 120 volts for a standard US outlet to get the maximum watts. A plug-in electricity usage meter shows the real draw, which is often lower than the label."},
+    {"q": "Why is my refrigerator's wattage so low here?", "a": "A refrigerator's compressor cycles on and off, so its average draw over a day is much lower than its running wattage. A modern fridge uses roughly 400 to 700 kWh a year, which works out to an average of about 50 to 80 watts. Use 24 hours a day with the average figure."},
+    {"q": "Do appliances use electricity when turned off?", "a": "Many do. TVs, game consoles, chargers and anything with a clock or remote draw standby power, usually 1 to 5 watts each. Across a whole home that can add up to 5 to 10 percent of the bill. A smart power strip cuts it off completely."},
+    {"q": "Does a space heater on a thermostat use its full wattage all the time?", "a": "No. Once the room reaches the set temperature, the heater cycles on and off, so real use may be half its rated wattage or less in a well-insulated room. Treat the calculator's figure for continuous running as a worst case."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="appliance">Appliance</label>
+        <select id="appliance" name="appliance">
+          <option value="1500" selected>Space heater (1,500 W)</option>
+          <option value="900">Window air conditioner (900 W)</option>
+          <option value="3500">Central air conditioner (3,500 W)</option>
+          <option value="70">Refrigerator, modern (70 W average)</option>
+          <option value="150">Refrigerator, older (150 W average)</option>
+          <option value="400">Gaming PC (400 W)</option>
+          <option value="150">Desktop computer (150 W)</option>
+          <option value="50">Laptop (50 W)</option>
+          <option value="100">TV, 50–65 in (100 W)</option>
+          <option value="60">Ceiling fan (60 W)</option>
+          <option value="10">LED bulb (10 W)</option>
+          <option value="60">Incandescent bulb (60 W)</option>
+          <option value="500">Dehumidifier (500 W)</option>
+          <option value="3000">Clothes dryer (3,000 W)</option>
+          <option value="1100">Microwave (1,100 W)</option>
+          <option value="7200">EV charger, Level 2 (7,200 W)</option>
+          <option value="custom">Custom wattage</option>
+        </select>
+      </div>
+      <div class="field" data-show="custom" hidden>
+        <label for="watts">Wattage</label>
+        <div class="input"><input id="watts" name="watts" type="number" min="0" step="1" value="250" inputmode="numeric"><span class="unit">W</span></div>
+        <div class="hint">Check the label. Amps × 120 = watts for a standard US outlet.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="hours">Hours per day</label>
+          <div class="input"><input id="hours" name="hours" type="number" min="0" max="24" step="0.25" value="8" inputmode="decimal"><span class="unit">hr</span></div>
+        </div>
+        <div class="field">
+          <label for="days">Days per month</label>
+          <div class="input"><input id="days" name="days" type="number" min="0" max="31" step="1" value="30" inputmode="numeric"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="rate">Electricity rate</label>
+        <div class="input"><span class="unit pre">$</span><input id="rate" name="rate" type="number" min="0" step="0.001" value="0.18" inputmode="decimal"><span class="unit">per kWh</span></div>
+        <div class="hint">US average is about $0.18. Your bill shows your actual rate.</div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Cost per month</span><b data-out="month">—</b></div>
+    <div class="result"><span>Energy per day</span><b data-out="kwhDay">—</b></div>
+    <div class="result"><span>Energy per month</span><b data-out="kwhMonth">—</b></div>
+    <div class="result"><span>Cost per hour</span><b data-out="hour">—</b></div>
+    <div class="result"><span>Cost per day of use</span><b data-out="day">—</b></div>
+    <div class="result"><span>Cost per year</span><b data-out="year">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const custom = v.appliance === "custom";
+  out.show("custom", custom);
+  const watts = custom ? v.watts : parseFloat(v.appliance);
+  const hours = Math.min(24, Math.max(0, v.hours));
+  const days = Math.min(31, Math.max(0, v.days));
+
+  const kwhDay = watts * hours / 1000;
+  const kwhMonth = kwhDay * days;
+  const perHour = watts / 1000 * v.rate;
+  const perDay = kwhDay * v.rate;
+  const month = kwhMonth * v.rate;
+  const year = month * 12;
+
+  out.set("month", Calc.money(month));
+  out.set("kwhDay", `${Calc.num(kwhDay, 2)} kWh`);
+  out.set("kwhMonth", `${Calc.num(kwhMonth, 1)} kWh`);
+  out.set("hour", Calc.money(perHour, perHour < 0.1 ? 3 : 2));
+  out.set("day", Calc.money(perDay));
+  out.set("year", Calc.money(year));
+
+  if (month <= 0) return;
+  const sel = document.getElementById("appliance");
+  const name = sel.options[sel.selectedIndex].text;
+  if (/Refrigerator/.test(name) && hours < 24) {
+    out.note("Refrigerators run all day. The wattage here is a 24-hour average, so set hours per day to 24.");
+  } else if (/heater|air conditioner|Dehumidifier/.test(name)) {
+    out.note("This assumes it runs flat out. On a thermostat it cycles on and off, so real cost is often 30 to 60% lower.");
+  } else {
+    out.note(`Every 1 cent change in your rate moves this by ${Calc.money(kwhMonth * 0.01)} a month.`);
+  }
+}));
+</script>
+<!-- article -->
+<h2>How electricity cost is calculated</h2>
+<p>Your utility bills you for energy in <strong>kilowatt-hours (kWh)</strong>. One kWh is 1,000 watts running for one
+hour, or a 100 watt TV running for ten hours. To find what an appliance costs, convert its wattage and running time
+to kWh, then multiply by your rate. This calculator does that for a day, then scales it by the days per month you use
+the appliance. The yearly figure is simply the monthly cost times 12, so for seasonal items like heaters and air
+conditioners, multiply the monthly cost by the number of months you actually run them instead.</p>
+<p>The default rate is $0.18 per kWh, close to the 2026 US average residential price reported by the US Energy
+Information Administration (roughly 18 cents). Your own rate may be very different: under 14 cents in some states
+and above 40 cents in Hawaii. Divide the total on your bill by the kWh used to get an all-in rate that includes
+delivery charges.</p>
+
+<h2>The formula</h2>
+<div class="formula">kWh per day = watts × hours per day ÷ 1,000<br>
+kWh per month = kWh per day × days per month<br>
+monthly cost = kWh per month × rate per kWh<br>
+yearly cost = monthly cost × 12</div>
+
+<h2>Example: a space heater</h2>
+<p>A 1,500 watt space heater running 8 hours a day, 30 days a month, at $0.18 per kWh.</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Cost per hour (1.5 kW × $0.18)</td><td>$0.27</td></tr>
+  <tr><td>Energy per day (1,500 × 8 ÷ 1,000)</td><td>12 kWh</td></tr>
+  <tr><td>Cost per day (12 × $0.18)</td><td>$2.16</td></tr>
+  <tr><td>Energy per month (12 × 30)</td><td>360 kWh</td></tr>
+  <tr><td><strong>Cost per month</strong></td><td><strong>$64.80</strong></td></tr>
+  <tr><td>Cost per year (× 12)</td><td>$777.60</td></tr>
+</table>
+<p>For comparison, a 10 watt LED bulb on for the same 8 hours a day uses 2.4 kWh a month, about 43 cents.</p>
+
+<h2>Typical wattages</h2>
+<p>The presets use common ratings. Actual draw depends on the model, its age and settings, so the label on your
+appliance, or better still a plug-in usage meter, gives the most accurate number.</p>
+<table>
+  <tr><th>Appliance</th><th>Typical watts</th><th>Notes</th></tr>
+  <tr><td>Space heater</td><td>1,500</td><td>Max on most plug-in units</td></tr>
+  <tr><td>Window AC</td><td>500–1,400</td><td>Depends on BTU size</td></tr>
+  <tr><td>Refrigerator</td><td>50–150 avg</td><td>Compressor cycles</td></tr>
+  <tr><td>Gaming PC</td><td>300–600</td><td>While gaming</td></tr>
+  <tr><td>Clothes dryer</td><td>1,800–5,000</td><td>Electric models</td></tr>
+  <tr><td>EV Level 2</td><td>7,200</td><td>30 A at 240 V</td></tr>
+</table>
+
+<h2>Ways to cut the cost</h2>
+<h3>Target the big heaters</h3>
+<p>Anything that makes heat with electricity (space heaters, dryers, water heaters, ovens) draws 1,500 watts or more.
+An hour of a space heater uses as much energy as 150 hours of an LED bulb, so shaving heater time saves far more
+than turning off lights.</p>
+<h3>Use time-of-use rates</h3>
+<p>If your utility offers a time-of-use plan, run the dryer and dishwasher and charge an EV overnight, when rates can
+be half the peak price. Enter the off-peak rate above to see the difference.</p>
+<h3>Kill standby power</h3>
+<p>Game consoles, TVs, cable boxes and chargers keep drawing a few watts when off. At 18 cents, every watt running
+around the clock costs about $1.58 a year, so a 20 watt cluster of standby devices costs over $30 a year.</p>
+<h3>Replace old fridges and bulbs</h3>
+<p>A refrigerator from the early 2000s can use twice the energy of a new ENERGY STAR model, and an LED uses about
+one-sixth the power of an incandescent bulb with the same light output.</p>

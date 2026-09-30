@@ -1,0 +1,144 @@
+---
+{
+  "title": "eBay Fee Calculator 2026: Fees, Payout & Profit",
+  "description": "Calculate eBay final value fees (13.6% + $0.40), your payout and real profit after item cost, shipping and promoted listing fees.",
+  "h1": "eBay Fee Calculator",
+  "short": "eBay Fee Calculator",
+  "intro": "Enter your sale price and costs to see eBay's fees, what lands in your bank account, and your actual profit.",
+  "updated": "September 2026",
+  "related": ["poshmark-fee-calculator", "mercari-fee-calculator", "etsy-fee-calculator", "side-hustle-tax-calculator"],
+  "faq": [
+    {"q": "How much does eBay take from a sale in 2026?", "a": "For most categories eBay charges a 13.6% final value fee on the total sale amount plus $0.40 per order ($0.30 if the order is $10 or less). On a $100 sale with no shipping or tax, that's $14.00."},
+    {"q": "Does eBay charge fees on shipping and sales tax?", "a": "Yes. The final value fee is calculated on the total amount the buyer pays, including the shipping you charge and the sales tax eBay collects. That's why free shipping with a higher price and charged shipping cost about the same in fees."},
+    {"q": "Which eBay categories have different fees?", "a": "Rates range from about 2.5% to 15.3% depending on category. Books, movies and music are among the highest at 15.3%; some categories such as guitars and high-priced sneakers are lower. Check eBay's seller fee page for your exact category and use the custom rate option above."},
+    {"q": "Are there listing fees on eBay?", "a": "Most sellers get 250 free listings per month. After that, insertion fees are usually $0.35 per listing. Store subscribers get more free listings."},
+    {"q": "How do promoted listing fees work?", "a": "With Promoted Listings General, you pick an ad rate (for example 5%). You only pay it if the item sells through a promoted click, and it's charged on top of the final value fee."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="price">Sold price</label>
+        <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="50" inputmode="decimal"></div>
+      </div>
+      <div class="field">
+        <label for="shipCharged">Shipping charged to buyer</label>
+        <div class="input"><span class="unit pre">$</span><input id="shipCharged" name="shipCharged" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div>
+        <div class="hint">Enter 0 if you offer free shipping.</div>
+      </div>
+      <div class="field">
+        <label for="category">Category</label>
+        <select id="category" name="category">
+          <option value="13.6">Most categories (13.6%)</option>
+          <option value="15.3">Books, movies &amp; music (15.3%)</option>
+          <option value="custom">Custom rate…</option>
+        </select>
+      </div>
+      <div class="field" data-show="custom" hidden>
+        <label for="customRate">Custom final value fee</label>
+        <div class="input"><input id="customRate" name="customRate" type="number" min="0" max="30" step="0.1" value="12.7" inputmode="decimal"><span class="unit">%</span></div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="itemCost">Item cost</label>
+          <div class="input"><span class="unit pre">$</span><input id="itemCost" name="itemCost" type="number" min="0" step="0.01" value="15" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="shipCost">Your shipping cost</label>
+          <div class="input"><span class="unit pre">$</span><input id="shipCost" name="shipCost" type="number" min="0" step="0.01" value="8" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="taxRate">Buyer's sales tax</label>
+          <div class="input"><input id="taxRate" name="taxRate" type="number" min="0" max="15" step="0.1" value="7" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+        <div class="field">
+          <label for="adRate">Promoted ad rate</label>
+          <div class="input"><input id="adRate" name="adRate" type="number" min="0" max="100" step="0.1" value="0" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Profit</span><b data-out="profit">—</b></div>
+    <div class="result"><span>Total eBay fees</span><b data-out="fees">—</b></div>
+    <div class="result"><span>Final value fee</span><b data-out="fvf">—</b></div>
+    <div class="result"><span>Per-order fee</span><b data-out="orderFee">—</b></div>
+    <div class="result" data-show="ad" hidden><span>Promoted listing fee</span><b data-out="adFee">—</b></div>
+    <div class="result"><span>Payout from eBay</span><b data-out="payout">—</b></div>
+    <div class="result"><span>Profit margin</span><b data-out="margin">—</b></div>
+    <div class="result"><span>Break-even sold price</span><b data-out="breakeven">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const custom = v.category === "custom";
+  out.show("custom", custom);
+  const rate = (custom ? v.customRate : parseFloat(v.category)) / 100;
+
+  const itemTotal = v.price + v.shipCharged;
+  const tax = itemTotal * v.taxRate / 100;
+  const orderTotal = itemTotal + tax;               // fees apply to all of this
+  const orderFee = itemTotal <= 0 ? 0 : (orderTotal <= 10 ? 0.30 : 0.40);
+  const fvf = orderTotal * rate;
+  const adFee = itemTotal * v.adRate / 100;
+  const fees = fvf + orderFee + adFee;
+  const payout = itemTotal - fees;                  // tax passes through to the state
+  const profit = payout - v.itemCost - v.shipCost;
+
+  // Break-even price p where fees + costs = revenue (assumes same shipping and tax).
+  const t = 1 + v.taxRate / 100, a = v.adRate / 100;
+  const costs = v.itemCost + v.shipCost + 0.40 - v.shipCharged * (1 - rate * t - a);
+  const breakeven = costs / (1 - rate * t - a);
+
+  out.set("profit", Calc.money(profit), Calc.tone(profit));
+  out.set("fees", Calc.money(fees));
+  out.set("fvf", Calc.money(fvf));
+  out.set("orderFee", Calc.money(orderFee));
+  out.show("ad", v.adRate > 0);
+  out.set("adFee", Calc.money(adFee));
+  out.set("payout", Calc.money(payout));
+  out.set("margin", itemTotal > 0 ? Calc.pct(profit / itemTotal) : "—");
+  out.set("breakeven", Calc.money(Math.max(0, breakeven)));
+  if (itemTotal > 0) out.note(`eBay keeps ${Calc.pct(fees / itemTotal)} of what the buyer pays you (before tax).`);
+}));
+</script>
+<!-- article -->
+<h2>How eBay fees work in 2026</h2>
+<p>eBay's main charge is the <strong>final value fee</strong>. For most categories it's <strong>13.6%</strong> of the
+total sale amount, plus a <strong>per-order fee of $0.40</strong> ($0.30 when the order total is $10 or less).
+You only pay it when an item sells.</p>
+<p>The detail that surprises new sellers: "total sale amount" means everything the buyer pays. That includes the
+item price, the shipping you charge, and the sales tax eBay collects on the buyer's behalf. You never receive the
+tax (eBay sends it to the state), but you still pay the fee on it.</p>
+
+<h2>The formula</h2>
+<div class="formula">order total = (price + shipping charged) × (1 + sales tax rate)<br>
+final value fee = order total × 13.6%<br>
+eBay fees = final value fee + $0.40 + promoted ad fee<br>
+profit = price + shipping charged − eBay fees − item cost − your shipping cost</div>
+
+<h2>Example: a $50 sale</h2>
+<p>You sell a jacket for $50 with free shipping. The buyer pays 7% sales tax, so the order total is $53.50.</p>
+<table>
+  <tr><th>Line</th><th>Amount</th></tr>
+  <tr><td>Final value fee (13.6% of $53.50)</td><td>$7.28</td></tr>
+  <tr><td>Per-order fee</td><td>$0.40</td></tr>
+  <tr><td><strong>Total eBay fees</strong></td><td><strong>$7.68</strong></td></tr>
+  <tr><td>Payout ($50 − $7.68)</td><td>$42.32</td></tr>
+  <tr><td>Minus item cost ($15) and shipping label ($8)</td><td><strong>$19.32 profit</strong></td></tr>
+</table>
+
+<h2>Five ways to keep more of each sale</h2>
+<ul>
+  <li><strong>Price with fees in mind.</strong> Use the break-even number above as your floor when accepting offers.</li>
+  <li><strong>Weigh shipping before you list.</strong> Underestimating a label is the most common way flips lose money.</li>
+  <li><strong>Only promote when it pays.</strong> A 5% ad rate on a $50 item costs $2.50; worth it for slow sellers, not for items that sell anyway.</li>
+  <li><strong>Watch your category.</strong> Books and media carry higher rates; some categories are much lower.</li>
+  <li><strong>Consider a Store</strong> if you list more than 250 items a month. It adds free listings and can lower fees in some categories.</li>
+</ul>

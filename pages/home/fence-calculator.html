@@ -1,0 +1,223 @@
+---
+{
+  "title": "Fence Calculator: Posts, Rails, Pickets and Cost",
+  "description": "Estimate posts, rails, pickets or privacy boards and bags of concrete for a wood fence from its length, height, post spacing and gates, plus total cost.",
+  "h1": "Fence Calculator",
+  "short": "Fence Calculator",
+  "intro": "Enter your fence length, height, style and post spacing to see how many posts, rails, boards and concrete bags to buy for a wood fence.",
+  "updated": "September 2026",
+  "related": ["deck-calculator", "concrete-calculator", "board-foot-calculator", "gravel-calculator"],
+  "faq": [
+    {"q": "How far apart should fence posts be?", "a": "8 feet on center is standard for wood privacy and picket fences because rails come in 8 foot lengths. In windy areas, for tall 8 foot fences or heavy boards, 6 feet gives a stiffer fence. Never exceed the length of your rails, and check local wind-load rules."},
+    {"q": "How many bags of concrete per fence post?", "a": "Typically 2 bags of 50 lb concrete for a 4x4 post in an 8 to 10 inch hole about 2 feet deep, and 3 bags for a deeper 3 foot hole or a gate post. Wider or deeper holes need more. Buying a few extra bags is cheap insurance, since unopened bags can usually be returned."},
+    {"q": "How deep should fence posts be?", "a": "A common rule is to bury at least one third of the post's height above ground, and at least 2 feet. A 6 foot fence usually needs posts set 2 to 3 feet deep, so 8 to 9 foot posts. In cold climates, set posts below the frost line so they are not heaved out in winter."},
+    {"q": "How many pickets do I need for 100 feet of fence?", "a": "For a privacy fence with 5.5 inch wide boards butted together, 100 feet needs about 219 boards, or 230 with 5 percent spare. A picket fence with 3.5 inch pickets and 2.5 inch gaps needs 200 pickets, or 210 with spare."},
+    {"q": "Do I need 2 or 3 rails on a fence?", "a": "Fences up to about 5 feet tall usually use 2 rails, one near the top and one near the bottom. Fences 6 feet and taller need a third rail in the middle to keep boards from warping. Very tall or heavy fences may use 4."},
+    {"q": "Does this include gate hardware?", "a": "No. Gates need hinges, a latch and often a drop rod or anti-sag kit, which typically cost 30 to 100 dollars per gate. The calculator adds one extra post for each gate but prices only posts, rails, boards and concrete."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="length">Fence length</label>
+          <div class="input"><input id="length" name="length" type="number" min="0" step="1" value="100" inputmode="decimal"><span class="unit">ft</span></div>
+          <div class="hint">Total run, including gates.</div>
+        </div>
+        <div class="field">
+          <label for="height">Fence height</label>
+          <select id="height" name="height" data-num>
+            <option value="3">3 ft</option>
+            <option value="4">4 ft</option>
+            <option value="5">5 ft</option>
+            <option value="6" selected>6 ft</option>
+            <option value="8">8 ft</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="spacing">Post spacing</label>
+          <div class="input"><input id="spacing" name="spacing" type="number" min="1" step="0.5" value="8" inputmode="decimal"><span class="unit">ft</span></div>
+        </div>
+        <div class="field">
+          <label for="gates">Gates</label>
+          <div class="input"><input id="gates" name="gates" type="number" min="0" step="1" value="1" inputmode="numeric"></div>
+          <div class="hint">Each adds one post.</div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="style">Style</label>
+        <select id="style" name="style">
+          <option value="privacy" selected>Wood privacy (boards touching)</option>
+          <option value="picket">Picket (spaced pickets)</option>
+        </select>
+      </div>
+      <div data-show="privacy">
+        <div class="fields">
+          <div class="row2">
+            <div class="field">
+              <label for="pWidth">Board width</label>
+              <div class="input"><input id="pWidth" name="pWidth" type="number" min="0.5" step="0.25" value="5.5" inputmode="decimal"><span class="unit">in</span></div>
+              <div class="hint">A 1×6 is 5.5 in actual.</div>
+            </div>
+            <div class="field">
+              <label for="pGap">Gap</label>
+              <div class="input"><input id="pGap" name="pGap" type="number" min="0" step="0.125" value="0" inputmode="decimal"><span class="unit">in</span></div>
+            </div>
+          </div>
+          <div class="field">
+            <label for="pPrice">Price per board</label>
+            <div class="input"><span class="unit pre">$</span><input id="pPrice" name="pPrice" type="number" min="0" step="0.01" value="3.50" inputmode="decimal"></div>
+          </div>
+        </div>
+      </div>
+      <div data-show="picket" hidden>
+        <div class="fields">
+          <div class="row2">
+            <div class="field">
+              <label for="kWidth">Picket width</label>
+              <div class="input"><input id="kWidth" name="kWidth" type="number" min="0.5" step="0.25" value="3.5" inputmode="decimal"><span class="unit">in</span></div>
+              <div class="hint">A 1×4 is 3.5 in actual.</div>
+            </div>
+            <div class="field">
+              <label for="kGap">Gap</label>
+              <div class="input"><input id="kGap" name="kGap" type="number" min="0" step="0.125" value="2.5" inputmode="decimal"><span class="unit">in</span></div>
+            </div>
+          </div>
+          <div class="field">
+            <label for="kPrice">Price per picket</label>
+            <div class="input"><span class="unit pre">$</span><input id="kPrice" name="kPrice" type="number" min="0" step="0.01" value="2.50" inputmode="decimal"></div>
+          </div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="postPrice">Price per post</label>
+          <div class="input"><span class="unit pre">$</span><input id="postPrice" name="postPrice" type="number" min="0" step="0.01" value="16" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="railPrice">Price per rail</label>
+          <div class="input"><span class="unit pre">$</span><input id="railPrice" name="railPrice" type="number" min="0" step="0.01" value="6" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="bagsPer">Concrete per post</label>
+          <div class="input"><input id="bagsPer" name="bagsPer" type="number" min="0" step="0.5" value="2" inputmode="decimal"><span class="unit">bags</span></div>
+          <div class="hint">50 lb bags.</div>
+        </div>
+        <div class="field">
+          <label for="bagPrice">Price per bag</label>
+          <div class="input"><span class="unit pre">$</span><input id="bagPrice" name="bagPrice" type="number" min="0" step="0.01" value="6.50" inputmode="decimal"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="boardLabel">Boards to buy</span><b data-out="boards">—</b></div>
+    <div class="result"><span>Posts</span><b data-out="posts">—</b></div>
+    <div class="result"><span>Post length</span><b data-out="postLen">—</b></div>
+    <div class="result"><span>Rails</span><b data-out="rails">—</b></div>
+    <div class="result"><span>Concrete (50 lb bags)</span><b data-out="bags">—</b></div>
+    <div class="result"><span>Posts and rails cost</span><b data-out="frameCost">—</b></div>
+    <div class="result"><span data-out="boardCostLabel">Boards cost</span><b data-out="boardCost">—</b></div>
+    <div class="result"><span>Concrete cost</span><b data-out="bagCost">—</b></div>
+    <div class="result"><span>Total materials cost</span><b data-out="total">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const picket = v.style === "picket";
+  out.show("privacy", !picket);
+  out.show("picket", picket);
+  const bw = picket ? v.kWidth : v.pWidth;
+  const gap = picket ? v.kGap : v.pGap;
+  const boardPrice = picket ? v.kPrice : v.pPrice;
+
+  const sections = v.spacing > 0 ? Math.ceil(v.length / v.spacing - 1e-9) : 0;
+  const posts = v.length > 0 ? sections + 1 + v.gates : 0;
+  const railsPer = v.height > 5 ? 3 : 2;
+  const rails = sections * railsPer;
+  const exactBoards = bw + gap > 0 ? (v.length * 12) / (bw + gap) : 0;
+  const boards = Math.ceil(exactBoards * 1.05 - 1e-9);       // 5% spare for splits and culls
+  const bags = Math.ceil(posts * v.bagsPer - 1e-9);
+  const postLen = v.height + Math.max(2, v.height / 3);
+
+  const frameCost = posts * v.postPrice + rails * v.railPrice;
+  const boardCost = boards * boardPrice;
+  const bagCost = bags * v.bagPrice;
+  const noun = picket ? "Pickets" : "Boards";
+
+  out.set("boardLabel", `${noun} to buy`);
+  out.set("boardCostLabel", `${noun} cost`);
+  out.set("boards", Calc.num(boards, 0));
+  out.set("posts", Calc.num(posts, 0));
+  out.set("postLen", `at least ${Calc.num(postLen, 1)} ft`);
+  out.set("rails", `${Calc.num(rails, 0)} (${railsPer} per section)`);
+  out.set("bags", Calc.num(bags, 0));
+  out.set("frameCost", Calc.money(frameCost));
+  out.set("boardCost", Calc.money(boardCost));
+  out.set("bagCost", Calc.money(bagCost));
+  out.set("total", Calc.money(frameCost + boardCost + bagCost));
+
+  if (v.length <= 0) return;
+  out.note(v.spacing > 8
+    ? "Posts more than 8 ft apart need rails longer than a standard 8 ft 2×4. Most wood fences use 8 ft or less."
+    : `Assumes one straight run. Add one post for each corner or end. ${noun} should be about ${v.height} ft long; gate hardware is not included.`);
+}));
+</script>
+<!-- article -->
+<h2>How the fence calculator works</h2>
+<p>A wood fence is a series of identical sections: two posts, two or three horizontal rails between them, and boards
+or pickets nailed to the rails. The calculator divides the fence length by the post spacing to find the number of
+sections, then counts the materials each section needs.</p>
+<ul>
+  <li><strong>Posts:</strong> one per section plus one to close the run, plus one extra for each gate so the gate has
+  its own hinge and latch posts. Corners are not counted automatically; add one post per corner.</li>
+  <li><strong>Rails:</strong> 2 per section for fences 5 ft and under, 3 per section for 6 and 8 ft fences.</li>
+  <li><strong>Boards:</strong> the fence length in inches divided by board width plus gap, plus 5% for split, warped
+  or knotted boards you'll reject. Gates are covered with the same boards, so gate width isn't subtracted.</li>
+  <li><strong>Concrete:</strong> bags per post × posts. Two 50 lb bags suit a 4×4 post in an 8–10 in hole about 2 ft
+  deep; use 3 for deeper holes or gate posts.</li>
+</ul>
+
+<h2>The formula</h2>
+<div class="formula">sections = fence length ÷ post spacing, rounded up<br>
+posts = sections + 1 + gates<br>
+rails = sections × (2 if height ≤ 5 ft, otherwise 3)<br>
+boards = fence length × 12 ÷ (board width + gap) × 1.05, rounded up<br>
+concrete bags = posts × bags per post</div>
+
+<h2>Example: 100 ft of 6 ft privacy fence</h2>
+<p>Posts 8 ft apart, one gate, 1×6 boards (5.5 in actual) butted tight, 2 bags of concrete per post. Prices: $16 per
+post, $6 per 2×4 rail, $3.50 per board, $6.50 per bag.</p>
+<table>
+  <tr><th>Item</th><th>Count</th><th>Cost</th></tr>
+  <tr><td>Sections (100 ÷ 8 = 12.5)</td><td>13</td><td>—</td></tr>
+  <tr><td>Posts (13 + 1 + 1 gate)</td><td>15</td><td>$240.00</td></tr>
+  <tr><td>Rails (13 × 3)</td><td>39</td><td>$234.00</td></tr>
+  <tr><td><strong>Boards (1,200 ÷ 5.5 = 218.2, + 5%)</strong></td><td><strong>230</strong></td><td>$805.00</td></tr>
+  <tr><td>Concrete (15 × 2)</td><td>30 bags</td><td>$195.00</td></tr>
+  <tr><td>Total materials</td><td></td><td>$1,474.00</td></tr>
+</table>
+<p>Switch to a 4 ft picket fence with 3.5 in pickets and 2.5 in gaps and the same 100 ft needs 210 pickets and only
+2 rails per section. Posts should be at least 8 ft long for the 6 ft fence (6 ft plus 2 ft in the ground).</p>
+
+<h2>Tips before you dig</h2>
+<ul>
+  <li><strong>Call 811 first.</strong> It's free, and required in most states, to have buried utility lines marked a
+  few days before you dig post holes.</li>
+  <li><strong>Check the rules.</strong> Many towns and HOAs limit fence height (often 4 ft in front yards and 6 ft in
+  back), require a permit and set how far from the property line the fence must sit.</li>
+  <li><strong>Use ground-contact posts.</strong> Buy posts rated for ground contact (UC4A or better). Crown the concrete
+  at the top so water runs away from the post.</li>
+  <li><strong>Set the end and gate posts first,</strong> run a string line between them, and set line posts to the string.</li>
+  <li><strong>Leave a gap at the bottom.</strong> Keep boards about 2 in above the soil so they don't wick moisture and rot.</li>
+  <li><strong>Plan for fasteners.</strong> Use exterior-rated nails or screws: about 4 per board on a 2-rail fence and
+  6 on a 3-rail fence.</li>
+</ul>

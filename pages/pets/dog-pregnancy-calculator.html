@@ -1,0 +1,168 @@
+---
+{
+  "title": "Dog Pregnancy Calculator: Due Date & Timeline",
+  "description": "Find your dog's due date from the breeding, ovulation or LH surge date, plus how far along she is and a week-by-week timeline of scans, prep and whelping.",
+  "h1": "Dog Pregnancy Calculator",
+  "short": "Dog Pregnancy Calculator",
+  "intro": "Enter the breeding date (or the ovulation or LH surge date from progesterone testing) to get your dog's due date, the normal whelping window and a timeline of key milestones.",
+  "updated": "September 2026",
+  "related": ["puppy-weight-calculator", "dog-food-calculator", "dog-age-calculator", "dog-chocolate-toxicity-calculator"],
+  "faq": [
+    {"q": "How long are dogs pregnant?", "a": "About 63 days, or nine weeks, counted from ovulation. Counted from the breeding date, puppies usually arrive between 58 and 68 days, and the Merck Veterinary Manual gives an outer range of 58 to 72 days from the first mating. The range is wide because sperm can survive several days waiting for eggs to mature."},
+    {"q": "How accurate is a dog due date?", "a": "If ovulation was pinpointed with progesterone testing, whelping is very predictable, usually 63 days after ovulation give or take a day or two, or 65 days after the LH surge. From a breeding date alone, the estimate can be off by several days in either direction."},
+    {"q": "When can a vet confirm a dog is pregnant?", "a": "An ultrasound can usually confirm pregnancy from about 25 to 35 days after breeding, when heartbeats become visible. A relaxin blood test works from roughly 25 to 30 days. An experienced vet may feel the developing pregnancies by palpation around days 28 to 35. X-rays show puppy skeletons from about day 45 and give the most reliable count after day 55."},
+    {"q": "What are the signs that my dog is about to give birth?", "a": "Restlessness, nesting, loss of appetite, panting and shivering are common in the last day or two. The most useful sign is a drop in rectal temperature below about 99°F (37.2°C), which typically happens 12 to 24 hours before labor. Start taking her temperature twice a day about a week before the due date."},
+    {"q": "When should I call the vet during whelping?", "a": "Call if there is no sign of labor by about 68 days after breeding, if she strains hard for 30 minutes without producing a puppy, if more than 2 to 4 hours pass between puppies, if there is green or black discharge before the first puppy, or if she seems weak or in severe pain."},
+    {"q": "Should I change my pregnant dog's food?", "a": "Usually not for the first five weeks. From about week five or six, most vets recommend gradually switching to a high-quality puppy or all-life-stages food and increasing the amount, so that by whelping she eats roughly 25 to 50% more than her normal maintenance amount. Ask your vet about her specific needs and avoid extra calcium supplements unless prescribed."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="date">Date</label>
+        <div class="input"><input id="date" name="date" type="date"></div>
+        <div class="hint">If she was bred more than once, use the first breeding date.</div>
+      </div>
+      <div class="field">
+        <label for="dateType">This date is the</label>
+        <select id="dateType" name="dateType">
+          <option value="breed" selected>Breeding (mating) date</option>
+          <option value="ovu">Ovulation date (progesterone-timed)</option>
+          <option value="lh">LH surge date (progesterone-timed)</option>
+        </select>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Estimated due date</span><b data-out="due">—</b></div>
+    <div class="result"><span>Normal whelping window</span><b data-out="window">—</b></div>
+    <div class="result"><span>Days along today</span><b data-out="along">—</b></div>
+    <div class="result"><span>Stage</span><b data-out="stage">—</b></div>
+    <div class="result"><span>Days until due date</span><b data-out="left">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+  <div style="grid-column: 1 / -1;">
+    <h2 style="font-size: 18px; margin: 0 0 6px;">Pregnancy timeline</h2>
+    <div class="result"><span>Day 0: breeding / ovulation</span><b data-out="m0">—</b></div>
+    <div class="result"><span>Days 18–21: embryos implant in the uterus</span><b data-out="m18">—</b></div>
+    <div class="result"><span>Days 25–35: ultrasound can confirm pregnancy and heartbeats</span><b data-out="m25">—</b></div>
+    <div class="result"><span>Days 28–35: vet may feel pregnancy by palpation; relaxin blood test positive</span><b data-out="m28">—</b></div>
+    <div class="result"><span>Day 35+: start gradually increasing food, switch to puppy food</span><b data-out="m35">—</b></div>
+    <div class="result"><span>Day 45+: puppy skeletons show on x-ray (best count after day 55)</span><b data-out="m45">—</b></div>
+    <div class="result"><span>Days 55–58: set up whelping box, take temperature twice daily</span><b data-out="m55">—</b></div>
+    <div class="result"><span>Day 63: due date (temperature drops below ~99°F 12–24 h before labor)</span><b data-out="m63">—</b></div>
+    <div class="result"><span data-out="lateLabel">Call your vet if no labor by</span><b data-out="late">—</b></div>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const add = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+  const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+  // Read "YYYY-MM-DD" as a local date; default to 30 days ago if empty or invalid.
+  let entered;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v.date || "");
+  if (m) entered = new Date(+m[1], +m[2] - 1, +m[3]);
+  if (!entered || isNaN(entered)) {
+    entered = add(today, -30);
+    document.getElementById("date").value = iso(entered);
+  }
+
+  // Convert to an ovulation-equivalent day 0. The LH surge comes about 2 days before ovulation.
+  const base = v.dateType === "lh" ? add(entered, 2) : entered;
+  const [lo, hi] = v.dateType === "breed" ? [58, 68] : [61, 65];
+  const due = add(base, 63);
+
+  const long = (d) => d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+  const short = (d) => d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const range = (a, b) => `${short(add(base, a))} – ${short(add(base, b))}`;
+  const day = Math.round((today - base) / 86400000);
+
+  out.set("due", long(due));
+  out.set("window", `${short(add(base, lo))} – ${short(add(base, hi))}`);
+  out.set("along", day < 0 ? "Not yet" : `${day} days (week ${Math.floor(day / 7) + 1})`);
+  let stage;
+  if (day < 0) stage = "Date is in the future";
+  else if (day <= 21) stage = "First trimester (weeks 1–3)";
+  else if (day <= 42) stage = "Second trimester (weeks 4–6)";
+  else if (day <= 63) stage = "Third trimester (weeks 7–9)";
+  else if (day <= hi) stage = "Due now: watch for labor";
+  else stage = "Past the normal range";
+  out.set("stage", stage);
+  const left = 63 - day;
+  out.set("left", left > 0 ? `${left} days` : left === 0 ? "Today" : `${-left} days past`);
+
+  out.set("m0", short(base));
+  out.set("m18", range(18, 21));
+  out.set("m25", range(25, 35));
+  out.set("m28", range(28, 35));
+  out.set("m35", "From " + short(add(base, 35)));
+  out.set("m45", "From " + short(add(base, 45)));
+  out.set("m55", range(55, 58));
+  out.set("m63", short(due));
+  out.set("lateLabel", v.dateType === "breed" ? "Day 68: call your vet if no labor by" : "Day 65: call your vet if no labor by");
+  out.set("late", short(add(base, hi)));
+
+  if (day > hi) out.note("She is past the usual whelping window for this date. Contact your vet today.");
+  else if (v.dateType === "breed") out.note("From a breeding date the due date is an estimate; puppies commonly arrive a few days early or late. Progesterone-timed ovulation gives a much tighter window.");
+  else out.note("With a progesterone-timed date, most dogs whelp within a day or two of the due date.");
+}));
+</script>
+<!-- article -->
+<h2>How dog due dates are calculated</h2>
+<p>A dog's pregnancy lasts about <strong>63 days from ovulation</strong>, roughly nine weeks. The complication is that
+breeding and ovulation don't always happen on the same day. Dog eggs need a couple of days to mature after they're
+released, and sperm can survive in the reproductive tract for several days, so a mating can take place days before or
+after the eggs are ready. That is why a due date counted from the breeding date comes with a wide window: most litters
+arrive <strong>58 to 68 days</strong> after mating, and the Merck Veterinary Manual gives an outer range of 58 to 72 days
+from the first breeding.</p>
+<p>Breeders who use progesterone blood tests to pinpoint ovulation get far more precise dates. Whelping is typically
+<strong>63 ± 1–2 days after ovulation</strong> or <strong>65 ± 1–2 days after the LH surge</strong>, which comes about two
+days before ovulation. Choose the date type that matches what you know.</p>
+
+<h2>The formula</h2>
+<div class="formula">from breeding date: due = breeding date + 63 days (window 58–68)<br>
+from ovulation date: due = ovulation date + 63 days (window 61–65)<br>
+from LH surge date: due = LH surge date + 65 days (window 63–67)<br>
+days along = today − breeding (or ovulation) date</div>
+
+<h2>Example: bred on June 1, 2026</h2>
+<p>For a dog bred once on Monday, June 1, 2026, using the breeding date:</p>
+<table>
+  <tr><th>Milestone</th><th>Day</th><th>Date</th></tr>
+  <tr><td>Breeding</td><td>0</td><td>Jun 1</td></tr>
+  <tr><td>Implantation</td><td>18–21</td><td>Jun 19 – Jun 22</td></tr>
+  <tr><td>Ultrasound window</td><td>25–35</td><td>Jun 26 – Jul 6</td></tr>
+  <tr><td>Start increasing food</td><td>35+</td><td>From Jul 6</td></tr>
+  <tr><td>X-ray shows skeletons</td><td>45+</td><td>From Jul 16</td></tr>
+  <tr><td>Whelping box, temperature checks</td><td>55–58</td><td>Jul 26 – Jul 29</td></tr>
+  <tr><td><strong>Estimated due date</strong></td><td><strong>63</strong></td><td><strong>Mon, Aug 3, 2026</strong></td></tr>
+  <tr><td>Normal whelping window</td><td>58–68</td><td>Jul 29 – Aug 8</td></tr>
+  <tr><td>Call the vet if no labor</td><td>68</td><td>Aug 8</td></tr>
+</table>
+
+<h2>The three trimesters</h2>
+<h3>Weeks 1–3 (days 0–21)</h3>
+<p>Fertilized eggs travel to the uterus and implant around days 18–21. There are usually no visible changes, though some
+dogs have mild morning sickness or a slightly reduced appetite around week three. Keep feeding and exercise normal.</p>
+<h3>Weeks 4–6 (days 22–42)</h3>
+<p>This is the window to confirm the pregnancy with an ultrasound or relaxin test. Fetuses grow quickly, and her belly and
+nipples may start to enlarge. From about week five or six, begin a gradual switch to a puppy or all-life-stages food.</p>
+<h3>Weeks 7–9 (days 43–63)</h3>
+<p>Her abdomen grows noticeably and you may see puppies moving. An x-ray after day 55 gives the best puppy count, which
+helps you know when she's finished whelping. Introduce the whelping box a week or two ahead so she's comfortable in it,
+and start taking her rectal temperature twice a day. Normal is about 100–102.5°F; a drop below about 99°F usually means
+labor within 12–24 hours.</p>
+
+<h2>Practical tips</h2>
+<ul>
+  <li><strong>Book a vet check early.</strong> Confirm the pregnancy, discuss nutrition and parasite control, and ask what signs should prompt an emergency call.</li>
+  <li><strong>Avoid unprescribed supplements.</strong> Extra calcium during pregnancy can increase the risk of dangerously low calcium (eclampsia) after whelping.</li>
+  <li><strong>Know your emergency plan.</strong> Save the number of an emergency clinic that's open nights and weekends before the due date.</li>
+  <li><strong>Watch the clock during labor.</strong> Call a vet for 30 minutes of hard straining without a puppy, more than 2–4 hours between puppies, or green-black discharge before the first puppy.</li>
+</ul>
+<p><em>This calculator gives estimates for planning and is not veterinary advice. Pregnancy and whelping should be supervised by a veterinarian.</em></p>

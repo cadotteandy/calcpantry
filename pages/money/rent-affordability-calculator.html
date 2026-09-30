@@ -1,0 +1,158 @@
+---
+{
+  "title": "Rent Affordability Calculator: How Much Rent Can I Afford?",
+  "description": "Find the most rent you can afford with the 30% rule, 50/30/20 budget, 40x landlord rule or a debt-to-income check, plus the income needed for any rent.",
+  "h1": "Rent Affordability Calculator",
+  "short": "Rent Affordability Calculator",
+  "intro": "Enter your income and monthly debt payments to see how much rent you can afford under the most common rules, and what income a landlord will want to see for the apartment you have in mind.",
+  "updated": "September 2026",
+  "related": ["hourly-to-salary-calculator", "emergency-fund-calculator", "savings-goal-calculator", "debt-payoff-calculator"],
+  "faq": [
+    {"q": "How much rent can I afford on $60,000 a year?", "a": "Under the 30% rule, $60,000 a year is $5,000 a month gross, so the guideline is up to $1,500 a month. Landlords using the 40x rule would approve up to the same $1,500. If you carry car or card payments, a lower figure is safer."},
+    {"q": "Is the 30% rule based on gross or take-home pay?", "a": "Gross pay, before taxes. The benchmark comes from federal housing policy: HUD considers households paying more than 30% of gross income on housing, including utilities, to be cost-burdened. Because it uses gross pay, 30% can feel tight after taxes."},
+    {"q": "What does 40 times the rent mean?", "a": "Many landlords, especially in New York City, want your gross annual income to be at least 40 times the monthly rent. For a $2,000 apartment that is $80,000 a year. It works out to rent of exactly 30% of gross monthly income. Guarantors are often asked to earn 80 times the rent."},
+    {"q": "What is the 3x rent rule?", "a": "Some landlords want gross monthly income of at least three times the rent, which is 36 times the rent per year. It is slightly looser than the 40x rule, allowing rent up to about 33% of gross income."},
+    {"q": "Should utilities count toward rent affordability?", "a": "Yes, if you want to match the HUD definition, which counts rent plus utilities. If utilities are not included in your rent, subtract a realistic estimate for electricity, gas, water and internet from the maximum rent shown here."},
+    {"q": "How do my debts affect how much rent I can afford?", "a": "The 30% and 40x rules ignore debts, but your budget doesn't. The 50/30/20 and debt-to-income options subtract your monthly debt payments, which gives a more realistic ceiling if you have car, student loan or card payments."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="income">Gross income</label>
+          <div class="input"><span class="unit pre">$</span><input id="income" name="income" type="number" min="0" step="1000" value="66000" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="period">Per</label>
+          <select id="period" name="period">
+            <option value="year">Year</option>
+            <option value="month">Month</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="debts">Monthly debt payments</label>
+        <div class="input"><span class="unit pre">$</span><input id="debts" name="debts" type="number" min="0" step="25" value="400" inputmode="decimal"><span class="unit">/mo</span></div>
+        <div class="hint">Car loan, student loans, card minimums, personal loans.</div>
+      </div>
+      <div class="field">
+        <label for="takehome">Take-home pay (optional)</label>
+        <div class="input"><span class="unit pre">$</span><input id="takehome" name="takehome" type="number" min="0" step="50" value="" placeholder="Estimated at 75% of gross" inputmode="decimal"><span class="unit">/mo</span></div>
+        <div class="hint">Used by the 50/30/20 rule. Leave blank to estimate.</div>
+      </div>
+      <div class="field">
+        <label for="rule">Affordability rule</label>
+        <select id="rule" name="rule">
+          <option value="r30">30% of gross income</option>
+          <option value="r503020">50/30/20 budget (take-home pay)</option>
+          <option value="r40x">Landlord 40x rent rule</option>
+          <option value="dti">Debt-to-income: rent + debts ≤ 36%</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="target">Rent you're considering</label>
+        <div class="input"><span class="unit pre">$</span><input id="target" name="target" type="number" min="0" step="50" value="1800" inputmode="decimal"><span class="unit">/mo</span></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your rent budget</h2>
+    <div class="result big"><span data-out="headLabel">Maximum rent</span><b data-out="headline">—</b></div>
+    <div class="result"><span>Gross monthly income</span><b data-out="gross">—</b></div>
+    <h2 style="margin-top:14px">All rules compared</h2>
+    <div class="result"><span>30% of gross</span><b data-out="r30">—</b></div>
+    <div class="result"><span>50/30/20 (needs minus debts)</span><b data-out="r503020">—</b></div>
+    <div class="result"><span>Landlord 40x rule</span><b data-out="r40x">—</b></div>
+    <div class="result"><span>Rent + debts ≤ 36%</span><b data-out="dti">—</b></div>
+    <h2 style="margin-top:14px" data-out="targetHead">Income needed</h2>
+    <div class="result"><span>For the 40x rule (per year)</span><b data-out="need40">—</b></div>
+    <div class="result"><span>For the 30% rule (per year)</span><b data-out="need30">—</b></div>
+    <div class="result"><span>That rent as % of your gross</span><b data-out="targetPct">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+const TAKEHOME_EST = 0.75;   // rough take-home share of gross after taxes and typical payroll deductions
+const LABELS = { r30: "Maximum rent (30% rule)", r503020: "Maximum rent (50/30/20)", r40x: "Maximum rent (40x rule)", dti: "Maximum rent (36% debt-to-income)" };
+
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const gross = v.period === "month" ? v.income : v.income / 12;
+  const debts = Math.max(0, v.debts);
+  const estimated = !(v.takehome > 0);
+  const takehome = estimated ? gross * TAKEHOME_EST : v.takehome;
+  const rule = LABELS[v.rule] ? v.rule : "r30";
+
+  const rules = {
+    r30: gross * 0.30,
+    r503020: takehome * 0.50 - debts,
+    r40x: gross * 12 / 40,
+    dti: gross * 0.36 - debts,
+  };
+  const fmt = (n) => (n > 0 ? Calc.money(n, 0) : "$0");
+
+  out.set("headLabel", LABELS[rule]);
+  out.set("gross", Calc.money(gross, 0));
+  Object.keys(rules).forEach((k) => out.set(k, fmt(rules[k])));
+  out.set("headline", gross > 0 ? fmt(rules[rule]) : "—");
+
+  const t = Math.max(0, v.target);
+  out.set("targetHead", t > 0 ? `Income needed for ${Calc.money(t, 0)} rent` : "Income needed");
+  out.set("need40", t > 0 ? Calc.money(t * 40, 0) : "—");
+  out.set("need30", t > 0 ? Calc.money(t * 12 / 0.30, 0) : "—");
+  out.set("targetPct", t > 0 && gross > 0 ? Calc.pct(t / gross) : "—");
+
+  if (gross <= 0) { out.note("Enter your gross (before-tax) income to see your rent budget."); return; }
+  if (rules[rule] <= 0) { out.note("Your debt payments use up this rule's whole housing budget. Paying down debt, or a roommate, would free up room for rent."); return; }
+  const parts = [];
+  if (rule === "r503020") parts.push(estimated
+    ? `Take-home pay estimated at ${Calc.money(takehome, 0)} a month (75% of gross); enter yours for a better figure.`
+    : "The 50% for needs also covers groceries, utilities, insurance and transport, so aim below this.");
+  if (t > 0 && t > rules[rule]) parts.push(`${Calc.money(t, 0)} is over this rule's limit by ${Calc.money(t - rules[rule], 0)} a month.`);
+  else if (t > 0) parts.push(`${Calc.money(t, 0)} fits within this rule.`);
+  parts.push("Rules of thumb only; count utilities if they're not included in the rent.");
+  out.note(parts.join(" "));
+}));
+</script>
+<!-- article -->
+<p><strong>This is a guideline, not financial advice.</strong> A landlord's approval and a comfortable budget are two different things. Use the lowest number that fits your life.</p>
+
+<h2>The rules this calculator uses</h2>
+<h3>30% of gross income</h3>
+<p>The best-known benchmark comes from federal housing policy. HUD considers a household cost-burdened when housing costs, including utilities, take more than 30% of gross income, and severely burdened above 50%. It ignores debts and taxes, so it can be generous for people with loans or high state taxes.</p>
+<h3>The landlord 40x rule</h3>
+<p>Many landlords, especially in New York City, want gross annual income of at least 40 times the monthly rent. That is a market convention, not a law. It works out to exactly the same limit as the 30% rule. Some landlords use 3x monthly rent instead (36x a year), which allows about 33%. Guarantors are usually asked to earn around 80x.</p>
+<h3>50/30/20 budget</h3>
+<p>Popularized by Elizabeth Warren and Amelia Warren Tyagi in <em>All Your Worth</em>, this splits take-home pay into 50% needs, 30% wants and 20% savings and extra debt payments. Minimum debt payments are needs, so the calculator subtracts them from the 50%. Groceries, utilities, insurance and transport also come out of that 50%, so treat the result as a hard ceiling.</p>
+<h3>Debt-to-income: rent + debts ≤ 36%</h3>
+<p>Borrowed from lending, this caps rent plus debt payments at 36% of gross income. It is useful if your debts are large, because it shrinks your rent budget dollar for dollar.</p>
+<div class="formula">gross monthly = annual income ÷ 12<br>
+30% rule = gross monthly × 0.30<br>
+40x rule = annual income ÷ 40<br>
+50/30/20 = take-home × 0.50 − debt payments<br>
+36% DTI = gross monthly × 0.36 − debt payments<br>
+income needed (40x) = rent × 40</div>
+
+<h2>Example: $66,000 a year with $400 of debt payments</h2>
+<p>Gross monthly income is $5,500. Take-home pay isn't entered, so the calculator estimates it at 75% of gross, or $4,125 a month. The apartment being considered rents for $1,800.</p>
+<table>
+  <tr><th>Rule</th><th>Maximum rent</th></tr>
+  <tr><td><strong>30% of gross ($5,500 × 0.30)</strong></td><td><strong>$1,650</strong></td></tr>
+  <tr><td>50/30/20 ($4,125 × 0.50 − $400)</td><td>$1,663</td></tr>
+  <tr><td>Landlord 40x ($66,000 ÷ 40)</td><td>$1,650</td></tr>
+  <tr><td>36% DTI ($5,500 × 0.36 − $400)</td><td>$1,580</td></tr>
+  <tr><td>Income needed for $1,800 (40x)</td><td>$72,000 a year</td></tr>
+  <tr><td>Income needed for $1,800 (30%)</td><td>$72,000 a year</td></tr>
+</table>
+<p>The $1,800 apartment is 32.7% of gross income, $150 over the 30% line. A landlord using the 40x rule would likely ask for a guarantor, and a budget built around it would feel tight.</p>
+
+<h2>Tips before you sign</h2>
+<ul>
+  <li><strong>Add utilities.</strong> If rent doesn't include them, subtract a realistic monthly estimate for power, gas, water and internet from the maximum.</li>
+  <li><strong>Count move-in costs.</strong> First month, security deposit, application fees and moving can easily reach two to three months of rent up front.</li>
+  <li><strong>Enter your real take-home pay.</strong> Use a recent pay stub. Retirement contributions and health premiums can cut take-home well below 75% of gross.</li>
+  <li><strong>Irregular income?</strong> Freelancers and gig workers should use a conservative average of the last 12 months, and landlords may ask for tax returns or bank statements.</li>
+  <li><strong>Leave room to save.</strong> Rent that fits the rule but leaves nothing for an emergency fund is still too much.</li>
+</ul>

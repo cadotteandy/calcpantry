@@ -1,0 +1,160 @@
+---
+{
+  "title": "Puppy Weight Calculator: Estimate Adult Size",
+  "description": "Estimate how big your puppy will get from its age in weeks, current weight and breed size, with how much of its adult size it has reached and when growth stops.",
+  "h1": "Puppy Weight Calculator",
+  "short": "Puppy Weight Calculator",
+  "intro": "Enter your puppy's age, current weight and expected size group for a rough estimate of adult weight, how far along it is, and when it will likely stop growing.",
+  "updated": "September 2026",
+  "related": ["dog-food-calculator", "dog-age-calculator", "dog-pregnancy-calculator", "dog-chocolate-toxicity-calculator"],
+  "faq": [
+    {"q": "How can I tell how big my puppy will get?", "a": "The best predictor is the size of the parents, especially for purebreds. Without that, growth rules of thumb help: small breeds are roughly a quarter of adult weight at 6 weeks, medium breeds about 40% at 14 weeks, and large breeds reach about half their adult weight around 5 months. This calculator turns those patterns into an estimated range."},
+    {"q": "How accurate are puppy weight calculators?", "a": "They are rough. Individual puppies grow at different rates, and mixed breeds can land well outside the usual range for their size group. Expect the real adult weight to fall within about 15% of the estimate for many puppies, but not all. Re-check every few weeks, since estimates get better as the puppy gets older."},
+    {"q": "Do paws predict how big a puppy will get?", "a": "Only loosely. Big paws on a young puppy often do mean a bigger dog, but paw size varies by breed and it is not a reliable measurement. Weight history, age and parent size are much better guides."},
+    {"q": "At what age is a dog fully grown?", "a": "Small and toy breeds usually reach adult weight at about 9 to 12 months, medium breeds at 12 to 15 months, large breeds at 15 to 18 months and giant breeds at 18 to 24 months. Many dogs keep filling out, adding muscle and chest, for a few months after they reach full height."},
+    {"q": "Is the current weight divided by age times 52 rule accurate?", "a": "That rule assumes a puppy gains the same amount every week for a year, but puppies grow fastest early and then slow down. It tends to overestimate adult weight for young small and medium puppies, which is why this calculator uses size-specific growth curves instead."},
+    {"q": "Is my puppy overweight or underweight?", "a": "Weight alone cannot tell you. Check body condition: you should be able to feel the ribs easily under a thin layer of fat and see a waist from above. Your vet can assess body condition and growth at each puppy visit."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="weeks">Puppy's age</label>
+        <div class="input"><input id="weeks" name="weeks" type="number" min="0" max="120" step="1" value="12" inputmode="numeric"><span class="unit">weeks</span></div>
+        <div class="hint">Months × 4.35 ≈ weeks. Most accurate from about 10 weeks on.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="weight">Current weight</label>
+          <div class="input"><input id="weight" name="weight" type="number" min="0" step="0.1" value="12" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="unit">Unit</label>
+          <select id="unit" name="unit">
+            <option value="lb">lb</option>
+            <option value="kg">kg</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="size">Expected adult size</label>
+        <select id="size" name="size">
+          <option value="small">Toy / small (under 25 lb / 11 kg)</option>
+          <option value="medium" selected>Medium (25–50 lb / 11–23 kg)</option>
+          <option value="large">Large (50–100 lb / 23–45 kg)</option>
+          <option value="giant">Giant (over 100 lb / 45 kg)</option>
+        </select>
+        <div class="hint">Base this on the breed or the parents' size. For a mix, pick the group that best fits the parents.</div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Estimated adult weight</span><b data-out="range">—</b></div>
+    <div class="result"><span>Best single estimate</span><b data-out="best">—</b></div>
+    <div class="result"><span>Share of adult weight now</span><b data-out="pct">—</b></div>
+    <div class="result"><span>Growth usually finishes</span><b data-out="done">—</b></div>
+    <div class="result"><span>Still to gain (approx.)</span><b data-out="gain">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  // Typical share of adult weight (%) by age in weeks, smoothed from common growth rules:
+  // small ~25% at 6 wk (x4) and ~33% at 8 wk (x3); medium ~40% at 14 wk (x2.5);
+  // large ~half at about 5 months; giant ~half at about 7 months.
+  const curves = {
+    small:  [[6, 25], [8, 33], [12, 50], [16, 62], [20, 72], [26, 85], [36, 95], [44, 100]],
+    medium: [[6, 15], [8, 22], [12, 35], [14, 40], [16, 46], [20, 56], [26, 70], [36, 86], [44, 94], [52, 98], [60, 100]],
+    large:  [[6, 10], [8, 15], [12, 25], [16, 38], [20, 48], [26, 60], [36, 74], [52, 88], [65, 96], [78, 100]],
+    giant:  [[6, 7], [8, 10], [12, 17], [16, 24], [20, 32], [26, 43], [36, 58], [52, 76], [78, 92], [104, 100]],
+  };
+  const doneText = { small: "9–12 months", medium: "12–15 months", large: "15–18 months", giant: "18–24 months" };
+  const pts = curves[v.size] || curves.medium;
+  const u = v.unit === "kg" ? " kg" : " lb";
+  const w = v.weeks;
+
+  out.set("done", doneText[v.size] || doneText.medium);
+  if (w < 6 || v.weight <= 0) {
+    ["range", "best", "pct", "gain"].forEach((k) => out.set(k, "—"));
+    out.note(w < 6 ? "Estimates before 6 weeks are unreliable; puppies are still nursing and growth is too variable. Try again at 8 weeks or later." : "Enter your puppy's current weight.");
+    return;
+  }
+
+  let pct = 100;
+  for (let i = 1; i < pts.length; i++) {
+    const [x0, y0] = pts[i - 1], [x1, y1] = pts[i];
+    if (w <= x1) { pct = y0 + (y1 - y0) * (w - x0) / (x1 - x0); break; }
+  }
+  const best = v.weight / (pct / 100);
+  const low = best * 0.85, high = best * 1.15;   // honest +/-15% band
+
+  out.set("range", `${Calc.num(low, 0)}–${Calc.num(high, 0)}${u}`);
+  out.set("best", Calc.num(best, 1) + u);
+  out.set("pct", Calc.num(pct, 0) + "%");
+  out.set("gain", pct >= 100 ? "Little or none" : Calc.num(best - v.weight, 1) + u);
+
+  if (pct >= 100) out.note("At this age most dogs in this size group are at or near adult weight. Further gains are usually muscle and filling out, or extra fat.");
+  else out.note("Rough estimate only. Parents' size is the best predictor, and individual puppies can land outside this range. Re-check every 2–4 weeks; the estimate firms up as your puppy gets older.");
+}));
+</script>
+<!-- article -->
+<h2>How this puppy weight calculator works</h2>
+<p>Puppies don't grow at a steady rate. They pile on weight fastest in the first few months, then slow down as they approach
+adult size, and the timing depends heavily on breed size. A Chihuahua is close to full grown at 9 months, while a Great Dane
+can keep growing until two years old. So the useful question is: <strong>what share of its adult weight does a puppy of this
+size group usually carry at this age?</strong></p>
+<p>This calculator uses a typical growth curve for each size group, built from the rules of thumb vets and breeders have
+used for decades:</p>
+<ul>
+  <li><strong>Toy / small:</strong> weight at 6 weeks × 4 (about 25%), or weight at 8 weeks × 3 (about 33%).</li>
+  <li><strong>Medium:</strong> weight at 14 weeks × 2.5 (about 40%).</li>
+  <li><strong>Large:</strong> roughly half of adult weight at about 5 months (20–22 weeks).</li>
+  <li><strong>Giant:</strong> roughly half of adult weight at 6–7 months, with growth continuing to 18–24 months.</li>
+</ul>
+<p>Between those anchor points, the curve is smoothed so you can enter any age. The result is shown as a range of ±15%
+around the best estimate, because that is realistically how precise this kind of prediction is.</p>
+
+<h2>The formula</h2>
+<div class="formula">share now = typical % of adult weight for this age and size<br>
+estimated adult weight = current weight ÷ share now<br>
+range = estimate × 0.85 to estimate × 1.15</div>
+
+<h3>Typical share of adult weight used</h3>
+<table>
+  <tr><th>Age</th><th>Toy / small</th><th>Medium</th><th>Large</th><th>Giant</th></tr>
+  <tr><td>8 weeks</td><td>33%</td><td>22%</td><td>15%</td><td>10%</td></tr>
+  <tr><td>12 weeks</td><td>50%</td><td>35%</td><td>25%</td><td>17%</td></tr>
+  <tr><td>16 weeks</td><td>62%</td><td>46%</td><td>38%</td><td>24%</td></tr>
+  <tr><td>26 weeks (6 mo)</td><td>85%</td><td>70%</td><td>60%</td><td>43%</td></tr>
+  <tr><td>36 weeks</td><td>95%</td><td>86%</td><td>74%</td><td>58%</td></tr>
+  <tr><td>52 weeks (1 yr)</td><td>100%</td><td>98%</td><td>88%</td><td>76%</td></tr>
+</table>
+
+<h2>Example: a 12-week-old medium puppy</h2>
+<p>A 12-week-old puppy weighing 12 lb, expected to be a medium-size dog:</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Typical share at 12 weeks (medium)</td><td>35%</td></tr>
+  <tr><td>Best estimate = 12 ÷ 0.35</td><td>34.3 lb</td></tr>
+  <tr><td>Range = 34.3 × 0.85 to 34.3 × 1.15</td><td><strong>29–39 lb</strong></td></tr>
+  <tr><td>Still to gain</td><td>22.3 lb</td></tr>
+  <tr><td>Growth usually finishes</td><td>12–15 months</td></tr>
+</table>
+
+<h3>Why not "weight ÷ weeks × 52"?</h3>
+<p>That popular formula assumes a puppy gains the same amount every week for a year. For the example puppy it predicts
+52 lb, far above what a medium dog at 35% of adult weight will reach, because growth slows sharply after the first few
+months. It can be a reasonable check for small breeds around 4 to 6 months, but it overestimates young puppies.</p>
+
+<h2>Tips for a better estimate</h2>
+<ul>
+  <li><strong>Look at the parents.</strong> For a purebred, the adult weight of the mother and father beats any formula. Mixed breeds most often land between the two parents.</li>
+  <li><strong>Weigh regularly on the same scale.</strong> A weekly or biweekly weight log is the best way to spot a puppy tracking above or below its curve.</li>
+  <li><strong>Enter an older age when you can.</strong> A 16-week estimate is more reliable than an 8-week one.</li>
+  <li><strong>Don't push growth.</strong> Large and giant puppies should grow steadily, not fast. Feed a food made for large-breed puppies and keep them lean, which is linked to healthier joints.</li>
+  <li><strong>Judge body condition too.</strong> A heavy puppy is not necessarily a big-framed one; fat puppies inflate the estimate.</li>
+</ul>
+<p><em>This calculator gives a rough estimate for planning, not a prediction you can count on, and it is not veterinary advice. Your vet can track your puppy's growth and body condition at each visit.</em></p>

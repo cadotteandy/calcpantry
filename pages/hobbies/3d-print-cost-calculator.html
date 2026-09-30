@@ -1,0 +1,169 @@
+---
+{
+  "title": "3D Print Cost Calculator: Filament, Power & Price",
+  "description": "Work out what a 3D print really costs: filament, electricity, printer wear and failed prints, plus a suggested sale price with your markup.",
+  "h1": "3D Print Cost Calculator",
+  "short": "3D Print Cost Calculator",
+  "intro": "Enter the filament weight and print time from your slicer to see the true cost of a print and what to charge if you sell it.",
+  "updated": "September 2026",
+  "related": ["etsy-fee-calculator", "side-hustle-tax-calculator", "freelance-rate-calculator", "board-foot-calculator"],
+  "faq": [
+    {"q": "How much does it cost to 3D print something?", "a": "Most small FDM prints cost well under $2 in materials and power. A 50 g PLA part that takes 4 hours costs about $1.00 in filament at $20 per kilogram, about 9 cents in electricity, and roughly 30 cents in printer wear, so around $1.50 all in. Filament is almost always the biggest line."},
+    {"q": "How much electricity does a 3D printer use?", "a": "A typical desktop FDM printer averages about 100 to 150 watts while printing PLA. It spikes higher for a minute or two while the bed and nozzle heat up, then settles down. Printing ABS or ASA with a hotter bed and an enclosure pushes the average up. At 120 W and $0.18 per kWh, an hour of printing costs about 2 cents."},
+    {"q": "How do I find how many grams of filament a print uses?", "a": "Your slicer shows it after slicing. PrusaSlicer, Bambu Studio, Cura and OrcaSlicer all report filament used in grams (and meters) along with the estimated print time. Use those numbers directly in the calculator."},
+    {"q": "How much should I charge for 3D prints?", "a": "Start from the full cost per print, including failures and printer wear, then add your time for design, removal, support cleanup and packing. Many sellers mark material-and-machine cost up 100% to 300% for simple items, and charge design time separately for custom work. Marketplace fees and shipping come on top."},
+    {"q": "What failure rate should I use?", "a": "A well-tuned printer running a proven file may fail fewer than 1 in 20 prints, so 5% is a reasonable default. Use 10% to 20% for new designs, tall or thin parts, or tricky materials like TPU and nylon."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="grams">Filament used</label>
+        <div class="input"><input id="grams" name="grams" type="number" min="0" step="1" value="50" inputmode="decimal"><span class="unit">g</span></div>
+        <div class="hint">From your slicer's print summary.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="spoolPrice">Spool price</label>
+          <div class="input"><span class="unit pre">$</span><input id="spoolPrice" name="spoolPrice" type="number" min="0" step="0.01" value="20" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="spoolWeight">Spool weight</label>
+          <div class="input"><input id="spoolWeight" name="spoolWeight" type="number" min="1" step="1" value="1000" inputmode="decimal"><span class="unit">g</span></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="hours">Print time</label>
+          <div class="input"><input id="hours" name="hours" type="number" min="0" step="1" value="4" inputmode="numeric"><span class="unit">h</span></div>
+        </div>
+        <div class="field">
+          <label for="minutes">&nbsp;</label>
+          <div class="input"><input id="minutes" name="minutes" type="number" min="0" max="59" step="1" value="0" inputmode="numeric" aria-label="Print time minutes"><span class="unit">min</span></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="watts">Average power draw</label>
+          <div class="input"><input id="watts" name="watts" type="number" min="0" step="1" value="120" inputmode="decimal"><span class="unit">W</span></div>
+        </div>
+        <div class="field">
+          <label for="rate">Electricity rate</label>
+          <div class="input"><span class="unit pre">$</span><input id="rate" name="rate" type="number" min="0" step="0.01" value="0.18" inputmode="decimal"><span class="unit">/kWh</span></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="printerCost">Printer cost</label>
+          <div class="input"><span class="unit pre">$</span><input id="printerCost" name="printerCost" type="number" min="0" step="1" value="400" inputmode="decimal"></div>
+          <div class="hint">Enter 0 to skip wear.</div>
+        </div>
+        <div class="field">
+          <label for="lifeHours">Expected lifetime</label>
+          <div class="input"><input id="lifeHours" name="lifeHours" type="number" min="0" step="100" value="5000" inputmode="numeric"><span class="unit">h</span></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="failRate">Failure rate</label>
+          <div class="input"><input id="failRate" name="failRate" type="number" min="0" max="90" step="1" value="5" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+        <div class="field">
+          <label for="markup">Markup for selling</label>
+          <div class="input"><input id="markup" name="markup" type="number" min="0" step="5" value="100" inputmode="decimal"><span class="unit">%</span></div>
+          <div class="hint">Enter 0 if not selling.</div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Total cost per print</span><b data-out="total">—</b></div>
+    <div class="result"><span>Filament</span><b data-out="filament">—</b></div>
+    <div class="result"><span>Electricity</span><b data-out="power">—</b></div>
+    <div class="result"><span>Printer wear</span><b data-out="wear">—</b></div>
+    <div class="result"><span>Failure allowance</span><b data-out="fail">—</b></div>
+    <div class="result"><span>Energy used</span><b data-out="kwh">—</b></div>
+    <div class="result" data-show="sell" hidden><span>Suggested sale price</span><b data-out="sale">—</b></div>
+    <div class="result" data-show="sell" hidden><span>Gross profit per print</span><b data-out="profit">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const hours = v.hours + v.minutes / 60;
+  const filament = v.spoolWeight > 0 ? v.grams * v.spoolPrice / v.spoolWeight : 0;
+  const kwh = v.watts / 1000 * hours;
+  const power = kwh * v.rate;
+  const wear = v.lifeHours > 0 ? v.printerCost / v.lifeHours * hours : 0;
+  const base = filament + power + wear;
+  const f = Math.min(v.failRate, 90) / 100;
+  const total = base / (1 - f);            // pay for the failed attempts too
+  const fail = total - base;
+  const sale = total * (1 + v.markup / 100);
+
+  out.set("total", Calc.money(total));
+  out.set("filament", Calc.money(filament));
+  out.set("power", Calc.money(power));
+  out.set("wear", Calc.money(wear));
+  out.set("fail", Calc.money(fail));
+  out.set("kwh", Calc.num(kwh, 2) + " kWh");
+  out.show("sell", v.markup > 0);
+  out.set("sale", Calc.money(sale));
+  out.set("profit", Calc.money(sale - total), Calc.tone(sale - total));
+  if (total > 0) out.note(`Filament is ${Calc.pct(filament / total, 0)} of the cost. Your time for cleanup, packing and design isn't included.`);
+}));
+</script>
+<!-- article -->
+<h2>What goes into the cost of a 3D print</h2>
+<p>The slicer tells you two numbers that drive almost everything: <strong>grams of filament</strong> and
+<strong>print time</strong>. Filament is usually 60–75% of the cost of a print. Electricity is small, often a
+few cents. The two costs hobbyists forget are <strong>printer wear</strong> (nozzles, belts, build plates and
+eventually the printer itself) and <strong>failed prints</strong>, which burn filament and hours without producing
+anything you can use or sell.</p>
+
+<h2>The formula</h2>
+<div class="formula">filament = grams × spool price ÷ spool weight<br>
+electricity = watts ÷ 1000 × hours × $/kWh<br>
+wear = printer cost ÷ lifetime hours × hours<br>
+cost per print = (filament + electricity + wear) ÷ (1 − failure rate)<br>
+sale price = cost per print × (1 + markup)</div>
+<p>Dividing by (1 − failure rate) spreads the cost of failed attempts across the good prints. At 5%, you pay
+for about 1.05 prints for every one that comes off the bed usable.</p>
+
+<h2>Example: a 50 g PLA part</h2>
+<p>A 50 g part that takes 4 hours, printed with $20 per kilogram PLA on a $400 printer you expect to run for
+5,000 hours, at 120 W and $0.18 per kWh with a 5% failure rate:</p>
+<table>
+  <tr><th>Line</th><th>Amount</th></tr>
+  <tr><td>Filament (50 g × $20 ÷ 1,000 g)</td><td>$1.00</td></tr>
+  <tr><td>Electricity (0.12 kW × 4 h = 0.48 kWh × $0.18)</td><td>$0.09</td></tr>
+  <tr><td>Printer wear ($400 ÷ 5,000 h × 4 h)</td><td>$0.32</td></tr>
+  <tr><td>Failure allowance ($1.41 ÷ 0.95 − $1.41)</td><td>$0.07</td></tr>
+  <tr><td><strong>Total cost per print</strong></td><td><strong>$1.48</strong></td></tr>
+  <tr><td>Sale price at 100% markup</td><td>$2.96</td></tr>
+</table>
+
+<h2>Where the default numbers come from</h2>
+<ul>
+  <li><strong>120 W power draw.</strong> Measured averages for popular printers while printing PLA sit around
+  100 W (Prusa MK4) to 130 W (Bambu Lab P1S). Heat-up briefly draws several hundred watts, and hot-bed
+  materials like ABS raise the average. A plug-in energy meter gives you your exact number.</li>
+  <li><strong>$0.18 per kWh.</strong> The US average residential rate in 2026 is roughly 18 cents per kWh
+  according to EIA data, but it ranges from about 13 cents to over 50 cents by state. Check your bill.</li>
+  <li><strong>5,000-hour lifetime.</strong> A conservative guess for a hobby printer before major parts or a
+  replacement are needed. Include maintenance parts in the printer cost if you want them covered.</li>
+  <li><strong>5% failure rate.</strong> Reasonable for a tuned printer and a proven file. Raise it for new designs.</li>
+</ul>
+
+<h2>Tips for pricing prints you sell</h2>
+<ul>
+  <li><strong>Charge for your time separately.</strong> Support removal, sanding and packing often take longer than
+  the print costs. Put an hourly rate on it.</li>
+  <li><strong>Batch parts on one plate.</strong> Heat-up energy and your setup time get shared across more items.</li>
+  <li><strong>Price the plate, not just the part.</strong> Purge towers and multi-color waste add grams the part
+  itself doesn't show. Use the slicer's total for the whole plate.</li>
+  <li><strong>Remember fees and shipping.</strong> Marketplace fees of 10–15% can eat a thin markup.</li>
+</ul>

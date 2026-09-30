@@ -1,0 +1,163 @@
+---
+{
+  "title": "Compound Interest Calculator with Monthly Contributions",
+  "description": "See how savings grow with compound interest. Enter a deposit, monthly contribution, rate and years to get your final balance and a year-by-year growth table.",
+  "h1": "Compound Interest Calculator",
+  "short": "Compound Interest Calculator",
+  "intro": "Enter a starting deposit, what you'll add each month, an interest rate and how long you'll leave it to see your final balance and how much of it is interest.",
+  "related": ["savings-goal-calculator", "emergency-fund-calculator", "credit-card-payoff-calculator", "hourly-to-salary-calculator"],
+  "faq": [
+    {"q": "How does compound interest work?", "a": "You earn interest on your deposits and on the interest already added to your account. Each period's interest becomes part of the balance, so the next period's interest is a little larger. Over long stretches, interest can end up being more than everything you put in."},
+    {"q": "Does compounding frequency matter much?", "a": "Less than most people expect. At 7% for 20 years with $10,000 up front and $500 a month, daily compounding ends about $9,000 higher than annual compounding on a balance of roughly $300,000. The rate, the amount you add and the time you leave it matter far more."},
+    {"q": "What is the difference between APR and APY?", "a": "APR is the stated annual rate before compounding. APY includes compounding, so it shows what you actually earn in a year. A 7% APR compounded monthly is about a 7.23% APY. Savings accounts usually quote APY; if you enter an APY here, choose annual compounding."},
+    {"q": "What rate of return should I use?", "a": "Use the APY for savings accounts and CDs. For stock investments, returns vary year to year and are never guaranteed. Many people test a cautious long-run figure such as 5% to 7% after inflation, and also try a lower rate to see a worse case."},
+    {"q": "What is the Rule of 72?", "a": "Divide 72 by the annual rate to estimate how many years it takes money to double with no further deposits. At 7%, a single deposit doubles in roughly 10 years; at 4%, about 18 years."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="initial">Initial deposit</label>
+          <div class="input"><span class="unit pre">$</span><input id="initial" name="initial" type="number" min="0" step="500" value="10000" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="monthly">Monthly contribution</label>
+          <div class="input"><span class="unit pre">$</span><input id="monthly" name="monthly" type="number" min="0" step="50" value="500" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="rate">Annual interest rate</label>
+          <div class="input"><input id="rate" name="rate" type="number" min="0" max="50" step="0.1" value="7" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+        <div class="field">
+          <label for="years">Years</label>
+          <div class="input"><input id="years" name="years" type="number" min="1" max="100" step="1" value="20" inputmode="numeric"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="freq">Compounding</label>
+          <select id="freq" name="freq">
+            <option value="1">Annually</option>
+            <option value="4">Quarterly</option>
+            <option value="12" selected>Monthly</option>
+            <option value="365">Daily</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="timing">Contributions at</label>
+          <select id="timing" name="timing">
+            <option value="end">End of month</option>
+            <option value="start">Start of month</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your growth</h2>
+    <div class="result big"><span data-out="headLabel">Final balance</span><b data-out="headline">—</b></div>
+    <div class="result"><span>Total contributions</span><b data-out="contrib">—</b></div>
+    <div class="result"><span>Total interest</span><b data-out="interest">—</b></div>
+    <div class="result"><span>Effective annual yield (APY)</span><b data-out="apy">—</b></div>
+    <div data-show="table">
+      <h2 style="margin-top:14px">Year by year</h2>
+      <table style="width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums">
+        <thead><tr><th style="text-align:left;padding:4px 0">Year</th><th style="text-align:right;padding:4px 0">Balance</th><th style="text-align:right;padding:4px 0">Interest</th></tr></thead>
+        <tbody data-rows></tbody>
+      </table>
+    </div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+const MAX_YEARS = 100, FULL_ROWS = 30;
+
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const years = Math.min(MAX_YEARS, Math.max(0, Math.round(v.years)));
+  const n = [1, 4, 12, 365].includes(Number(v.freq)) ? Number(v.freq) : 12;
+  const r = Math.max(0, v.rate) / 100;
+  const P = Math.max(0, v.initial), C = Math.max(0, v.monthly);
+  const start = v.timing === "start";
+  // Convert the stated annual rate, compounded n times a year, to an equivalent monthly rate.
+  const i = Math.pow(1 + r / n, n / 12) - 1;
+  const apy = Math.pow(1 + r / n, n) - 1;
+  const rowsEl = document.querySelector("[data-rows]");
+
+  out.set("headLabel", years ? `Balance after ${years} ${years === 1 ? "year" : "years"}` : "Final balance");
+  if (!years) {
+    ["headline", "contrib", "interest", "apy"].forEach((k) => out.set(k, "—"));
+    out.show("table", false);
+    out.note("Enter how many years you'll leave the money invested.");
+    return;
+  }
+
+  let bal = P, contrib = P, yearInt = 0;
+  const rows = [];
+  for (let m = 1; m <= years * 12; m++) {
+    if (start) { bal += C; contrib += C; }
+    const it = bal * i; bal += it; yearInt += it;
+    if (!start) { bal += C; contrib += C; }
+    if (m % 12 === 0) { rows.push({ y: m / 12, bal, int: yearInt }); yearInt = 0; }
+  }
+  const interest = bal - contrib;
+  out.set("headline", Calc.money(bal));
+  out.set("contrib", Calc.money(contrib));
+  out.set("interest", Calc.money(interest), Calc.tone(interest));
+  out.set("apy", Calc.pct(apy, 2));
+
+  // Every year up to 30; longer terms show every 5th year plus the last.
+  const shown = years <= FULL_ROWS ? rows : rows.filter((row) => row.y % 5 === 0 || row.y === years);
+  const td = "padding:4px 0;border-top:1px solid var(--line)";
+  out.show("table", true);
+  rowsEl.innerHTML = shown.map((row) =>
+    `<tr><td style="${td}">${row.y}</td><td style="${td};text-align:right">${Calc.money(row.bal, 0)}</td><td style="${td};text-align:right">${Calc.money(row.int, 0)}</td></tr>`).join("");
+
+  const share = bal > 0 ? interest / bal : 0;
+  out.note(`${share > 0 ? `Interest makes up ${Calc.pct(share)} of the final balance. ` : ""}Assumes a steady rate with no taxes, fees or withdrawals. Investment returns vary and aren't guaranteed. Not financial advice.`);
+}));
+</script>
+<!-- article -->
+<p><strong>This is an illustration, not financial advice.</strong> Real savings rates change and investment returns go up and down. The calculator assumes one steady rate and ignores taxes, fees and inflation.</p>
+
+<h2>How the calculator works</h2>
+<p>The calculator runs month by month. It converts your annual rate and compounding choice into an equivalent monthly rate, adds interest to the balance, and adds your contribution at the start or end of each month. Contributions made at the start of the month earn one extra month of interest each time.</p>
+<p>Compounding frequency sets how often interest is added. More frequent compounding turns the same stated rate into a slightly higher effective yield (APY). A 7% rate works out to 7.00% APY compounded annually, 7.19% quarterly, 7.23% monthly and 7.25% daily.</p>
+<div class="formula">APY = (1 + rate ÷ n)<sup>n</sup> − 1, where n = compounding periods per year<br>
+monthly rate i = (1 + rate ÷ n)<sup>n ÷ 12</sup> − 1<br>
+each month: balance = balance × (1 + i) + contribution<br>
+total interest = final balance − deposit − all contributions</div>
+<p>With monthly compounding and end-of-month deposits this matches the classic future value formula: FV = P(1 + i)<sup>m</sup> + C × ((1 + i)<sup>m</sup> − 1) ÷ i, where m is the number of months.</p>
+
+<h2>Example: $10,000 plus $500 a month at 7% for 20 years</h2>
+<p>Start with $10,000, add $500 at the end of every month, and earn 7% compounded monthly (a monthly rate of 0.5833%).</p>
+<table>
+  <tr><th>Year</th><th>Balance</th><th>Interest that year</th></tr>
+  <tr><td>1</td><td>$16,919</td><td>$919</td></tr>
+  <tr><td>5</td><td>$49,973</td><td>$3,148</td></tr>
+  <tr><td>10</td><td>$106,639</td><td>$6,968</td></tr>
+  <tr><td>15</td><td>$186,971</td><td>$12,383</td></tr>
+  <tr><td>20</td><td>$300,851</td><td>$20,061</td></tr>
+</table>
+<p>The final balance is <strong>$300,850.72</strong>. You put in $130,000 ($10,000 plus 240 × $500), and total interest is $170,850.72, more than you contributed. In year 20 alone, interest adds more than $20,000, over three times the $6,000 you deposit that year.</p>
+<p>Switching to start-of-month contributions raises the total to $302,370.09. Switching to annual compounding instead lowers it to $292,465.03.</p>
+
+<h2>What makes the biggest difference</h2>
+<h3>Time</h3>
+<p>Half of the example's final balance builds up in the last seven years. Starting five years earlier often matters more than finding a slightly higher rate.</p>
+<h3>Rate</h3>
+<p>Small rate differences compound too. The Rule of 72 gives a quick check: divide 72 by the rate to estimate how many years a lump sum takes to double. At 7% that's about 10 years; at 4%, about 18.</p>
+<h3>Contributions</h3>
+<p>Regular deposits drive most of the growth in the early years. Automating a transfer on payday keeps it going without effort.</p>
+
+<h2>Tips for using the results</h2>
+<ul>
+  <li><strong>Match the rate to the account.</strong> Savings accounts and CDs quote APY; enter it with annual compounding to avoid double-counting.</li>
+  <li><strong>Think in today's dollars.</strong> To account for inflation, subtract an expected inflation rate from your return before entering it.</li>
+  <li><strong>Remember taxes.</strong> Interest in a regular savings or brokerage account is taxable each year. Tax-advantaged accounts such as a 401(k) or IRA let the full amount compound.</li>
+  <li><strong>Try a lower rate too.</strong> Planning around a cautious rate means good years are a bonus, not a requirement.</li>
+</ul>

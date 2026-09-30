@@ -1,0 +1,190 @@
+---
+{
+  "title": "Raised Bed Soil Calculator: Cubic Feet, Bags and Mix",
+  "description": "Find how much soil fills your raised beds in cubic feet and yards, split into Mel's Mix or 60/30/10 components, with bag counts, cost and extra for settling.",
+  "h1": "Raised Bed Soil Calculator",
+  "short": "Raised Bed Soil",
+  "intro": "Enter your bed size, depth and soil recipe to see how many cubic feet of each ingredient to buy, how many bags that is, and what it will cost.",
+  "updated": "September 2026",
+  "related": ["mulch-calculator", "grass-seed-calculator", "gravel-calculator", "fence-calculator"],
+  "faq": [
+    {"q": "How much soil do I need for a 4x8 raised bed?", "a": "A 4 by 8 foot bed filled 12 inches deep holds 32 cubic feet, or about 1.2 cubic yards. Adding 10 percent for settling brings it to about 35 cubic feet, which is roughly 24 bags of 1.5 cubic feet or 18 bags of 2 cubic feet."},
+    {"q": "What is Mel's Mix?", "a": "Mel's Mix is the soil recipe from Square Foot Gardening: equal volumes of blended compost, peat moss (or coco coir) and coarse vermiculite. It is light, drains well and holds moisture, and it needs no digging, so it suits shallow beds of about 6 inches."},
+    {"q": "Is it cheaper to buy raised bed soil in bags or in bulk?", "a": "For a bed or two, bags are simpler. Once you need more than about one cubic yard (27 cubic feet), bulk soil from a landscape yard is usually much cheaper per cubic foot, even with a delivery fee. Ask for a raised bed or garden blend that is screened and contains compost."},
+    {"q": "Why does raised bed soil settle?", "a": "Fresh soil is full of air pockets, and compost keeps breaking down. Expect a new bed to sink 10 to 20 percent over the first season, most of it after the first few heavy waterings. Buying a little extra and topping up with compost each spring keeps beds full."},
+    {"q": "How deep should a raised bed be filled?", "a": "Six inches is enough for lettuce, herbs and most shallow-rooted crops. Tomatoes, peppers, squash and root vegetables do better with 10 to 12 inches. If the bed sits on loosened native soil, roots can grow below it, so you rarely need more than 12 inches."},
+    {"q": "Can I fill the bottom of a deep raised bed with something cheaper?", "a": "Yes. For beds deeper than 18 inches, many gardeners fill the bottom with logs, branches, leaves or straw, an approach known as hugelkultur, and put good soil on top. Expect extra settling as that material breaks down, and do not use treated wood."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="length">Bed length</label>
+          <div class="input"><input id="length" name="length" type="number" min="0" step="0.5" value="8" inputmode="decimal"><span class="unit">ft</span></div>
+        </div>
+        <div class="field">
+          <label for="width">Bed width</label>
+          <div class="input"><input id="width" name="width" type="number" min="0" step="0.5" value="4" inputmode="decimal"><span class="unit">ft</span></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="depth">Soil depth</label>
+          <div class="input"><input id="depth" name="depth" type="number" min="0" step="1" value="12" inputmode="numeric"><span class="unit">in</span></div>
+        </div>
+        <div class="field">
+          <label for="beds">Number of beds</label>
+          <div class="input"><input id="beds" name="beds" type="number" min="1" step="1" value="1" inputmode="numeric"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="mix">Soil mix</label>
+        <select id="mix" name="mix">
+          <option value="mel" selected>Mel's Mix: 1/3 compost, 1/3 peat or coir, 1/3 vermiculite</option>
+          <option value="603010">60% topsoil, 30% compost, 10% perlite</option>
+          <option value="5050">50% topsoil, 50% compost</option>
+          <option value="bagged">Bagged raised bed mix (one product)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="settle">Extra for settling</label>
+        <select id="settle" name="settle" data-num>
+          <option value="0">None</option>
+          <option value="10" selected>10%</option>
+          <option value="15">15%</option>
+          <option value="20">20%</option>
+        </select>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="bag">Bag size</label>
+          <select id="bag" name="bag" data-num>
+            <option value="1">1 cu ft</option>
+            <option value="1.5" selected>1.5 cu ft</option>
+            <option value="2">2 cu ft</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="price">Average price per bag</label>
+          <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="10" inputmode="decimal"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Soil to buy</span><b data-out="cuft">—</b></div>
+    <div class="result"><span>In cubic yards</span><b data-out="cuyd">—</b></div>
+    <div class="result"><span>Bed volume (before extra)</span><b data-out="volume">—</b></div>
+    <div class="result"><span data-out="n1">—</span><b data-out="c1">—</b></div>
+    <div data-show="c2" hidden><div class="result"><span data-out="n2">—</span><b data-out="c2">—</b></div></div>
+    <div data-show="c3" hidden><div class="result"><span data-out="n3">—</span><b data-out="c3">—</b></div></div>
+    <div class="result"><span>Total bags</span><b data-out="bags">—</b></div>
+    <div class="result"><span>Estimated cost</span><b data-out="cost">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const MIXES = {
+    mel: [["Compost", 1 / 3], ["Peat moss or coco coir", 1 / 3], ["Coarse vermiculite", 1 / 3]],
+    "603010": [["Topsoil", 0.6], ["Compost", 0.3], ["Perlite", 0.1]],
+    "5050": [["Topsoil", 0.5], ["Compost", 0.5]],
+    bagged: [["Raised bed mix", 1]],
+  };
+  const beds = Math.max(1, Math.round(v.beds));
+  const volume = v.length * v.width * (v.depth / 12) * beds;
+  const cuft = volume * (1 + v.settle / 100);
+  const parts = MIXES[v.mix];
+
+  let bags = 0;
+  for (let i = 0; i < 3; i++) {
+    const p = parts[i];
+    const k = i + 1;
+    if (i > 0) out.show(`c${k}`, !!p);
+    if (!p) continue;
+    const amt = cuft * p[1];
+    const b = v.bag > 0 ? Math.ceil(amt / v.bag - 1e-9) : 0;
+    bags += b;
+    out.set(`n${k}`, `${p[0]} (${Calc.num(p[1] * 100, 0)}%)`);
+    out.set(`c${k}`, `${Calc.num(amt, 1)} cu ft · ${b} bag${b === 1 ? "" : "s"}`);
+  }
+
+  out.set("cuft", `${Calc.num(cuft, 1)} cu ft`);
+  out.set("cuyd", `${Calc.num(cuft / 27, 2)} cu yd`);
+  out.set("volume", `${Calc.num(volume, 1)} cu ft`);
+  out.set("bags", `${Calc.num(bags, 0)} × ${Calc.num(v.bag, 1)} cu ft`);
+  out.set("cost", Calc.money(bags * v.price));
+
+  if (cuft <= 0) return;
+  if (cuft > 27) {
+    out.note(`That's more than a cubic yard. Bulk soil from a landscape supplier (about ${Calc.num(Math.ceil(cuft / 27 * 2) / 2, 1)} yd) is usually far cheaper than ${bags} bags.`);
+  } else if (v.mix === "mel") {
+    out.note("Peat moss and coir are sold compressed: a 3.8 cu ft bale fluffs up to roughly 7 to 8 cu ft, so you need fewer bales than bags.");
+  } else {
+    out.note("New soil settles 10 to 20% in the first season. Top up with compost each spring.");
+  }
+}));
+</script>
+<!-- article -->
+<h2>How much soil a raised bed holds</h2>
+<p>A raised bed is a box, so the soil it holds is simply length × width × depth. The only catch is units: beds are
+measured in feet, depth in inches, and soil is sold by the cubic foot in bags or by the cubic yard in bulk. This
+calculator converts the depth to feet, multiplies by the number of beds, and adds an allowance for
+<strong>settling</strong>. Freshly filled soil is fluffy and full of air, and compost keeps decomposing, so a new bed
+typically sinks 10 to 20% in its first season. Adding 10% up front means the bed stays close to full after the first
+few waterings.</p>
+<p>The total is then split by the recipe you choose, and each ingredient is rounded up to whole bags separately,
+because you can't buy a partial bag of vermiculite. That is why the bag count can be a little higher than the total
+volume divided by the bag size.</p>
+
+<h2>The formula</h2>
+<div class="formula">bed volume (cu ft) = length (ft) × width (ft) × depth (in) ÷ 12 × number of beds<br>
+soil to buy = bed volume × (1 + settling %)<br>
+cubic yards = cubic feet ÷ 27<br>
+each ingredient = soil to buy × its share, then ÷ bag size, rounded up</div>
+
+<h2>Example: one 4 × 8 ft bed, 12 inches deep</h2>
+<p>A single 8 × 4 ft bed filled 12 inches deep with Mel's Mix, 10% extra for settling, using 1.5 cu ft bags at an
+average of $10 each.</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Bed volume (8 × 4 × 1 ft)</td><td>32 cu ft</td></tr>
+  <tr><td><strong>Soil to buy (+10%)</strong></td><td><strong>35.2 cu ft</strong></td></tr>
+  <tr><td>In cubic yards (35.2 ÷ 27)</td><td>1.3 cu yd</td></tr>
+  <tr><td>Compost (1/3)</td><td>11.7 cu ft · 8 bags</td></tr>
+  <tr><td>Peat moss or coir (1/3)</td><td>11.7 cu ft · 8 bags</td></tr>
+  <tr><td>Coarse vermiculite (1/3)</td><td>11.7 cu ft · 8 bags</td></tr>
+  <tr><td>Total bags / cost</td><td>24 bags · $240.00</td></tr>
+</table>
+<p>Switch to 60% topsoil, 30% compost and 10% perlite and the same bed needs 21.1, 10.6 and 3.5 cu ft, which is
+15 + 8 + 3 = 26 bags because of rounding on each ingredient.</p>
+
+<h2>Choosing a soil mix</h2>
+<h3>Mel's Mix</h3>
+<p>The Square Foot Gardening recipe is equal parts blended compost, peat moss (or coco coir) and coarse vermiculite.
+It is light, weed-free and holds water well, which is why it works in shallow 6 inch beds. Use compost from several
+sources if you can, since blends supply a wider range of nutrients. It is also the most expensive mix per cubic foot,
+mainly because of the vermiculite.</p>
+<h3>60/30/10</h3>
+<p>Screened topsoil, compost and a drainage material such as perlite or coarse sand. The mineral soil gives the bed
+weight and structure and holds nutrients longer, while compost feeds the plants. It is the most common choice for
+deep beds and costs much less when bought in bulk.</p>
+<h3>50/50 topsoil and compost</h3>
+<p>The simplest bulk recipe and the one many landscape yards sell premixed as garden blend. Good for large or deep
+beds where cost matters more than a light texture.</p>
+
+<h2>Buying tips</h2>
+<ul>
+  <li><strong>Bulk beats bags past about a cubic yard.</strong> A yard is 27 cu ft, or 18 bags of 1.5 cu ft. Bulk soil
+  delivered is usually cheaper once you need two yards or more.</li>
+  <li><strong>Compressed bales go further.</strong> A 3.8 cu ft bale of peat moss expands to roughly 7 to 8 cu ft when
+  loosened, and coir bricks expand several times over. Buy by expanded volume.</li>
+  <li><strong>Don't fill deep beds with bagged potting mix.</strong> It is designed for containers, costs more and
+  compacts over time. Save it for pots.</li>
+  <li><strong>Top up yearly.</strong> Add an inch or two of compost each spring to replace what settles and what the
+  plants use.</li>
+</ul>

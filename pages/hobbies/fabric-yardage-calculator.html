@@ -1,0 +1,181 @@
+---
+{
+  "title": "Fabric Yardage Calculator: Yards Needed From Cuts",
+  "description": "Estimate how many yards of fabric to buy from your cut pieces, fabric width, pattern repeat and shrinkage allowance, rounded up to the nearest 1/8 yard.",
+  "h1": "Fabric Yardage Calculator",
+  "short": "Fabric Yardage Calculator",
+  "intro": "List the pieces you need to cut, pick your fabric width, and get a buy-this-much yardage estimate and cost.",
+  "updated": "September 2026",
+  "related": ["board-foot-calculator", "3d-print-cost-calculator", "etsy-fee-calculator", "flooring-calculator"],
+  "faq": [
+    {"q": "How do I calculate how much fabric I need?", "a": "Measure every piece you need to cut, including seam allowances. Work out how many of each piece fit side by side across the usable fabric width, count how many rows that takes, and add up the row lengths. Divide the total inches by 36 to get yards, add a margin for shrinkage and mistakes, and round up to the next 1/8 yard."},
+    {"q": "Should I buy 45 inch or 60 inch fabric?", "a": "Wider fabric fits more pieces per row, so you usually need fewer yards of 60 inch fabric. Whether it saves money depends on the price per yard and whether your pieces actually fit two or three across. Run both widths through the calculator and compare the cost line."},
+    {"q": "How much extra fabric should I buy for shrinkage?", "a": "Cotton and linen can shrink 3% to 5% or more on the first wash, so pre-washing is recommended. Adding about 10% covers shrinkage, straightening the grain and a small cutting mistake. For expensive fabric or tight layouts, some sewists add a full extra 1/4 yard instead."},
+    {"q": "How does pattern repeat affect yardage?", "a": "If a print or plaid needs to match across pieces, each piece has to start at the same point in the repeat. That means every row of pieces uses a whole number of repeats, so a 19 inch piece on fabric with a 12 inch repeat uses 24 inches. Large repeats can add a lot of yardage."},
+    {"q": "Do seam allowances need to be included in piece sizes?", "a": "Yes. Enter the cut size of each piece, which is the finished size plus seam allowance on every sewn edge. Commercial pattern pieces usually already include seam allowance; check the pattern instructions."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label>Pieces to cut (cut size, inches)</label>
+        <div class="hint">Quantity × length (along the grain) × width. Leave quantity at 0 for unused rows.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="q1">Piece A qty</label>
+          <div class="input"><input id="q1" name="q1" type="number" min="0" step="1" value="2" inputmode="numeric"><span class="unit">pcs</span></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="l1">Length</label><div class="input"><input id="l1" name="l1" type="number" min="0" step="0.25" value="19" inputmode="decimal"><span class="unit">in</span></div></div>
+          <div class="field"><label for="w1">Width</label><div class="input"><input id="w1" name="w1" type="number" min="0" step="0.25" value="19" inputmode="decimal"><span class="unit">in</span></div></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="q2">Piece B qty</label>
+          <div class="input"><input id="q2" name="q2" type="number" min="0" step="1" value="4" inputmode="numeric"><span class="unit">pcs</span></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="l2">Length</label><div class="input"><input id="l2" name="l2" type="number" min="0" step="0.25" value="13" inputmode="decimal"><span class="unit">in</span></div></div>
+          <div class="field"><label for="w2">Width</label><div class="input"><input id="w2" name="w2" type="number" min="0" step="0.25" value="19" inputmode="decimal"><span class="unit">in</span></div></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="q3">Piece C qty</label>
+          <div class="input"><input id="q3" name="q3" type="number" min="0" step="1" value="0" inputmode="numeric"><span class="unit">pcs</span></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="l3">Length</label><div class="input"><input id="l3" name="l3" type="number" min="0" step="0.25" value="0" inputmode="decimal"><span class="unit">in</span></div></div>
+          <div class="field"><label for="w3">Width</label><div class="input"><input id="w3" name="w3" type="number" min="0" step="0.25" value="0" inputmode="decimal"><span class="unit">in</span></div></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="q4">Piece D qty</label>
+          <div class="input"><input id="q4" name="q4" type="number" min="0" step="1" value="0" inputmode="numeric"><span class="unit">pcs</span></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="l4">Length</label><div class="input"><input id="l4" name="l4" type="number" min="0" step="0.25" value="0" inputmode="decimal"><span class="unit">in</span></div></div>
+          <div class="field"><label for="w4">Width</label><div class="input"><input id="w4" name="w4" type="number" min="0" step="0.25" value="0" inputmode="decimal"><span class="unit">in</span></div></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="fabricWidth">Fabric width</label>
+          <select id="fabricWidth" name="fabricWidth">
+            <option value="44">44/45 in (quilting cotton)</option>
+            <option value="54">54 in (home decor)</option>
+            <option value="60">58/60 in (apparel, knits)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="repeat">Pattern repeat</label>
+          <div class="input"><input id="repeat" name="repeat" type="number" min="0" step="0.25" value="0" inputmode="decimal"><span class="unit">in</span></div>
+          <div class="hint">0 if no matching needed.</div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="price">Price per yard</label>
+        <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="12.99" inputmode="decimal"></div>
+      </div>
+      <label class="check"><input type="checkbox" name="extra" checked> Add 10% for shrinkage and cutting errors</label>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Fabric to buy</span><b data-out="yards">—</b></div>
+    <div class="result"><span>Yards (decimal)</span><b data-out="yardsDec">—</b></div>
+    <div class="result"><span>Layout length</span><b data-out="layout">—</b></div>
+    <div class="result"><span>With allowance</span><b data-out="inches">—</b></div>
+    <div class="result"><span>Usable width assumed</span><b data-out="usable">—</b></div>
+    <div class="result"><span>Fabric cost</span><b data-out="cost">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const usable = parseFloat(v.fabricWidth) - 1;     // trim ~1/2" selvage each side
+  let layout = 0, rotated = false, tooWide = false;
+  const plan = [];
+  for (const i of [1, 2, 3, 4]) {
+    const q = Math.floor(v["q" + i]);
+    let l = v["l" + i], w = v["w" + i];
+    if (q <= 0 || l <= 0 || w <= 0) continue;
+    if (w > usable && l <= usable) { [l, w] = [w, l]; rotated = true; }   // turn it to fit
+    if (w > usable) tooWide = true;
+    const across = Math.max(1, Math.floor(usable / w));
+    const rows = Math.ceil(q / across);
+    const rowLen = v.repeat > 0 ? Math.ceil(l / v.repeat) * v.repeat : l;
+    layout += rows * rowLen;
+    plan.push(`${"ABCD"[i - 1]}: ${across} across, ${rows} row${rows > 1 ? "s" : ""}`);
+  }
+  const inches = layout * (v.extra ? 1.10 : 1);
+  const eighths = Math.ceil(inches / 36 * 8 - 1e-6);   // tolerance for float noise
+  const yd = eighths / 8;
+  const whole = Math.floor(eighths / 8), rem = eighths % 8;
+  const g = rem % 4 === 0 ? 4 : rem % 2 === 0 ? 2 : 1;
+  const frac = rem ? `${rem / g}/${8 / g}` : "";
+  const label = eighths === 0 ? "0 yd" : `${whole ? whole : ""}${whole && frac ? " " : ""}${frac} yd`;
+
+  out.set("yards", label);
+  out.set("yardsDec", Calc.num(yd, 3) + " yd");
+  out.set("layout", Calc.num(layout, 2) + " in");
+  out.set("inches", Calc.num(inches, 2) + " in");
+  out.set("usable", Calc.num(usable, 0) + " in");
+  out.set("cost", Calc.money(yd * v.price));
+  let note = plan.length ? "Layout: " + plan.join("; ") + "." : "Enter at least one piece.";
+  if (rotated) note += " A piece wider than the fabric was turned 90°; check that the grainline allows it.";
+  if (tooWide) note += " One piece is wider than the fabric in both directions and will need a seam.";
+  out.note(note);
+}));
+</script>
+<!-- article -->
+<h2>How this yardage estimate works</h2>
+<p>Fabric comes off the bolt as a long strip of fixed width, so the question is how much <em>length</em> your
+pieces use. For each piece type, the calculator works out how many fit side by side across the usable width,
+how many rows that takes, and how long those rows are. It adds the rows together, applies your shrinkage
+allowance, converts to yards and rounds up to the next 1/8 yard, the smallest cut most shops will make.</p>
+<p>Usable width is taken as the listed width minus 1 inch, to allow for trimming the selvages. Pieces are laid
+with their length running along the grain (parallel to the selvage), as most patterns require. If a piece is
+wider than the fabric, it's turned 90° and you'll get a warning to check the grainline.</p>
+
+<h2>The formula</h2>
+<div class="formula">pieces across = floor(usable width ÷ piece width)<br>
+rows = ceil(quantity ÷ pieces across)<br>
+row length = piece length, rounded up to a whole pattern repeat if matching<br>
+total inches = Σ (rows × row length) × 1.10 (if extra is on)<br>
+yards = total inches ÷ 36, rounded up to the next 1/8</div>
+
+<h2>Example: two 18-inch envelope pillow covers</h2>
+<p>Each cover needs one 19 × 19 inch front and two 13 × 19 inch back panels (half-inch seams included), cut
+from 44/45 inch quilting cotton at $12.99 a yard. Usable width is 43 inches.</p>
+<table>
+  <tr><th>Piece</th><th>Qty</th><th>Across</th><th>Rows</th><th>Length used</th></tr>
+  <tr><td>Front, 19 × 19 in</td><td>2</td><td>2</td><td>1</td><td>19 in</td></tr>
+  <tr><td>Back, 13 × 19 in</td><td>4</td><td>2</td><td>2</td><td>26 in</td></tr>
+  <tr><td colspan="4">Layout length</td><td>45 in</td></tr>
+  <tr><td colspan="4">Plus 10% allowance</td><td>49.5 in</td></tr>
+  <tr><td colspan="4"><strong>Buy (49.5 ÷ 36 = 1.375 yd)</strong></td><td><strong>1 3/8 yd</strong></td></tr>
+  <tr><td colspan="4">Cost at $12.99/yd</td><td>$17.86</td></tr>
+</table>
+<p>Notice the 5-inch strip left down one side of each row. That's normal. Wider fabric wouldn't help here
+because 60-inch fabric (59 usable) still only fits three 19-inch pieces across.</p>
+
+<h2>What this estimate doesn't do</h2>
+<p>Real cutting layouts are smarter than this. An experienced sewist nests small pieces into gaps beside big
+ones, while this calculator lays each piece type in its own rows. That makes the result a safe upper bound for
+rectangles. It's less reliable for curved pattern pieces (sleeves, collars, flared skirts), bias-cut pieces, and
+napped fabrics like velvet or corduroy where every piece must face the same way. For those, use the yardage
+chart on the pattern envelope, or lay the pattern pieces out on a measured floor space.</p>
+
+<h2>Tips for buying the right amount</h2>
+<ul>
+  <li><strong>Enter cut sizes, not finished sizes.</strong> Add seam allowance to every sewn edge, and hem allowance where needed.</li>
+  <li><strong>Pre-wash natural fibers.</strong> Cotton and linen often shrink 3–5% on the first wash, more for loose weaves.</li>
+  <li><strong>Buy it all at once.</strong> Dye lots vary, so a second trip for a few more inches may not match.</li>
+  <li><strong>Compare widths by cost.</strong> Switch the width selector and watch the cost line, not just the yards.</li>
+</ul>

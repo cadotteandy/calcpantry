@@ -1,0 +1,210 @@
+---
+{
+  "title": "Amazon Seller Fee Calculator 2026: Referral & FBA",
+  "description": "Calculate Amazon referral fees by category, the $0.99 or $39.99 plan cost, FBA and media closing fees, and see your profit, margin and ROI per sale.",
+  "h1": "Amazon Seller Fee Calculator",
+  "short": "Amazon Fee Calculator",
+  "intro": "Pick your category and selling plan, enter your price and costs, and see what Amazon keeps and what you actually make on each unit.",
+  "updated": "September 2026",
+  "related": ["flip-profit-calculator", "ebay-fee-calculator", "markup-margin-calculator", "side-hustle-tax-calculator"],
+  "faq": [
+    {"q": "How much does Amazon take per sale?", "a": "Most sellers pay a referral fee of 8% to 15% of the total sale price (15% in most categories, with a $0.30 minimum per item), plus $0.99 per item on the Individual plan or a $39.99 monthly Professional subscription. FBA fulfillment fees and a $1.80 closing fee on media items are extra."},
+    {"q": "Should I choose the Individual or Professional plan?", "a": "The Individual plan costs $0.99 per item sold, so the $39.99 Professional plan is cheaper once you sell about 41 or more items a month. Professional also unlocks bulk listing tools, advertising and eligibility for the Buy Box, which matters for most serious sellers."},
+    {"q": "Is the referral fee charged on shipping?", "a": "Yes. Amazon calculates the referral fee on the total sales price, which includes the item price plus any shipping or gift-wrap charges the buyer pays. It is not charged on the sales tax Amazon collects."},
+    {"q": "What is the $1.80 closing fee?", "a": "Amazon adds a $1.80 closing fee to every item sold in media categories: books, DVDs, music, software and video. It is charged on top of the 15% referral fee, which is why low-priced used books are hard to sell profitably."},
+    {"q": "How do I find my FBA fulfillment fee?", "a": "FBA fees depend on the product's size tier and shipping weight, so the easiest way is to search for your product in Amazon's Revenue Calculator or check the fee preview in Seller Central, then enter the per-unit fee here. Remember monthly storage fees are separate."},
+    {"q": "Which categories have tiered referral fees?", "a": "Clothing and accessories pay 5% at $15 or less, 10% from $15 to $20 and 17% above $20. Beauty, health and baby products pay 8% at $10 or less and 15% above. Electronics accessories and jewelry charge a lower rate on the portion of the price above $100 and $250."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="price">Sale price</label>
+          <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="25" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="shipCharged">Shipping charged</label>
+          <div class="input"><span class="unit pre">$</span><input id="shipCharged" name="shipCharged" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="category">Category</label>
+        <select id="category" name="category">
+          <option value="std15">Home, toys, sports, office, tools, pet &amp; most others (15%)</option>
+          <option value="media">Books, music, DVD, video, software (15% + $1.80)</option>
+          <option value="clothing">Clothing &amp; accessories (5% / 10% / 17%)</option>
+          <option value="beauty">Beauty, health &amp; baby (8% ≤ $10, else 15%)</option>
+          <option value="grocery">Grocery &amp; gourmet (8% ≤ $15, else 15%)</option>
+          <option value="electronics">Consumer electronics &amp; computers (8%)</option>
+          <option value="elecacc">Electronics accessories (15%, 8% above $100)</option>
+          <option value="auto">Automotive &amp; industrial (12%)</option>
+          <option value="jewelry">Jewelry (20%, 5% above $250)</option>
+          <option value="custom">Custom rate…</option>
+        </select>
+      </div>
+      <div class="row2" data-show="custom" hidden>
+        <div class="field">
+          <label for="customRate">Referral fee</label>
+          <div class="input"><input id="customRate" name="customRate" type="number" min="0" max="50" step="0.1" value="15" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+        <div class="field">
+          <label for="customMin">Minimum fee</label>
+          <div class="input"><span class="unit pre">$</span><input id="customMin" name="customMin" type="number" min="0" step="0.01" value="0.30" inputmode="decimal"></div>
+        </div>
+      </div>
+      <label class="check" data-show="custom" hidden><input type="checkbox" name="customMedia"> Media item ($1.80 closing fee)</label>
+      <div class="field">
+        <label for="plan">Selling plan</label>
+        <select id="plan" name="plan">
+          <option value="individual">Individual ($0.99 per item sold)</option>
+          <option value="pro">Professional ($39.99 per month)</option>
+        </select>
+      </div>
+      <div class="field" data-show="pro" hidden>
+        <label for="units">Units you sell per month</label>
+        <div class="input"><input id="units" name="units" type="number" min="1" step="1" value="50" inputmode="decimal"><span class="unit">units</span></div>
+        <div class="hint">Used to spread the $39.99 subscription across each sale.</div>
+      </div>
+      <div class="field">
+        <label for="fba">FBA fulfillment fee (per unit)</label>
+        <div class="input"><span class="unit pre">$</span><input id="fba" name="fba" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div>
+        <div class="hint">Leave at 0 if you ship orders yourself. For FBA, look up your item's exact fee in Amazon's Revenue Calculator.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="itemCost">Item cost</label>
+          <div class="input"><span class="unit pre">$</span><input id="itemCost" name="itemCost" type="number" min="0" step="0.01" value="8" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="shipCost">Shipping &amp; prep cost</label>
+          <div class="input"><span class="unit pre">$</span><input id="shipCost" name="shipCost" type="number" min="0" step="0.01" value="5" inputmode="decimal"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Profit per unit</span><b data-out="profit">—</b></div>
+    <div class="result"><span>Total Amazon fees</span><b data-out="fees">—</b></div>
+    <div class="result"><span>Referral fee</span><b data-out="referral">—</b></div>
+    <div class="result"><span>Plan cost per unit</span><b data-out="planFee">—</b></div>
+    <div class="result" data-show="closing" hidden><span>Closing fee</span><b data-out="closing">—</b></div>
+    <div class="result" data-show="hasFba" hidden><span>FBA fulfillment fee</span><b data-out="fbaFee">—</b></div>
+    <div class="result"><span>Payout from Amazon</span><b data-out="payout">—</b></div>
+    <div class="result"><span>Profit margin</span><b data-out="margin">—</b></div>
+    <div class="result"><span>ROI (on item cost)</span><b data-out="roi">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const custom = v.category === "custom";
+  out.show("custom", custom);
+  out.show("pro", v.plan === "pro");
+
+  const total = v.price + v.shipCharged;   // referral fee applies to price + shipping charged
+  let referral = 0, min = 0.30, media = false;
+  switch (v.category) {
+    case "std15": referral = total * 0.15; break;
+    case "media": referral = total * 0.15; min = 0; media = true; break;
+    case "clothing": referral = total * (total <= 15 ? 0.05 : total <= 20 ? 0.10 : 0.17); break;
+    case "beauty": referral = total * (total <= 10 ? 0.08 : 0.15); break;
+    case "grocery": referral = total * (total <= 15 ? 0.08 : 0.15); min = 0; break;
+    case "electronics": referral = total * 0.08; break;
+    case "elecacc": referral = Math.min(total, 100) * 0.15 + Math.max(0, total - 100) * 0.08; break;
+    case "auto": referral = total * 0.12; break;
+    case "jewelry": referral = Math.min(total, 250) * 0.20 + Math.max(0, total - 250) * 0.05; break;
+    default: referral = total * v.customRate / 100; min = v.customMin; media = v.customMedia;
+  }
+  if (total <= 0) { referral = 0; media = false; }
+  else referral = Math.max(referral, min);
+
+  const planFee = total <= 0 ? 0 : (v.plan === "pro" ? 39.99 / Math.max(1, v.units) : 0.99);
+  const closing = media ? 1.80 : 0;
+  const fbaFee = total > 0 ? v.fba : 0;
+  const fees = referral + planFee + closing + fbaFee;
+  const payout = total - fees;
+  const profit = payout - v.itemCost - v.shipCost;
+
+  out.set("profit", Calc.money(profit), Calc.tone(profit));
+  out.set("fees", Calc.money(fees));
+  out.set("referral", Calc.money(referral));
+  out.set("planFee", Calc.money(planFee));
+  out.show("closing", closing > 0);
+  out.set("closing", Calc.money(closing));
+  out.show("hasFba", fbaFee > 0);
+  out.set("fbaFee", Calc.money(fbaFee));
+  out.set("payout", Calc.money(payout));
+  out.set("margin", total > 0 ? Calc.pct(profit / total) : "—");
+  out.set("roi", v.itemCost > 0 ? Calc.pct(profit / v.itemCost) : "—");
+
+  if (total <= 0) return;
+  if (v.plan === "pro" && v.units < 41) out.note(`At ${Calc.num(v.units, 0)} units a month the Individual plan ($0.99 each) would be cheaper. Professional pays off from about 41 units.`);
+  else if (v.plan === "individual") out.note(`Amazon keeps ${Calc.pct(fees / total)} of the sale. If you sell 41+ units a month, the Professional plan costs less than $0.99 per item.`);
+  else out.note(`Amazon keeps ${Calc.pct(fees / total)} of the sale.`);
+}));
+</script>
+<!-- article -->
+<h2>How Amazon seller fees work</h2>
+<p>Every Amazon sale carries up to four kinds of fees. This calculator adds them up per unit so you can see real profit
+before you send inventory in or list an item:</p>
+<ul>
+  <li><strong>Selling plan.</strong> The Individual plan charges <strong>$0.99 per item sold</strong>. The Professional
+  plan is a flat <strong>$39.99 a month</strong> no matter how much you sell, so its cost per unit falls as volume
+  rises. The two cost the same at about 40 units a month.</li>
+  <li><strong>Referral fee.</strong> Amazon's commission, a percentage of the total sales price (item price plus any
+  shipping or gift wrap the buyer pays). It's <strong>15% in most categories</strong>, 8% for consumer electronics and
+  computers, and tiered in a few categories. Most categories have a <strong>$0.30 minimum</strong> per item.</li>
+  <li><strong>Closing fee.</strong> Books, music, DVDs, video and software add a flat <strong>$1.80</strong> per item.</li>
+  <li><strong>FBA fulfillment fee.</strong> If Amazon stores and ships your product, it charges a per-unit fee based on
+  size tier and weight. Because those tables change often and depend on exact dimensions, enter the fee from Amazon's
+  Revenue Calculator rather than relying on an estimate.</li>
+</ul>
+
+<h2>The formula</h2>
+<div class="formula">total sales price = item price + shipping charged<br>
+referral fee = max(total × category rate, $0.30)<br>
+Amazon fees = referral fee + plan cost per unit + closing fee + FBA fee<br>
+profit = total sales price − Amazon fees − item cost − your shipping &amp; prep<br>
+margin = profit ÷ total sales price &nbsp;·&nbsp; ROI = profit ÷ item cost</div>
+
+<h2>Example: a $25 kitchen gadget</h2>
+<p>You sell a kitchen gadget for $25 with free shipping on the Individual plan and ship it yourself. The item cost you
+$8, and the label and packaging cost $5.</p>
+<table>
+  <tr><th>Line</th><th>Amount</th></tr>
+  <tr><td>Referral fee (15% of $25)</td><td>$3.75</td></tr>
+  <tr><td>Individual plan fee</td><td>$0.99</td></tr>
+  <tr><td><strong>Total Amazon fees</strong></td><td><strong>$4.74</strong></td></tr>
+  <tr><td>Payout ($25 − $4.74)</td><td>$20.26</td></tr>
+  <tr><td>Minus item cost ($8) and shipping ($5)</td><td><strong>$7.26 profit</strong></td></tr>
+  <tr><td>Margin ($7.26 ÷ $25)</td><td>29.0%</td></tr>
+  <tr><td>ROI ($7.26 ÷ $8)</td><td>90.8%</td></tr>
+</table>
+<p>Switch to the Professional plan at 50 units a month and the plan cost drops to $0.80 per unit, adding $0.19 to each
+sale's profit.</p>
+
+<h3>Tiered categories</h3>
+<p>Some categories change rate with price. In <strong>clothing and accessories</strong> the whole price is charged 5% at
+$15 or less, 10% from $15.01 to $20, and 17% above $20. <strong>Beauty, health and baby</strong> pay 8% at $10 or less
+and 15% above; <strong>grocery</strong> pays 8% at $15 or less and 15% above. <strong>Electronics accessories</strong>
+(15% on the first $100, 8% on the rest) and <strong>jewelry</strong> (20% on the first $250, 5% on the rest) only apply
+the lower rate to the portion above the threshold. Categories not listed, such as watches, furniture and Amazon device
+accessories, have their own rates: use the custom option.</p>
+
+<h2>Tips for pricing on Amazon</h2>
+<ul>
+  <li><strong>Watch the tier edges.</strong> A $20.99 shirt pays 17% ($3.57); drop it to $19.99 and it pays 10% ($2.00),
+  so the cheaper price can net you more.</li>
+  <li><strong>Don't forget storage.</strong> FBA monthly storage and aged-inventory fees aren't included here. Slow sellers
+  can quietly eat their margin.</li>
+  <li><strong>Price in returns.</strong> Categories like clothing see high return rates, and returns cost you shipping
+  and sometimes a refund administration fee.</li>
+  <li><strong>Check the minimum.</strong> On very cheap items the $0.30 minimum plus $0.99 per-item fee can take a large
+  share of the sale.</li>
+  <li><strong>Ask about new-seller incentives.</strong> Amazon offers credits and fee reductions to new Professional
+  sellers, which can make the first year cheaper than this calculator shows.</li>
+</ul>

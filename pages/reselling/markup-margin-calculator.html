@@ -1,0 +1,148 @@
+---
+{
+  "title": "Markup vs Margin Calculator: Price, Markup & Margin",
+  "description": "Find a selling price from cost plus markup or a target profit margin, or enter cost and price to get both. Includes a markup-to-margin conversion table.",
+  "h1": "Markup & Margin Calculator",
+  "short": "Markup & Margin",
+  "intro": "Choose what you know: a markup, a target margin, or a price. The calculator works out the rest, so you never mix up markup and margin again.",
+  "related": ["flip-profit-calculator", "amazon-seller-fee-calculator", "etsy-fee-calculator", "freelance-rate-calculator"],
+  "faq": [
+    {"q": "What is the difference between markup and margin?", "a": "Both measure the same profit, but against different numbers. Markup is profit divided by cost; margin is profit divided by the selling price. An item that costs $20 and sells for $30 has a $10 profit, a 50% markup and a 33.3% margin."},
+    {"q": "How do I convert markup to margin?", "a": "Divide the markup by one plus the markup: margin = markup ÷ (1 + markup). A 50% markup is 0.5 ÷ 1.5 = 33.3% margin, and a 100% markup is a 50% margin."},
+    {"q": "How do I price for a specific margin?", "a": "Divide your cost by one minus the target margin: price = cost ÷ (1 − margin). To get a 40% margin on a $20 item, charge $20 ÷ 0.6 = $33.33. Simply adding 40% to cost gives $28, which is only a 28.6% margin."},
+    {"q": "Can margin be more than 100%?", "a": "No. Margin is a share of the selling price, so it can approach but never reach 100%, which would mean the item cost nothing. Markup has no upper limit: a $5 item sold for $50 has a 900% markup but a 90% margin."},
+    {"q": "Should fees be part of cost?", "a": "For resellers, yes. If a marketplace takes 13% of the sale, your real margin is lower than the one calculated from item cost alone. Use a fee calculator for the platform, or add expected fees and shipping to the cost field for a truer picture."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="mode">I know the…</label>
+        <select id="mode" name="mode">
+          <option value="markup">Cost and markup % → find price</option>
+          <option value="margin">Cost and target margin % → find price</option>
+          <option value="price">Cost and selling price → find markup &amp; margin</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="cost">Cost</label>
+        <div class="input"><span class="unit pre">$</span><input id="cost" name="cost" type="number" min="0" step="0.01" value="20" inputmode="decimal"></div>
+      </div>
+      <div class="field" data-show="mMarkup">
+        <label for="markup">Markup</label>
+        <div class="input"><input id="markup" name="markup" type="number" min="0" step="1" value="50" inputmode="decimal"><span class="unit">%</span></div>
+      </div>
+      <div class="field" data-show="mMargin" hidden>
+        <label for="margin">Target margin</label>
+        <div class="input"><input id="margin" name="margin" type="number" min="0" max="99.9" step="1" value="40" inputmode="decimal"><span class="unit">%</span></div>
+        <div class="hint">Must be below 100%.</div>
+      </div>
+      <div class="field" data-show="mPrice" hidden>
+        <label for="price">Selling price</label>
+        <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="30" inputmode="decimal"></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big" data-show="headPrice"><span>Selling price</span><b data-out="priceBig">—</b></div>
+    <div class="result big" data-show="mPrice" hidden><span>Profit margin</span><b data-out="marginBig">—</b></div>
+    <div class="result"><span>Profit per item</span><b data-out="profit">—</b></div>
+    <div class="result" data-show="notMarkup" hidden><span>Markup</span><b data-out="markupOut">—</b></div>
+    <div class="result" data-show="notMargin"><span>Profit margin</span><b data-out="marginOut">—</b></div>
+    <div class="result" data-show="mPrice" hidden><span>Selling price</span><b data-out="priceOut">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const mode = v.mode;
+  out.show("mMarkup", mode === "markup");
+  out.show("mMargin", mode === "margin");
+  out.show("mPrice", mode === "price");
+  out.show("headPrice", mode !== "price");
+  out.show("notMarkup", mode !== "markup");
+  out.show("notMargin", mode === "markup");
+
+  let price;
+  if (mode === "markup") price = v.cost * (1 + v.markup / 100);
+  else if (mode === "margin") price = v.margin < 100 ? v.cost / (1 - v.margin / 100) : NaN;
+  else price = v.price;
+
+  const profit = price - v.cost;
+  const markup = v.cost > 0 ? profit / v.cost : NaN;
+  const margin = price > 0 ? profit / price : NaN;
+
+  out.set("priceBig", Calc.money(price));
+  out.set("priceOut", Calc.money(price));
+  out.set("profit", Calc.money(profit), Calc.tone(profit));
+  out.set("markupOut", Calc.pct(markup));
+  out.set("marginOut", Calc.pct(margin));
+  out.set("marginBig", Calc.pct(margin), Calc.tone(profit));
+
+  if (mode === "margin" && v.margin >= 100) out.note("A margin of 100% or more is impossible: it would mean the item cost nothing.");
+  else if (v.cost <= 0) out.note("Enter a cost above $0 to calculate markup.");
+  else if (isFinite(markup) && isFinite(margin) && profit > 0)
+    out.note(`A ${Calc.pct(markup)} markup is the same as a ${Calc.pct(margin)} margin.`);
+  else if (profit < 0) out.note("The price is below cost, so you lose money on each sale.");
+}));
+</script>
+<!-- article -->
+<h2>Markup vs margin: same profit, different base</h2>
+<p>Markup and margin both describe the profit on an item, and they're constantly confused. The difference is what you
+divide by:</p>
+<ul>
+  <li><strong>Markup</strong> is profit as a percentage of <strong>cost</strong>. It answers "how much did I add on
+  top of what I paid?"</li>
+  <li><strong>Margin</strong> (gross margin) is profit as a percentage of the <strong>selling price</strong>. It
+  answers "how much of each sale do I keep?"</li>
+</ul>
+<p>Because the selling price is always larger than the cost when you make a profit, the margin is always the smaller
+of the two numbers. The mistake that costs sellers money is adding a target margin to cost as if it were a markup:
+adding 40% to a $20 cost gives $28, which is only a 28.6% margin, not 40%.</p>
+
+<h2>The formulas</h2>
+<div class="formula">profit = price − cost<br>
+markup = profit ÷ cost &nbsp;·&nbsp; margin = profit ÷ price<br>
+price from markup = cost × (1 + markup)<br>
+price from margin = cost ÷ (1 − margin)<br>
+margin = markup ÷ (1 + markup) &nbsp;·&nbsp; markup = margin ÷ (1 − margin)</div>
+
+<h2>Example: a $20 item</h2>
+<p>An item costs you $20. Here's what each mode of the calculator returns with its default inputs.</p>
+<table>
+  <tr><th>You enter</th><th>Price</th><th>Result</th></tr>
+  <tr><td>50% markup</td><td>$30.00</td><td>$10.00 profit, 33.3% margin</td></tr>
+  <tr><td>40% target margin</td><td>$33.33</td><td>$13.33 profit, 66.7% markup</td></tr>
+  <tr><td>$30 selling price</td><td>$30.00</td><td>50% markup, 33.3% margin</td></tr>
+</table>
+<p>The first and third rows are the same sale described two ways: a $10 profit is 50% of the $20 cost and 33.3% of the
+$30 price.</p>
+
+<h2>Markup to margin conversion table</h2>
+<table>
+  <tr><th>Markup</th><th>Margin</th><th>Price on $20 cost</th></tr>
+  <tr><td>25%</td><td>20%</td><td>$25.00</td></tr>
+  <tr><td>33.3%</td><td>25%</td><td>$26.67</td></tr>
+  <tr><td>50%</td><td>33.3%</td><td>$30.00</td></tr>
+  <tr><td>66.7%</td><td>40%</td><td>$33.33</td></tr>
+  <tr><td>100%</td><td>50%</td><td>$40.00</td></tr>
+  <tr><td>150%</td><td>60%</td><td>$50.00</td></tr>
+  <tr><td>200%</td><td>66.7%</td><td>$60.00</td></tr>
+  <tr><td>300%</td><td>75%</td><td>$80.00</td></tr>
+</table>
+<p>"Keystone" pricing, a retail rule of thumb, means doubling the cost: a 100% markup and a 50% margin.</p>
+
+<h2>Tips for using markup and margin</h2>
+<ul>
+  <li><strong>Set targets as margins.</strong> Margin maps directly to how much of your revenue is left to cover fees,
+  overhead and profit, so it's easier to plan around.</li>
+  <li><strong>Include marketplace fees.</strong> A 50% markup on eBay, where fees take around 14% of the sale, leaves a
+  much thinner real margin. For resellers, a flip or platform fee calculator gives the true figure.</li>
+  <li><strong>Know that discounts cut deeper than they look.</strong> Taking 20% off a price with a 33.3% margin cuts
+  the margin to 16.7% and your profit from $10 to $4 on the $20 item above.</li>
+  <li><strong>Use markup for quick quotes.</strong> If you always add the same percentage to cost, markup is faster at
+  the counter; just remember what margin it really represents.</li>
+</ul>

@@ -1,0 +1,164 @@
+---
+{
+  "title": "Gig Driver Earnings Calculator: Real Hourly Pay",
+  "description": "Find your real hourly pay driving for DoorDash, Uber, Lyft or Instacart after gas, car wear and taxes, plus per-mile earnings and net pay per week and year.",
+  "h1": "Gig Driver Earnings Calculator",
+  "short": "Gig Driver Earnings Calculator",
+  "intro": "Enter a typical week of DoorDash, Uber, Lyft or Instacart driving to see what you really earn per hour once gas, wear on your car and taxes come out.",
+  "updated": "September 2026",
+  "related": ["side-hustle-tax-calculator", "lease-vs-buy-calculator", "hourly-to-salary-calculator", "emergency-fund-calculator"],
+  "faq": [
+    {"q": "How much do DoorDash and Uber drivers really make per hour?", "a": "It depends heavily on your market, but many drivers see $20 to $30 per hour on the app before costs. After gas, car wear and taxes, and counting time spent waiting between orders, real pay is often a third lower. Track one full week of payouts, online hours and miles and enter them above for your own number."},
+    {"q": "Should I count waiting time in my hours?", "a": "Yes. The apps often advertise pay per active hour, which leaves out the time you sit waiting for the next order. You can't do other work during that time, so use total hours logged in, from the moment you go online until you finish."},
+    {"q": "What does it really cost per mile to drive for gig apps?", "a": "Gas is usually 10 to 20 cents a mile. AAA's 2025 study puts maintenance, repairs and tires at about 11 cents a mile for a new car, and depreciation adds more the harder you drive. The 2026 IRS standard rate of 76 cents a mile from July 1 is a high-end estimate of the full cost, including depreciation, insurance and registration."},
+    {"q": "How much should gig drivers set aside for taxes?", "a": "Figure tax on your payouts minus the IRS mileage deduction, not on gross payouts. Self-employment tax is about 14.1% of that profit, plus federal and state income tax, so 20% to 30% of taxable profit is a common set-aside. The mileage deduction often cuts a driver's taxable income by a third or more."},
+    {"q": "Can I deduct gas and the mileage rate at the same time?", "a": "No. You choose either the standard mileage rate or your actual car expenses (gas, repairs, insurance, depreciation, business share of each). The mileage rate already includes gas. Most gig drivers come out ahead with the mileage rate because they drive a lot of miles in modest cars."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="payouts">Weekly payouts incl. tips</label>
+          <div class="input"><span class="unit pre">$</span><input id="payouts" name="payouts" type="number" min="0" step="10" value="1000" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="hours">Hours online</label>
+          <div class="input"><input id="hours" name="hours" type="number" min="0" step="1" value="35" inputmode="decimal"><span class="unit">h / wk</span></div>
+          <div class="hint">Include time waiting for orders.</div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="miles">Miles driven per week</label>
+        <div class="input"><input id="miles" name="miles" type="number" min="0" step="10" value="400" inputmode="decimal"><span class="unit">mi</span></div>
+        <div class="hint">All miles while online, including driving to pickups and back home.</div>
+      </div>
+      <label class="check"><input type="checkbox" name="useIrs"> Use the IRS rate (76¢/mile) as my full car cost</label>
+      <div class="row2" data-show="actual">
+        <div class="field">
+          <label for="mpg">Car fuel economy</label>
+          <div class="input"><input id="mpg" name="mpg" type="number" min="1" step="1" value="25" inputmode="decimal"><span class="unit">mpg</span></div>
+        </div>
+        <div class="field">
+          <label for="gas">Gas price</label>
+          <div class="input"><span class="unit pre">$</span><input id="gas" name="gas" type="number" min="0" step="0.05" value="3.20" inputmode="decimal"><span class="unit">/ gal</span></div>
+        </div>
+      </div>
+      <div class="field" data-show="actual">
+        <label for="wear">Maintenance &amp; wear per mile</label>
+        <div class="input"><span class="unit pre">$</span><input id="wear" name="wear" type="number" min="0" step="0.01" value="0.15" inputmode="decimal"><span class="unit">/ mi</span></div>
+        <div class="hint">Oil, tires, brakes, repairs (AAA: about 11¢) plus extra depreciation from the miles. Use 0.25 or more for a newer car.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="taxRate">Tax set-aside</label>
+          <div class="input"><input id="taxRate" name="taxRate" type="number" min="0" max="60" step="1" value="25" inputmode="decimal"><span class="unit">%</span></div>
+          <div class="hint">Of profit after the mileage deduction.</div>
+        </div>
+        <div class="field">
+          <label for="weeks">Weeks driven per year</label>
+          <div class="input"><input id="weeks" name="weeks" type="number" min="0" max="52" step="1" value="50" inputmode="decimal"><span class="unit">wk</span></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your real pay</h2>
+    <div class="result big"><span>Real hourly pay after car costs and tax</span><b data-out="real">—</b></div>
+    <div class="result"><span>Gross hourly (what the app shows)</span><b data-out="grossHr">—</b></div>
+    <div class="result"><span>Earnings per mile</span><b data-out="perMile">—</b></div>
+    <div class="result" data-show="actual"><span>Weekly gas cost</span><b data-out="gasCost">—</b></div>
+    <div class="result" data-show="actual"><span>Weekly car wear</span><b data-out="wearCost">—</b></div>
+    <div class="result" data-show="irs"><span>Weekly car cost at IRS rate</span><b data-out="irsCost">—</b></div>
+    <div class="result"><span>Weekly tax set-aside</span><b data-out="tax">—</b></div>
+    <div class="result"><span>Net per week</span><b data-out="netWeek">—</b></div>
+    <div class="result"><span>Net per year</span><b data-out="netYear">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+// 2026 IRS standard mileage rate: 72.5¢ Jan 1–Jun 30, 76¢ from Jul 1, 2026 (IRS Notice 2026-10 / Announcement 2026-11).
+const MILEAGE_RATE_2026 = 0.76;
+
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const irsMode = !!v.useIrs;
+  out.show("actual", !irsMode);
+  out.show("irs", irsMode);
+
+  const gasCost = v.mpg > 0 ? v.miles / v.mpg * v.gas : 0;
+  const wearCost = v.miles * v.wear;
+  const irsCost = v.miles * MILEAGE_RATE_2026;
+  const carCost = irsMode ? irsCost : gasCost + wearCost;
+
+  // Tax is figured on payouts minus the IRS mileage deduction, which is what most drivers claim.
+  const deduction = irsCost;
+  const taxable = Math.max(0, v.payouts - deduction);
+  const tax = taxable * Math.min(v.taxRate, 95) / 100;
+  const netWeek = v.payouts - carCost - tax;
+
+  out.set("real", v.hours > 0 ? Calc.money(netWeek / v.hours) : "—", Calc.tone(netWeek));
+  out.set("grossHr", v.hours > 0 ? Calc.money(v.payouts / v.hours) : "—");
+  out.set("perMile", v.miles > 0 ? Calc.money(v.payouts / v.miles) : "—");
+  out.set("gasCost", Calc.money(gasCost));
+  out.set("wearCost", Calc.money(wearCost));
+  out.set("irsCost", Calc.money(irsCost));
+  out.set("tax", Calc.money(tax));
+  out.set("netWeek", Calc.money(netWeek), Calc.tone(netWeek));
+  out.set("netYear", Calc.money(netWeek * v.weeks), Calc.tone(netWeek));
+
+  const saved = Math.min(deduction, v.payouts) * Math.min(v.taxRate, 95) / 100;
+  if (v.hours <= 0) out.note("Enter the hours you were logged in, including waiting time, to see your hourly pay.");
+  else if (netWeek <= 0) out.note("Your car costs and taxes are eating all of your payouts. Look for higher-paying orders per mile, or a more fuel-efficient car.");
+  else if (v.miles > 0 && v.payouts / v.miles < 1) out.note("You're earning under $1 per mile. Many experienced drivers decline orders that pay less than $1 to $1.50 per mile, counting the drive to pickup.");
+  else out.note(`Your ${Calc.money(deduction)} weekly IRS mileage deduction lowers your tax set-aside by about ${Calc.money(saved)}. Estimate only, not tax or financial advice.`);
+}));
+</script>
+<!-- article -->
+<p><strong>This is an estimate, not tax or financial advice.</strong> Pay, car costs and tax situations vary a lot between drivers and markets. Use a full week of real numbers for the best result.</p>
+
+<h2>Why app pay overstates what you earn</h2>
+<p>DoorDash, Uber, Lyft and Instacart show you gross payouts, and often pay per <em>active</em> hour. Three things come out before that money is really yours:</p>
+<ul>
+  <li><strong>Unpaid time.</strong> Waiting at restaurants and between orders counts as work because you can't do anything else. This calculator uses total hours online.</li>
+  <li><strong>Your car.</strong> Gas is the cost you see, but tires, oil, brakes and repairs arrive later. AAA's 2025 <em>Your Driving Costs</em> study puts maintenance, repairs and tires for a new car at 11.04¢ per mile, and depreciation at another 28.9¢ per mile at 15,000 miles a year.</li>
+  <li><strong>Taxes.</strong> Gig drivers are independent contractors, so nothing is withheld. You owe 15.3% self-employment tax on 92.35% of profit (about 14.1%) plus income tax.</li>
+</ul>
+
+<h2>The formula</h2>
+<div class="formula">gas = miles ÷ mpg × gas price<br>
+car wear = miles × maintenance &amp; wear per mile<br>
+tax set-aside = (payouts − miles × $0.76) × tax %<br>
+net per week = payouts − gas − car wear − tax set-aside<br>
+real hourly = net per week ÷ hours online</div>
+<p>Tax is figured on payouts minus the IRS mileage deduction, because that deduction is what you'll actually claim. With the IRS-rate toggle on, the calculator swaps gas and wear for 76¢ per mile. That's the high-end view: it's meant to cover depreciation, insurance and registration too.</p>
+
+<h2>Example: $1,000 a week</h2>
+<p>A driver earns $1,000 in payouts and tips over 35 hours online, drives 400 miles in a 25 mpg car with gas at $3.20, uses 15¢ per mile for wear, sets aside 25% for tax and drives 50 weeks a year.</p>
+<table>
+  <tr><th>Step</th><th>Amount</th></tr>
+  <tr><td>Gross hourly ($1,000 ÷ 35)</td><td>$28.57</td></tr>
+  <tr><td>Earnings per mile ($1,000 ÷ 400)</td><td>$2.50</td></tr>
+  <tr><td>Gas (400 ÷ 25 × $3.20)</td><td>$51.20</td></tr>
+  <tr><td>Car wear (400 × $0.15)</td><td>$60.00</td></tr>
+  <tr><td>Tax set-aside (($1,000 − $304) × 25%)</td><td>$174.00</td></tr>
+  <tr><td>Net per week</td><td>$714.80</td></tr>
+  <tr><td><strong>Real hourly pay</strong></td><td><strong>$20.42</strong></td></tr>
+  <tr><td>Net per year (× 50 weeks)</td><td>$35,740.00</td></tr>
+</table>
+<p>The app's $28.57 an hour is really $20.42. Using the IRS rate as the full car cost ($304 a week) drops it to $14.91, which is closer to the truth if you're wearing out a newer car you'd otherwise keep for years.</p>
+
+<h2>Choosing your per-mile wear cost</h2>
+<h3>Older, paid-off car</h3>
+<p>10–15¢ per mile covers tires, oil, brakes and the occasional repair. Depreciation matters less once a car is worth a few thousand dollars, but high mileage still shortens its life.</p>
+<h3>Newer or financed car</h3>
+<p>Add depreciation: 25–40¢ per mile is realistic. Every mile you put on a car worth $25,000 knocks real money off its resale value.</p>
+
+<h2>Tips to raise your real hourly</h2>
+<ul>
+  <li><strong>Judge orders per mile, not per trip.</strong> Count the drive to the pickup. Offers under about $1 per mile rarely pay once costs are included.</li>
+  <li><strong>Log every mile.</strong> At 76¢ per mile, 400 miles a week is over $15,000 a year of deductions. Use a mileage app from the moment you go online.</li>
+  <li><strong>Set aside tax on every payout.</strong> Move your set-aside to savings when you cash out, and make quarterly estimated payments if you'll owe $1,000 or more.</li>
+  <li><strong>Work the peaks.</strong> Fewer hours at lunch, dinner and weekend rushes often earn the same money with less waiting.</li>
+</ul>

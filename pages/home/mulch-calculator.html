@@ -1,0 +1,151 @@
+---
+{
+  "title": "Mulch Calculator: Cubic Yards, Bags and Cost",
+  "description": "Calculate how much mulch you need in cubic yards and 2 or 3 cubic foot bags from your bed size and depth, and compare bagged versus bulk mulch cost.",
+  "h1": "Mulch Calculator",
+  "short": "Mulch Calculator",
+  "intro": "Enter your bed size and mulch depth to see how many cubic yards or bags to buy, and whether bulk or bagged is cheaper.",
+  "updated": "September 2026",
+  "related": ["gravel-calculator", "concrete-calculator", "paint-calculator", "flooring-calculator"],
+  "faq": [
+    {"q": "How many bags of mulch are in a cubic yard?", "a": "A cubic yard is 27 cubic feet, so it takes 13.5 bags of 2 cubic feet or 9 bags of 3 cubic feet to equal one yard."},
+    {"q": "How deep should mulch be?", "a": "Two to three inches is the usual recommendation for garden beds and around trees. Fine or shredded mulch can go closer to 2 inches; coarse bark nuggets can go to 3 or 4 inches. Deeper than 4 inches can starve roots of air and hold too much moisture. Keep mulch a few inches away from tree trunks and plant stems."},
+    {"q": "How much area does a cubic yard of mulch cover?", "a": "One cubic yard covers about 108 square feet at 3 inches deep, 162 square feet at 2 inches, and 324 square feet at 1 inch. Divide 324 by your depth in inches to get the coverage."},
+    {"q": "Is bulk mulch cheaper than bags?", "a": "Almost always, per yard. Bulk shredded hardwood typically runs 25 to 45 dollars a cubic yard, while 2 cubic foot bags at 4 to 7 dollars work out to roughly 55 to 95 dollars a yard. Delivery fees of 50 dollars or more can erase the saving on small jobs, so bags often win below about 2 yards unless you can haul it yourself."},
+    {"q": "How much mulch do I need to top up an existing bed?", "a": "Measure how deep the old mulch still is and only add the difference. If a bed has 1 inch left and you want 3, enter 2 inches as the depth. Refreshing a bed each year usually takes about 1 inch."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="mode">Measure by</label>
+        <select id="mode" name="mode">
+          <option value="dims">Length × width</option>
+          <option value="sqft">Total square feet</option>
+        </select>
+      </div>
+      <div data-show="dims">
+      <div class="row2">
+        <div class="field">
+          <label for="length">Length</label>
+          <div class="input"><input id="length" name="length" type="number" min="0" step="0.1" value="20" inputmode="decimal"><span class="unit">ft</span></div>
+        </div>
+        <div class="field">
+          <label for="width">Width</label>
+          <div class="input"><input id="width" name="width" type="number" min="0" step="0.1" value="10" inputmode="decimal"><span class="unit">ft</span></div>
+        </div>
+      </div>
+      </div>
+      <div class="field" data-show="sqft" hidden>
+        <label for="area">Area</label>
+        <div class="input"><input id="area" name="area" type="number" min="0" step="1" value="200" inputmode="decimal"><span class="unit">sq ft</span></div>
+        <div class="hint">Add up several beds here if they're irregular.</div>
+      </div>
+      <div class="field">
+        <label for="depth">Depth</label>
+        <div class="input"><input id="depth" name="depth" type="number" min="0" step="0.5" value="3" inputmode="decimal"><span class="unit">in</span></div>
+        <div class="hint">2–3 in for most beds.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="bagPrice">Price per 2 cu ft bag</label>
+          <div class="input"><span class="unit pre">$</span><input id="bagPrice" name="bagPrice" type="number" min="0" step="0.01" value="4.50" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="yardPrice">Bulk price per yard</label>
+          <div class="input"><span class="unit pre">$</span><input id="yardPrice" name="yardPrice" type="number" min="0" step="0.01" value="40" inputmode="decimal"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Mulch needed</span><b data-out="yards">—</b></div>
+    <div class="result"><span>Area</span><b data-out="area">—</b></div>
+    <div class="result"><span>Volume</span><b data-out="cuft">—</b></div>
+    <div class="result"><span>2 cu ft bags</span><b data-out="bags2">—</b></div>
+    <div class="result"><span>3 cu ft bags</span><b data-out="bags3">—</b></div>
+    <div class="result"><span>Cost in 2 cu ft bags</span><b data-out="bagCost">—</b></div>
+    <div class="result"><span>Cost in bulk</span><b data-out="bulkCost">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const byDims = v.mode === "dims";
+  out.show("dims", byDims);
+  out.show("sqft", !byDims);
+  const area = byDims ? v.length * v.width : v.area;
+
+  const cuft = area * v.depth / 12;
+  const yards = cuft / 27;
+  const bags2 = Math.ceil(cuft / 2 - 1e-9);
+  const bags3 = Math.ceil(cuft / 3 - 1e-9);
+  const bagCost = bags2 * v.bagPrice;
+  const bulkCost = yards * v.yardPrice;
+
+  out.set("yards", `${Calc.num(yards, 2)} cu yd`);
+  out.set("area", `${Calc.num(area, 0)} sq ft`);
+  out.set("cuft", `${Calc.num(cuft, 1)} cu ft`);
+  out.set("bags2", Calc.num(bags2, 0));
+  out.set("bags3", Calc.num(bags3, 0));
+  out.set("bagCost", Calc.money(bagCost));
+  out.set("bulkCost", Calc.money(bulkCost));
+
+  if (cuft <= 0) return;
+  if (v.depth > 4) out.note("More than 4 inches of mulch can smother roots. 2–3 inches is plenty for most beds.");
+  else if (bulkCost < bagCost) out.note(`Bulk saves about ${Calc.money(bagCost - bulkCost)} before delivery. Many suppliers sell in half-yard steps and charge $50+ to deliver.`);
+  else out.note("Bags are the cheaper option at these prices.");
+}));
+</script>
+<!-- article -->
+<h2>How the mulch calculator works</h2>
+<p>Mulch is sold by volume: in bags measured in cubic feet, or in bulk by the cubic yard. To find the volume you
+need, multiply the bed's area by the depth. Because the area is in square feet and depth is in inches, the depth
+is divided by 12 first. That gives cubic feet, and dividing by 27 converts to cubic yards (one yard is
+3 × 3 × 3 ft).</p>
+<p>Bag counts are rounded up, since you can't buy part of a bag. Bulk cost is shown for the exact volume; in
+practice a landscape supplier will round up to the nearest half or whole yard.</p>
+
+<h2>The formula</h2>
+<div class="formula">cubic feet = length × width × (depth in inches ÷ 12)<br>
+cubic yards = cubic feet ÷ 27<br>
+2 cu ft bags = cubic feet ÷ 2, rounded up<br>
+3 cu ft bags = cubic feet ÷ 3, rounded up</div>
+
+<h2>Example: a 20 × 10 ft bed at 3 inches</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Area (20 × 10)</td><td>200 sq ft</td></tr>
+  <tr><td>Volume (200 × 3 ÷ 12)</td><td>50 cu ft</td></tr>
+  <tr><td><strong>Cubic yards (50 ÷ 27)</strong></td><td><strong>1.85 cu yd</strong></td></tr>
+  <tr><td>2 cu ft bags (50 ÷ 2)</td><td>25 bags</td></tr>
+  <tr><td>3 cu ft bags (50 ÷ 3 = 16.7)</td><td>17 bags</td></tr>
+  <tr><td>Cost in bags (25 × $4.50)</td><td>$112.50</td></tr>
+  <tr><td>Cost in bulk (1.852 yd × $40)</td><td>$74.07</td></tr>
+</table>
+<p>The defaults use typical 2026 prices: about $4.50 for a 2 cu ft bag of shredded hardwood at a big-box store, and
+$40 a yard for bulk hardwood mulch. Dyed and premium mulches (cedar, cypress, pine bark nuggets) often cost
+$40–$65 a yard in bulk and more in bags.</p>
+
+<h2>Quick coverage reference</h2>
+<table>
+  <tr><th>Depth</th><th>1 cubic yard covers</th><th>One 2 cu ft bag covers</th></tr>
+  <tr><td>1 in</td><td>324 sq ft</td><td>24 sq ft</td></tr>
+  <tr><td>2 in</td><td>162 sq ft</td><td>12 sq ft</td></tr>
+  <tr><td>3 in</td><td>108 sq ft</td><td>8 sq ft</td></tr>
+  <tr><td>4 in</td><td>81 sq ft</td><td>6 sq ft</td></tr>
+</table>
+
+<h2>Tips before you order</h2>
+<ul>
+  <li><strong>Measure irregular beds in pieces.</strong> Break curves into rough rectangles, add the areas, and use the
+  square-feet option. For a round bed, area = 3.14 × radius².</li>
+  <li><strong>Subtract what's already there.</strong> If old mulch is still an inch deep, only add the difference.</li>
+  <li><strong>Add a little for settling.</strong> Fresh shredded mulch compacts by roughly 10–20% in the first few weeks.
+  Round up rather than down.</li>
+  <li><strong>Keep it off trunks.</strong> Pile it 2–3 inches away from tree trunks and stems to avoid rot and pests.</li>
+  <li><strong>Compare delivered prices.</strong> For small jobs, a delivery fee can make bulk cost more than bags.</li>
+</ul>

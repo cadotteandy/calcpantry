@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% from "_ad.html" import ad with context %}
+{% block title %}{{ cat.name }}: Free Online Calculators | {{ site.name }}{% endblock %}
+{% block description %}{{ cat.blurb }}{% endblock %}
+{% block content %}
+<nav class="crumbs"><a href="/">Home</a></nav>
+<h1>{{ cat.icon }} {{ cat.name }}</h1>
+<p class="intro">{{ cat.blurb }}</p>
+<div class="cards">
+  {% for p in items %}<a class="card" href="{{ p.path }}"><b>{{ p.short or p.h1 }}</b><span>{{ p.description }}</span></a>{% endfor %}
+</div>
+{{ ad() }}
+{% endblock %}

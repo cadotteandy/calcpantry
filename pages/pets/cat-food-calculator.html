@@ -1,0 +1,159 @@
+---
+{
+  "title": "Cat Food Calculator: Calories, Cans & Cups Per Day",
+  "description": "Find how many calories your cat needs daily and how many cans of wet food and cups of dry food that is, with any wet and dry mix, from weight and life stage.",
+  "h1": "Cat Food Calculator",
+  "short": "Cat Food Calculator",
+  "intro": "Enter your cat's weight, life stage and the calorie counts on your wet and dry food labels to get daily calories and exactly how many cans and cups to feed.",
+  "updated": "September 2026",
+  "related": ["cat-age-calculator", "dog-food-calculator", "aquarium-stocking-calculator", "coffee-ratio-calculator"],
+  "faq": [
+    {"q": "How much should I feed my cat a day?", "a": "A typical 10 lb neutered indoor adult needs roughly 260 calories a day. That is about 3 cans of a 90 kcal, 3 oz wet food, or about two-thirds of a cup of a 400 kcal/cup dry food, or a mix of both. Your cat's food labels decide the exact amounts, so always convert from calories."},
+    {"q": "How many calories are in a can of cat food?", "a": "It varies widely. Small 3 oz cans are commonly about 70 to 100 kcal, and 5.5 oz cans about 150 to 200 kcal. Pâtés tend to be more calorie-dense than foods in gravy. The calorie statement is printed on the can, often as kcal per can or kcal/kg."},
+    {"q": "Should I feed my cat wet food, dry food or both?", "a": "All three can work for a healthy cat if the food is complete and balanced and the calories are right. Wet food adds water and is often helpful for weight control and cats with urinary issues; dry food is convenient and calorie-dense. Many owners feed a mix. Ask your vet if your cat has a medical condition."},
+    {"q": "How do I help my cat lose weight safely?", "a": "Calculate calories at your cat's ideal weight, not current weight, and use the weight loss option (0.8 × RER). Aim for slow loss of about 0.5 to 2% of body weight per week. Cats should never be put on a crash diet, because rapid weight loss can trigger a serious liver disease called hepatic lipidosis. Work with your vet."},
+    {"q": "How much should a kitten eat?", "a": "Kittens need about 2.5 times their resting energy requirement, recalculated as they grow, and most do best with several small meals a day or free access to kitten food. Weigh your kitten every week or two and update the numbers."},
+    {"q": "Do treats count toward my cat's calories?", "a": "Yes. Keep treats to about 10% of daily calories and trim meals to match. For a cat that needs 260 kcal, that is about 26 kcal of treats per day, which is often only a few pieces."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="weight">Cat's weight</label>
+          <div class="input"><input id="weight" name="weight" type="number" min="0" step="0.1" value="10" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="unit">Unit</label>
+          <select id="unit" name="unit">
+            <option value="lb">lb</option>
+            <option value="kg">kg</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="stage">Life stage &amp; body condition</label>
+        <select id="stage" name="stage">
+          <option value="2.5">Kitten, growing (2.5 × RER)</option>
+          <option value="1.2" selected>Neutered / spayed adult (1.2 × RER)</option>
+          <option value="1.4">Intact adult (1.4 × RER)</option>
+          <option value="1.0">Inactive or prone to weight gain (1.0 × RER)</option>
+          <option value="0.8">Weight loss (0.8 × RER at ideal weight)</option>
+        </select>
+        <div class="hint" data-show="loss" hidden>For weight loss, enter your cat's ideal weight above, not current weight.</div>
+      </div>
+      <div class="field">
+        <label for="wetPct">Wet / dry split (by calories)</label>
+        <select id="wetPct" name="wetPct" data-num>
+          <option value="100">All wet (100 / 0)</option>
+          <option value="75">Mostly wet (75 / 25)</option>
+          <option value="50" selected>Half and half (50 / 50)</option>
+          <option value="25">Mostly dry (25 / 75)</option>
+          <option value="0">All dry (0 / 100)</option>
+        </select>
+      </div>
+      <div class="row2" data-show="wet">
+        <div class="field">
+          <label for="kcalCan">Wet food kcal per can</label>
+          <div class="input"><input id="kcalCan" name="kcalCan" type="number" min="1" step="1" value="90" inputmode="decimal"><span class="unit">kcal</span></div>
+        </div>
+        <div class="field">
+          <label for="canOz">Can size</label>
+          <div class="input"><input id="canOz" name="canOz" type="number" min="0" step="0.1" value="3" inputmode="decimal"><span class="unit">oz</span></div>
+        </div>
+      </div>
+      <div class="field" data-show="dry">
+        <label for="kcalCup">Dry food kcal per cup</label>
+        <div class="input"><input id="kcalCup" name="kcalCup" type="number" min="1" step="1" value="400" inputmode="decimal"><span class="unit">kcal</span></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Daily calories</span><b data-out="mer">—</b></div>
+    <div class="result" data-show="wet"><span>Wet food: cans per day</span><b data-out="cans">—</b></div>
+    <div class="result" data-show="wet"><span>Wet food: ounces per day</span><b data-out="oz">—</b></div>
+    <div class="result" data-show="dry"><span>Dry food: cups per day</span><b data-out="cups">—</b></div>
+    <div class="result"><span>Resting energy (RER)</span><b data-out="rer">—</b></div>
+    <div class="result"><span>Treat allowance (10%)</span><b data-out="treats">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const kg = v.unit === "kg" ? v.weight : v.weight * 0.45359237;
+  const factor = parseFloat(v.stage);
+  const wetShare = Math.min(100, Math.max(0, v.wetPct)) / 100;
+  out.show("loss", v.stage === "0.8");
+  out.show("wet", wetShare > 0);
+  out.show("dry", wetShare < 1);
+
+  const rer = kg > 0 ? 70 * Math.pow(kg, 0.75) : 0;   // resting energy requirement, kcal/day
+  const mer = rer * factor;
+  const wetKcal = mer * wetShare, dryKcal = mer - wetKcal;
+  const cans = v.kcalCan > 0 ? wetKcal / v.kcalCan : NaN;
+  const cups = v.kcalCup > 0 ? dryKcal / v.kcalCup : NaN;
+
+  out.set("mer", Calc.num(mer, 0) + " kcal");
+  out.set("cans", Calc.num(cans, 2) + " cans");
+  out.set("oz", Calc.num(cans * v.canOz, 1) + " oz");
+  out.set("cups", Calc.num(cups, 2) + " cups");
+  out.set("rer", Calc.num(rer, 0) + " kcal");
+  out.set("treats", Calc.num(mer * 0.1, 0) + " kcal");
+  if (mer > 0) {
+    if (v.stage === "0.8") out.note("Aim for slow loss (about 0.5–2% of body weight a week) and involve your vet. Never cut a cat's food drastically: fast weight loss can cause a dangerous liver condition.");
+    else out.note("Starting estimate only. Weigh your cat monthly and adjust by about 10% to keep an ideal body condition. If you give treats, trim meals by the same number of calories.");
+  }
+}));
+</script>
+<!-- article -->
+<h2>How this cat food calculator works</h2>
+<p>Vets estimate a cat's calorie needs the same way they do for dogs, but with lower multipliers. First comes the
+<strong>resting energy requirement (RER)</strong>, the calories a cat burns at rest. That is multiplied by a
+<strong>life stage factor</strong> to get the daily energy requirement. These factors follow the WSAVA Global Nutrition
+Committee toolkit and the AAHA nutrition and weight management guidelines.</p>
+<p>Once you have daily calories, the portions are simple division by the calorie counts on your food labels. That matters
+more for cats than for most pets: a small can can hold anywhere from 70 to over 100 kcal, and dry cat foods range from
+roughly 300 to over 500 kcal per cup. If you feed both, pick a split and the calculator divides the calories between them.</p>
+
+<h2>The formula</h2>
+<div class="formula">weight in kg = weight in lb × 0.4536<br>
+RER = 70 × (weight in kg)<sup>0.75</sup><br>
+daily calories = RER × life stage factor<br>
+cans per day = (daily calories × wet share) ÷ kcal per can<br>
+cups per day = (daily calories × dry share) ÷ kcal per cup</div>
+
+<h3>Life stage factors used</h3>
+<table>
+  <tr><th>Cat</th><th>Factor × RER</th></tr>
+  <tr><td>Growing kitten</td><td>2.5</td></tr>
+  <tr><td>Neutered or spayed adult</td><td>1.2</td></tr>
+  <tr><td>Intact adult</td><td>1.4</td></tr>
+  <tr><td>Inactive or prone to weight gain</td><td>1.0</td></tr>
+  <tr><td>Weight loss (at ideal weight)</td><td>0.8</td></tr>
+</table>
+<p>Pregnant and nursing cats need much more, often 2 to 4 times RER while nursing, and are best fed with your vet's guidance.</p>
+
+<h2>Example: a 10 lb neutered indoor cat</h2>
+<p>A 10 lb (4.54 kg) neutered adult, fed half wet food (90 kcal per 3 oz can) and half dry food (400 kcal per cup), by calories:</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>RER = 70 × 4.536<sup>0.75</sup></td><td>218 kcal</td></tr>
+  <tr><td>Daily calories = 217.6 × 1.2</td><td><strong>261 kcal</strong></td></tr>
+  <tr><td>Wet share = 261 × 50% ÷ 90 kcal</td><td>1.45 cans (4.4 oz)</td></tr>
+  <tr><td>Dry share = 261 × 50% ÷ 400 kcal</td><td>0.33 cups</td></tr>
+  <tr><td>Treat allowance (10%)</td><td>26 kcal</td></tr>
+</table>
+<p>In practice: about one and a half small cans plus a level third of a cup of kibble, spread over two or more meals.</p>
+
+<h2>Tips for feeding the right amount</h2>
+<ul>
+  <li><strong>Weigh dry food if you can.</strong> A third of a cup of kibble is only about 30–40 grams, so small scooping errors add up fast. A kitchen scale is far more accurate than a cup.</li>
+  <li><strong>Check body condition.</strong> You should be able to feel your cat's ribs with light pressure and see a slight waist from above. Adjust portions by 10% and recheck in 3–4 weeks.</li>
+  <li><strong>Most indoor cats need less than the bag says.</strong> Feeding guides are written broadly; neutered, indoor cats often need 10–20% less.</li>
+  <li><strong>Use the ideal weight for weight loss.</strong> Calculating from an overweight cat's current weight will keep it overweight.</li>
+  <li><strong>Leftover wet food:</strong> cover and refrigerate opened cans and use within about 2–3 days; warm to room temperature before serving.</li>
+</ul>
+<p><em>This calculator is an educational estimate, not veterinary advice. Check your food labels and ask your vet, especially for kittens, pregnant or nursing cats, seniors, or cats with a medical condition.</em></p>

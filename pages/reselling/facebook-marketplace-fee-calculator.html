@@ -1,0 +1,153 @@
+---
+{
+  "title": "Facebook Marketplace Fee Calculator 2026: 10% Fee",
+  "description": "Calculate the Facebook Marketplace selling fee on shipped orders (10%, $0.80 minimum), your payout and profit, and compare it with a fee-free local sale.",
+  "h1": "Facebook Marketplace Fee Calculator",
+  "short": "Facebook Marketplace Fee Calculator",
+  "intro": "Enter your sale price and costs to see Facebook's selling fee on a shipped order, your payout, your profit, and how it compares with selling locally.",
+  "updated": "September 2026",
+  "related": ["mercari-fee-calculator", "ebay-fee-calculator", "depop-fee-calculator", "flip-profit-calculator"],
+  "faq": [
+    {"q": "How much does Facebook Marketplace charge to sell?", "a": "Local sales where the buyer picks up and pays you directly are free. For shipped orders paid through Facebook checkout, individual sellers pay a selling fee of 10% per transaction with a minimum of $0.80. On a $30 shipped sale with free shipping and no tax, the fee is $3.00."},
+    {"q": "Is the Facebook Marketplace fee charged on shipping and tax?", "a": "Yes. Meta's seller policy says the fee applies to the entire transaction, including the item price, any shipping fees and applicable taxes. Charging the buyer for shipping doesn't avoid the fee on that shipping."},
+    {"q": "Is there a separate payment processing fee?", "a": "Meta's policy lists a single selling fee for individual sellers on shipped orders: 10% with a $0.80 minimum. There is no separate listing fee or subscription, and you don't pay anything on local cash or peer-to-peer sales arranged outside checkout."},
+    {"q": "When does the $0.80 minimum apply?", "a": "Whenever 10% of the transaction is less than $0.80, which means any shipped order totaling under $8. A $5 shipped item pays $0.80, an effective rate of 16%. Cheap items usually make more sense as local pickup or in a bundle."},
+    {"q": "Do multiple items shipped together pay one fee?", "a": "Yes. Goods shipped together count as one transaction, so the 10% applies to the combined total and the $0.80 minimum applies once, not per item."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="mode">How it sells</label>
+        <select id="mode" name="mode">
+          <option value="ship">Shipped (Facebook checkout)</option>
+          <option value="local">Local pickup, paid in person</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="price">Sold price</label>
+        <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="30" inputmode="decimal"></div>
+      </div>
+      <div class="row2" data-show="ship">
+        <div class="field">
+          <label for="shipCharged">Shipping buyer pays</label>
+          <div class="input"><span class="unit pre">$</span><input id="shipCharged" name="shipCharged" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="taxRate">Buyer's sales tax</label>
+          <div class="input"><input id="taxRate" name="taxRate" type="number" min="0" max="15" step="0.1" value="0" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="itemCost">Item cost</label>
+          <div class="input"><span class="unit pre">$</span><input id="itemCost" name="itemCost" type="number" min="0" step="0.01" value="8" inputmode="decimal"></div>
+        </div>
+        <div class="field" data-show="ship">
+          <label for="shipCost">Shipping label cost</label>
+          <div class="input"><span class="unit pre">$</span><input id="shipCost" name="shipCost" type="number" min="0" step="0.01" value="7" inputmode="decimal"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Profit</span><b data-out="profit">—</b></div>
+    <div class="result"><span>Facebook selling fee</span><b data-out="fee">—</b></div>
+    <div class="result" data-show="ship"><span>Effective fee rate</span><b data-out="rate">—</b></div>
+    <div class="result"><span>Payout</span><b data-out="payout">—</b></div>
+    <div class="result"><span>Profit margin</span><b data-out="margin">—</b></div>
+    <div class="result"><span>Break-even sold price</span><b data-out="breakeven">—</b></div>
+    <div class="result" data-show="ship"><span>Profit if sold locally instead</span><b data-out="local">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const ship = v.mode === "ship";
+  out.show("ship", ship);
+
+  const shipCharged = ship ? v.shipCharged : 0;
+  const shipCost = ship ? v.shipCost : 0;
+  const t = 1 + (ship ? v.taxRate : 0) / 100;
+  const sale = v.price + shipCharged;                  // what the buyer pays you, before tax
+  const txn = sale * t;                                // fee base includes shipping and tax
+  const fee = ship && sale > 0 ? Math.max(txn * 0.10, 0.80) : 0;
+  const payout = sale - fee;                           // tax passes through to the state
+  const profit = payout - v.itemCost - shipCost;
+  const localProfit = v.price - v.itemCost;
+
+  // Break-even sold price with the same shipping and tax.
+  let breakeven;
+  if (!ship) breakeven = v.itemCost;
+  else {
+    const costs = v.itemCost + shipCost;
+    breakeven = costs / (1 - 0.10 * t) - shipCharged;          // 10% applies
+    if ((breakeven + shipCharged) * t * 0.10 < 0.80) breakeven = costs + 0.80 - shipCharged; // minimum applies
+  }
+
+  out.set("profit", Calc.money(profit), Calc.tone(profit));
+  out.set("fee", Calc.money(fee));
+  out.set("rate", sale > 0 ? Calc.pct(fee / sale) : "—");
+  out.set("payout", Calc.money(payout));
+  out.set("margin", sale > 0 ? Calc.pct(profit / sale) : "—");
+  out.set("breakeven", Calc.money(Math.max(0, breakeven)));
+  out.set("local", Calc.money(localProfit), Calc.tone(localProfit));
+  if (ship && sale > 0) {
+    if (txn * 0.10 < 0.80) out.note("The $0.80 minimum fee applies because the order total is under $8.");
+    else out.note(`Shipping costs you ${Calc.money(localProfit - profit)} more than a local sale at the same price, in fees and postage.`);
+  } else if (!ship) out.note("Facebook charges no fee on local sales paid in person.");
+}));
+</script>
+<!-- article -->
+<h2>How Facebook Marketplace fees work in 2026</h2>
+<p>Facebook Marketplace has two very different cost structures depending on how the item changes hands:</p>
+<ul>
+  <li><strong>Local pickup, paid in person:</strong> no fee at all. Facebook doesn't charge to list, and cash or
+  peer-to-peer payments you arrange yourself never pass through Facebook.</li>
+  <li><strong>Shipped orders through Facebook checkout:</strong> individual sellers pay a <strong>selling fee of 10%
+  per transaction, with a $0.80 minimum</strong>.</li>
+</ul>
+<p>The fee base is broader than many sellers expect. Meta's seller policy applies the 10% to the entire transaction,
+including the item price, any shipping the buyer pays, and applicable sales taxes. Items shipped together in one
+order count as a single transaction, so the minimum applies once per order.</p>
+
+<h2>The formula</h2>
+<div class="formula">transaction = (sold price + shipping buyer pays) × (1 + sales tax rate)<br>
+selling fee = the greater of transaction × 10% or $0.80<br>
+payout = sold price + shipping buyer pays − selling fee<br>
+profit = payout − item cost − shipping label cost</div>
+
+<h2>Example: a $30 shipped sale</h2>
+<p>You sell a pair of speakers for $30 with free shipping. You paid $8 for them at a yard sale, and the shipping label
+costs $7. We'll leave sales tax out to keep the numbers simple.</p>
+<table>
+  <tr><th>Line</th><th>Amount</th></tr>
+  <tr><td>Selling fee (10% of $30)</td><td>$3.00</td></tr>
+  <tr><td>Payout ($30 − $3.00)</td><td>$27.00</td></tr>
+  <tr><td>Minus item cost ($8) and label ($7)</td><td><strong>$12.00 profit</strong></td></tr>
+  <tr><td>Same sale as local pickup (no fee, no label)</td><td>$22.00 profit</td></tr>
+</table>
+<p>Shipping costs $10 in this example: $3 in fees plus the $7 label. That's the real trade-off on Marketplace. Local
+sales keep everything but only reach nearby buyers; shipping opens up the whole country but takes a noticeably bigger
+bite out of low-priced items.</p>
+
+<h3>When the $0.80 minimum kicks in</h3>
+<p>Any shipped order totaling under $8 pays the $0.80 minimum instead of 10%. On a $5 item, that's an effective rate of
+16%, before postage. Once a label is added, most sub-$10 items lose money when shipped, which is why small items
+work better as local pickups or bundles.</p>
+
+<h2>Tips for selling on Facebook Marketplace</h2>
+<ul>
+  <li><strong>Offer both options.</strong> Listing an item as available for shipping and local pickup widens your
+  audience, and local buyers still pay no fee.</li>
+  <li><strong>Price shipped listings a little higher.</strong> If an item goes for $30 locally, you need about $41
+  shipped to net the same, covering a $7 label and the 10% fee.</li>
+  <li><strong>Weigh before you list.</strong> An underestimated label is the most common way a shipped Marketplace sale
+  turns into a loss.</li>
+  <li><strong>Bundle small items.</strong> One order pays one minimum fee and one label.</li>
+  <li><strong>Stay on checkout for shipped sales.</strong> Facebook's purchase protection and seller protection only
+  cover orders paid through Facebook checkout.</li>
+</ul>

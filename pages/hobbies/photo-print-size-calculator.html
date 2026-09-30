@@ -1,0 +1,152 @@
+---
+{
+  "title": "Photo Print Size Calculator: Pixels to Inches & DPI",
+  "description": "See how big you can print a photo from its pixel dimensions at 300, 240 or 150 DPI, plus the effective DPI and crop for 4×6 up to 24×36 prints.",
+  "h1": "Photo Print Size Calculator",
+  "short": "Photo Print Size Calculator",
+  "intro": "Enter your image's width and height in pixels and pick a print resolution. See the largest print you can make, and how sharp each standard print size will be.",
+  "related": ["cross-stitch-fabric-calculator", "3d-print-cost-calculator", "etsy-fee-calculator", "fabric-yardage-calculator"],
+  "faq": [
+    {"q": "How do I calculate the maximum print size of a photo?", "a": "Divide the pixel width and height by the print resolution in pixels per inch. A 4000 by 3000 pixel photo at 300 DPI prints at 13.3 by 10 inches. At 150 DPI the same file prints at 26.7 by 20 inches, which still looks good on a wall viewed from a few feet away."},
+    {"q": "Is 300 DPI necessary for printing photos?", "a": "300 is the standard for prints held in the hand, like 4×6 and 5×7, and most photo labs recommend it. Between 240 and 300 is hard to tell apart on most printers. Larger prints are viewed from farther away, so 150 to 200 DPI usually looks sharp on a poster or canvas."},
+    {"q": "What is the difference between DPI and PPI?", "a": "PPI, pixels per inch, describes how densely an image's pixels are spread across the print. DPI, dots per inch, strictly describes how many ink dots a printer lays down. Photo labs and software use the two terms interchangeably for print resolution, and this calculator uses DPI in the PPI sense."},
+    {"q": "Why will my photo be cropped when I print 8×10?", "a": "Most cameras shoot 3:2 and most phones shoot 4:3, but an 8×10 print is 5:4. To fill the paper, part of the long side has to be trimmed. A 4:3 phone photo loses about 6% of its width at 8×10, and a 3:2 camera photo loses about 17%."},
+    {"q": "Can I upscale a photo to print it bigger?", "a": "Upscaling adds pixels but not real detail, so it cannot recover sharpness the camera never captured. Modern AI upscalers can make a low-resolution file look acceptable at a larger size, especially for prints viewed from a distance. Always order a small test print before an expensive large one."},
+    {"q": "How many megapixels do I need for an 8×10 print?", "a": "At 300 DPI an 8×10 print needs 2400 by 3000 pixels, which is 7.2 megapixels. At 240 DPI it needs about 4.6 megapixels. Almost any recent phone or camera has enough, as long as you don't crop the photo heavily first."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="pw">Image width</label>
+          <div class="input"><input id="pw" name="pw" type="number" min="0" step="1" value="4000" inputmode="numeric"><span class="unit">px</span></div>
+        </div>
+        <div class="field">
+          <label for="ph">Image height</label>
+          <div class="input"><input id="ph" name="ph" type="number" min="0" step="1" value="3000" inputmode="numeric"><span class="unit">px</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="dpi">Print resolution</label>
+        <select id="dpi" name="dpi">
+          <option value="300" selected>300 DPI: excellent, held in hand</option>
+          <option value="240">240 DPI: very good</option>
+          <option value="150">150 DPI: acceptable for large prints</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+      <div class="field" data-show="custom" hidden>
+        <label for="customDpi">Custom resolution</label>
+        <div class="input"><input id="customDpi" name="customDpi" type="number" min="1" step="1" value="200" inputmode="numeric"><span class="unit">DPI</span></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Largest print at <span data-out="dpiLabel">300 DPI</span></span><b data-out="maxIn">—</b></div>
+    <div class="result"><span>In centimeters</span><b data-out="maxCm">—</b></div>
+    <div class="result"><span>Megapixels</span><b data-out="mp">—</b></div>
+    <div class="result"><span>Aspect ratio</span><b data-out="ratio">—</b></div>
+    <h2 style="margin-top:16px">Standard print sizes</h2>
+    <div class="result"><span data-out="l0">4 × 6 in</span><b data-out="s0">—</b></div>
+    <div class="result"><span data-out="l1">5 × 7 in</span><b data-out="s1">—</b></div>
+    <div class="result"><span data-out="l2">8 × 10 in</span><b data-out="s2">—</b></div>
+    <div class="result"><span data-out="l3">11 × 14 in</span><b data-out="s3">—</b></div>
+    <div class="result"><span data-out="l4">16 × 20 in</span><b data-out="s4">—</b></div>
+    <div class="result"><span data-out="l5">24 × 36 in</span><b data-out="s5">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const SIZES = [[4, 6], [5, 7], [8, 10], [11, 14], [16, 20], [24, 36]];
+  const custom = v.dpi === "custom";
+  out.show("custom", custom);
+  const dpi = custom ? v.customDpi : parseFloat(v.dpi);
+  const w = Math.round(v.pw), h = Math.round(v.ph);
+  if (w <= 0 || h <= 0 || dpi <= 0) { out.note("Enter the image size in pixels and a print resolution."); return; }
+
+  const gcd = (a, b) => (b ? gcd(b, a % b) : a);
+  const g = gcd(w, h), rw = w / g, rh = h / g;
+  const dec = Math.max(w, h) / Math.min(w, h);
+  const ratio = (rw <= 32 && rh <= 32 ? `${rw}:${rh} · ` : "") + `${Calc.num(dec, 2)}:1`;
+
+  out.set("dpiLabel", `${Calc.num(dpi, 0)} DPI`);
+  out.set("maxIn", `${Calc.num(w / dpi, 1)} × ${Calc.num(h / dpi, 1)} in`);
+  out.set("maxCm", `${Calc.num(w / dpi * 2.54, 1)} × ${Calc.num(h / dpi * 2.54, 1)} cm`);
+  out.set("mp", `${Calc.num(w * h / 1e6, 1)} MP`);
+  out.set("ratio", ratio);
+
+  const L = Math.max(w, h), S = Math.min(w, h);
+  const land = w >= h;
+  const verdict = (d) => (d >= 300 ? "Excellent" : d >= 240 ? "Very good" : d >= 150 ? "Fair" : "Poor");
+  let worstCrop = 0;
+  SIZES.forEach(([ps, pl], i) => {
+    const eff = Math.min(L / pl, S / ps);                  // fill the paper, crop the excess
+    const crop = 1 - (pl * eff) * (ps * eff) / (L * S);
+    worstCrop = Math.max(worstCrop, crop);
+    const name = land ? `${pl} × ${ps} in` : `${ps} × ${pl} in`;
+    out.set("l" + i, crop > 0.01 ? `${name}, crops ${Calc.num(crop * 100, 0)}%` : name);
+    out.set("s" + i, `${Calc.num(eff, 0)} DPI · ${verdict(eff)}`, eff >= 240 ? "pos" : eff < 150 ? "neg" : "");
+  });
+
+  out.note(`Sizes are shown ${land ? "landscape" : "portrait"} to match your image. Effective DPI assumes the photo fills the paper, trimming whatever doesn't fit the print's shape.` +
+    (worstCrop > 0.01 ? " A crop percentage means that share of the image is cut off; order with a border (fit to page) to keep the whole frame." : ""));
+}));
+</script>
+<!-- article -->
+<h2>How print size is worked out from pixels</h2>
+<p>A digital photo is a grid of pixels. Printing spreads that grid across paper, and print resolution says how
+densely: 300 DPI (strictly, pixels per inch) puts 300 pixels in every inch. So the biggest print a file supports at
+a given quality is just its pixel dimensions divided by the resolution. Print bigger than that and each pixel covers
+more paper, so fine detail softens.</p>
+<p>How much resolution you need depends on viewing distance. A 4×6 held at arm's length shows every flaw, so labs
+recommend 300 DPI. Around 240 DPI is hard to tell apart on most printers. Wall prints are seen from several feet
+away, so 150 to 200 DPI usually looks sharp on posters and canvas.</p>
+
+<h2>The formulas</h2>
+<div class="formula">max print width (in) = pixel width ÷ DPI<br>
+max print height (in) = pixel height ÷ DPI &nbsp;·&nbsp; cm = in × 2.54<br>
+megapixels = width × height ÷ 1,000,000<br>
+effective DPI for a print = min(long px ÷ long in, short px ÷ short in)<br>
+crop = 1 − (print area × effective DPI²) ÷ image pixels</div>
+
+<h2>Example: a 12 megapixel phone photo</h2>
+<p>A 4000 × 3000 pixel image (4:3, 12.0 MP) prints up to <strong>13.3 × 10 inches</strong> (33.9 × 25.4 cm) at
+300 DPI. Here's how it fares at standard sizes, filling the paper:</p>
+<table>
+  <tr><th>Print</th><th>Effective DPI</th><th>Verdict, crop</th></tr>
+  <tr><td>6 × 4 in</td><td>667</td><td>Excellent, crops 11%</td></tr>
+  <tr><td>7 × 5 in</td><td>571</td><td>Excellent, crops 5%</td></tr>
+  <tr><td>10 × 8 in</td><td>375</td><td>Excellent, crops 6%</td></tr>
+  <tr><td>14 × 11 in</td><td>273</td><td>Very good, crops 5%</td></tr>
+  <tr><td>20 × 16 in</td><td>188</td><td>Fair, crops 6%</td></tr>
+  <tr><td>36 × 24 in</td><td>111</td><td>Poor, crops 11%</td></tr>
+</table>
+<p>The 16×20 at 188 DPI is fine framed on a wall. The 24×36 poster at 111 DPI will look soft up close, though it may
+pass at a distance.</p>
+
+<h2>Verdicts used here</h2>
+<ul>
+  <li><strong>Excellent (300+ DPI):</strong> sharp even when examined closely.</li>
+  <li><strong>Very good (240–299):</strong> nearly indistinguishable from 300 on most printers.</li>
+  <li><strong>Fair (150–239):</strong> good for wall prints viewed from a few feet; slightly soft up close.</li>
+  <li><strong>Poor (under 150):</strong> visible softness or pixelation; only for very large prints seen from far away.</li>
+</ul>
+
+<h2>Aspect ratio and cropping</h2>
+<p>Most phones shoot 4:3 and most cameras 3:2, but print sizes vary: 4×6 and 24×36 are 3:2, 8×10 and 16×20 are 5:4,
+5×7 is 7:5 and 11×14 is about 14:11. When the shapes differ, filling the paper means trimming part of the image. A
+3:2 camera photo printed at 8×10 loses about 17% of its width. Check the crop preview when ordering, or choose
+"fit" with a white border to keep the whole frame.</p>
+
+<h2>Tips for better prints</h2>
+<ul>
+  <li><strong>Use the original file.</strong> Messaging apps and social media shrink photos; a file from a chat app may be a fraction of the camera's pixels.</li>
+  <li><strong>Crop before you check.</strong> If you've cropped in an editor, enter the cropped pixel size, not the camera's.</li>
+  <li><strong>Don't just change the DPI field.</strong> Setting 300 DPI in an editor without resampling changes nothing about the pixels; only the pixel count matters.</li>
+  <li><strong>Test before going big.</strong> Order a small section print or a proof before an expensive canvas or metal print.</li>
+</ul>

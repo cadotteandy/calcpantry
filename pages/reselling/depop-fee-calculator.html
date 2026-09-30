@@ -1,0 +1,162 @@
+---
+{
+  "title": "Depop Fee Calculator 2026: Fees, Payout & Profit",
+  "description": "Calculate Depop's 3.3% + $0.45 payment processing fee and 12% Boosted Listings fee for US sellers, plus your payout and profit after costs.",
+  "h1": "Depop Fee Calculator",
+  "short": "Depop Fee Calculator",
+  "intro": "Enter your sale price, shipping and costs to see what Depop takes from a US sale, what you'll be paid, and your real profit.",
+  "updated": "September 2026",
+  "related": ["poshmark-fee-calculator", "mercari-fee-calculator", "ebay-fee-calculator", "flip-profit-calculator"],
+  "faq": [
+    {"q": "Does Depop still charge a selling fee in the US?", "a": "No. Depop removed its 10% selling fee for US sellers in 2024. You still pay a payment processing fee of 3.3% + $0.45 per order through Depop Payments, and a boosting fee if the sale came through a Boosted Listing."},
+    {"q": "Is the Depop processing fee charged on shipping and tax?", "a": "Yes. The 3.3% + $0.45 processing fee is calculated on the full amount the buyer pays: item price, shipping and any sales tax. Depop collects and remits the tax, so you never receive it, but it still counts toward the fee."},
+    {"q": "How much does it cost to boost a listing on Depop?", "a": "Boosts started on or after March 23, 2026 cost 12% of the item price, plus shipping if you arrange your own shipping. Boosts started before that date keep the old 8% rate. You only pay if the item sells within 28 days of a buyer interacting with the boosted listing."},
+    {"q": "How much do I make on a $40 Depop sale?", "a": "With $6 buyer-paid shipping and no tax, the buyer pays $46. Depop's processing fee is 3.3% of $46 plus $0.45, or $1.97, so you receive $44.03. After a $10 item cost and a $6 label, you keep $28.03."},
+    {"q": "Is Depop cheaper than Poshmark or Mercari?", "a": "For most unboosted sales, yes. Depop's processing fee works out to roughly 4% to 5% on a typical order, compared with Poshmark's 20% and Mercari's 10%. A boosted sale adds 12%, which brings Depop closer to Mercari."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="price">Item price</label>
+        <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="40" inputmode="decimal"></div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="shipCharged">Shipping buyer pays</label>
+          <div class="input"><span class="unit pre">$</span><input id="shipCharged" name="shipCharged" type="number" min="0" step="0.01" value="6" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="taxRate">Buyer's sales tax</label>
+          <div class="input"><input id="taxRate" name="taxRate" type="number" min="0" max="15" step="0.1" value="0" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="itemCost">Item cost</label>
+          <div class="input"><span class="unit pre">$</span><input id="itemCost" name="itemCost" type="number" min="0" step="0.01" value="10" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="shipCost">Your shipping cost</label>
+          <div class="input"><span class="unit pre">$</span><input id="shipCost" name="shipCost" type="number" min="0" step="0.01" value="6" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="boost">Boosted Listing</label>
+        <select id="boost" name="boost">
+          <option value="0">Not boosted</option>
+          <option value="12">Boosted (12%, from March 23, 2026)</option>
+          <option value="8">Boosted before March 23, 2026 (8%)</option>
+        </select>
+      </div>
+      <div class="field" data-show="boost" hidden>
+        <label for="shipMethod">How you ship</label>
+        <select id="shipMethod" name="shipMethod">
+          <option value="depop">Depop shipping label</option>
+          <option value="own">My own shipping</option>
+        </select>
+        <div class="hint">With your own shipping, the boost fee also applies to the shipping you charge.</div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Profit</span><b data-out="profit">—</b></div>
+    <div class="result"><span>Total Depop fees</span><b data-out="fees">—</b></div>
+    <div class="result"><span>Selling fee (US)</span><b>$0.00</b></div>
+    <div class="result"><span>Payment processing</span><b data-out="processing">—</b></div>
+    <div class="result" data-show="boost" hidden><span>Boosting fee</span><b data-out="boostFee">—</b></div>
+    <div class="result"><span>Payout from Depop</span><b data-out="payout">—</b></div>
+    <div class="result"><span>Profit margin</span><b data-out="margin">—</b></div>
+    <div class="result"><span>Break-even item price</span><b data-out="breakeven">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const sale = v.price + v.shipCharged;          // what the buyer pays you, before tax
+  const t = 1 + v.taxRate / 100;
+  const b = parseFloat(v.boost) / 100;
+  const own = v.shipMethod === "own" ? 1 : 0;
+  const has = sale > 0;
+
+  const processing = has ? sale * t * 0.033 + 0.45 : 0;  // charged on item + shipping + tax
+  const boostFee = b * (v.price + own * v.shipCharged);  // item price (+ shipping if you ship yourself)
+  const fees = processing + boostFee;
+  const payout = sale - fees;                             // tax passes through to the state
+  const profit = payout - v.itemCost - v.shipCost;
+
+  // Break-even item price with the same shipping, tax and boost settings.
+  const k = 1 - 0.033 * t - b;
+  const breakeven = (v.itemCost + v.shipCost + 0.45 - v.shipCharged * (1 - 0.033 * t - b * own)) / k;
+
+  out.set("profit", Calc.money(profit), Calc.tone(profit));
+  out.set("fees", Calc.money(fees));
+  out.set("processing", Calc.money(processing));
+  out.show("boost", b > 0);
+  out.set("boostFee", Calc.money(boostFee));
+  out.set("payout", Calc.money(payout));
+  out.set("margin", has ? Calc.pct(profit / sale) : "—");
+  out.set("breakeven", Calc.money(Math.max(0, breakeven)));
+  if (has) out.note(`Depop keeps ${Calc.pct(fees / sale)} of what the buyer pays you (before tax).`);
+}));
+</script>
+<!-- article -->
+<h2>How Depop fees work in 2026</h2>
+<p>Depop dropped its 10% selling fee for US sellers in 2024, so a standard US sale now carries just one charge: the
+<strong>payment processing fee of 3.3% + $0.45</strong> per order through Depop Payments. There are no listing fees
+and no monthly subscription.</p>
+<p>The processing fee is calculated on everything the buyer pays: the item price, the shipping, and any sales tax Depop
+collects. You never receive the tax (Depop sends it to the state), but you still pay 3.3% on it. That's why the
+calculator asks for the buyer's tax rate.</p>
+<p>The one optional fee is <strong>Boosted Listings</strong>. Boosts started on or after March 23, 2026 cost
+<strong>12%</strong> of the item price, up from 8%; boosts started before that date keep the old rate. If you arrange
+your own shipping, the boost fee applies to the shipping you charge as well. With a Depop label, it's charged on the
+item price only. You pay it only when the item sells within 28 days of a buyer viewing, liking or clicking the
+boosted listing.</p>
+
+<h2>The formula</h2>
+<div class="formula">sale = item price + shipping buyer pays<br>
+processing fee = sale × (1 + sales tax rate) × 3.3% + $0.45<br>
+boosting fee = item price × 12% (plus shipping × 12% if you ship yourself)<br>
+Depop fees = processing fee + boosting fee<br>
+profit = sale − Depop fees − item cost − your shipping cost</div>
+
+<h2>Example: a $40 sale with $6 shipping</h2>
+<p>You sell a vintage tee for $40 and the buyer pays $6 for shipping, which covers your $6 label. You paid $10 for the
+shirt. There's no boost, and we'll leave sales tax out to keep the numbers clean.</p>
+<table>
+  <tr><th>Line</th><th>Amount</th></tr>
+  <tr><td>Selling fee</td><td>$0.00</td></tr>
+  <tr><td>Payment processing (3.3% of $46 + $0.45)</td><td>$1.97</td></tr>
+  <tr><td><strong>Total Depop fees</strong></td><td><strong>$1.97</strong></td></tr>
+  <tr><td>Payout ($46 − $1.97)</td><td>$44.03</td></tr>
+  <tr><td>Minus item cost ($10) and label ($6)</td><td><strong>$28.03 profit</strong></td></tr>
+</table>
+<p>If the same shirt sold through a 12% boost with a Depop label, you'd add $4.80 in fees and profit would drop to
+$23.23. That's still less than Poshmark's 20% cut, but it's more than double the processing fee.</p>
+
+<h3>Depop fees at common price points</h3>
+<table>
+  <tr><th>Item price (+ $6 shipping)</th><th>Processing fee</th><th>Share of order</th></tr>
+  <tr><td>$15</td><td>$1.14</td><td>5.4%</td></tr>
+  <tr><td>$40</td><td>$1.97</td><td>4.3%</td></tr>
+  <tr><td>$100</td><td>$3.95</td><td>3.7%</td></tr>
+</table>
+<p>The fixed $0.45 matters most on cheap items, which is why bundles are worth encouraging.</p>
+
+<h2>Tips for keeping more of each Depop sale</h2>
+<ul>
+  <li><strong>Boost selectively.</strong> A boost that sells a stale item is worth 12%. Boosting items that would sell
+  anyway just hands Depop an extra cut.</li>
+  <li><strong>Push bundles.</strong> One order pays one $0.45 fixed fee, so three items in a bundle save you $0.90
+  compared with three separate sales.</li>
+  <li><strong>Check the label cost before offering free shipping.</strong> When you cover shipping, it comes straight
+  out of your profit. Enter it in "Your shipping cost" and set buyer shipping to $0.</li>
+  <li><strong>Use the break-even price as your offer floor.</strong> Anything below it loses money once fees and the
+  label are paid.</li>
+  <li><strong>Remember income tax.</strong> Depop issues a 1099-K once you pass the IRS reporting threshold, and
+  profit on items sold above what you paid is taxable.</li>
+</ul>

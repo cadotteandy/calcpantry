@@ -1,0 +1,202 @@
+---
+{
+  "title": "Roofing Calculator: Squares, Bundles and Cost",
+  "description": "Estimate roof area, squares and shingle bundles from your house size and pitch, plus underlayment rolls, drip edge, ridge cap and an installed cost range.",
+  "h1": "Roofing Calculator",
+  "short": "Roofing Calculator",
+  "intro": "Enter your house footprint, roof pitch, overhang and roof style to see how many squares and bundles of shingles to order, plus the trim and underlayment that go with them.",
+  "updated": "September 2026",
+  "related": ["deck-calculator", "fence-calculator", "drywall-calculator", "paint-calculator"],
+  "faq": [
+    {"q": "What is a roofing square?", "a": "A square is 100 square feet of roof surface. Shingles, underlayment and contractor quotes are all priced by the square, so a 2,000 square foot roof is 20 squares. Most asphalt shingles come three bundles to the square."},
+    {"q": "How many bundles of shingles do I need per square?", "a": "Three bundles cover one square for nearly all 3-tab and architectural (laminated) shingles. Some heavy designer shingles need four or five bundles per square, so check the coverage printed on the wrapper before you order."},
+    {"q": "How do I find my roof pitch without climbing up?", "a": "From the attic, hold a level horizontally against a rafter, mark 12 inches along it, and measure straight up from that mark to the underside of the rafter. That rise in inches is your pitch over 12. Free phone apps can also read the angle from a photo of the gable end."},
+    {"q": "How much waste should I add for roofing?", "a": "About 10 percent for a simple gable roof, 15 percent for a hip roof, and 15 to 20 percent or more for roofs with dormers, valleys and many angles. Waste covers cut-offs at rakes, hips and valleys and shingles used for the starter course."},
+    {"q": "Does this calculator work for complicated roofs?", "a": "It gives a sound estimate for rectangular gable and hip roofs. For L-shaped houses, split the footprint into rectangles, run each one and add the results. For roofs with many dormers and valleys, treat the result as a budget figure and have a roofer measure before ordering."},
+    {"q": "How much does a new shingle roof cost per square?", "a": "In 2026 most architectural shingle replacements cost roughly $450 to $700 per square installed, including tear-off, underlayment, flashing and labor. Steep pitches, multiple layers to remove and difficult access push the price higher."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="length">House length</label>
+          <div class="input"><input id="length" name="length" type="number" min="0" step="0.5" value="50" inputmode="decimal"><span class="unit">ft</span></div>
+        </div>
+        <div class="field">
+          <label for="width">House width</label>
+          <div class="input"><input id="width" name="width" type="number" min="0" step="0.5" value="30" inputmode="decimal"><span class="unit">ft</span></div>
+        </div>
+      </div>
+      <div class="hint">Measure the outside walls (footprint). For a gable roof, length runs along the ridge.</div>
+      <div class="row2">
+        <div class="field">
+          <label for="pitch">Roof pitch</label>
+          <select id="pitch" name="pitch" data-num>
+            <option value="3">3/12 (low)</option>
+            <option value="4">4/12</option>
+            <option value="5">5/12</option>
+            <option value="6" selected>6/12</option>
+            <option value="7">7/12</option>
+            <option value="8">8/12</option>
+            <option value="9">9/12</option>
+            <option value="10">10/12</option>
+            <option value="12">12/12 (steep)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="overhang">Eave overhang</label>
+          <div class="input"><input id="overhang" name="overhang" type="number" min="0" step="1" value="12" inputmode="numeric"><span class="unit">in</span></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="style">Roof style</label>
+          <select id="style" name="style">
+            <option value="gable" selected>Simple gable (10% waste)</option>
+            <option value="hip">Hip roof (15% waste)</option>
+            <option value="complex">Hip with valleys / dormers (20%)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="under">Underlayment</label>
+          <select id="under" name="under" data-num>
+            <option value="1000" selected>Synthetic (10 squares/roll)</option>
+            <option value="400">#15 felt (4 squares/roll)</option>
+            <option value="200">#30 felt (2 squares/roll)</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="bundlePrice">Shingle price per bundle</label>
+          <div class="input"><span class="unit pre">$</span><input id="bundlePrice" name="bundlePrice" type="number" min="0" step="0.01" value="42" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="installed">Installed price per square</label>
+          <div class="input"><span class="unit pre">$</span><input id="installed" name="installed" type="number" min="0" step="10" value="550" inputmode="decimal"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Squares to order</span><b data-out="squares">—</b></div>
+    <div class="result"><span>Roof surface area</span><b data-out="area">—</b></div>
+    <div class="result"><span>Shingle bundles</span><b data-out="bundles">—</b></div>
+    <div class="result"><span>Underlayment rolls</span><b data-out="rolls">—</b></div>
+    <div class="result"><span>Drip edge</span><b data-out="drip">—</b></div>
+    <div class="result"><span>Ridge cap</span><b data-out="ridge">—</b></div>
+    <div class="result"><span>Shingle cost (materials)</span><b data-out="shingleCost">—</b></div>
+    <div class="result"><span>Installed estimate</span><b data-out="installedCost">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const oh = (v.overhang / 12) * 2;                 // overhang on both sides, in feet
+  const L = v.length > 0 ? v.length + oh : 0;
+  const W = v.width > 0 ? v.width + oh : 0;
+  const factor = Math.sqrt(v.pitch * v.pitch + 144) / 12;
+  const area = L * W * factor;
+  const waste = { gable: 10, hip: 15, complex: 20 }[v.style];
+  const ordered = area * (1 + waste / 100);
+  const squares = ordered / 100;
+  const bundles = Math.ceil(squares * 3 - 1e-9);
+  const rolls = v.under > 0 ? Math.ceil(ordered / v.under - 1e-9) : 0;
+
+  // Drip edge: eaves plus sloped rakes on a gable; eaves all the way round on a hip.
+  const gable = v.style === "gable";
+  const drip = gable ? 2 * L + 2 * W * factor : 2 * (L + W);
+  const dripPcs = Math.ceil(drip / 10 - 1e-9);
+
+  // Ridge cap: ridge only on a gable; ridge plus four hips on a hip roof.
+  const half = W / 2;
+  const hipLen = half * Math.sqrt(2 + (v.pitch / 12) ** 2);
+  const ridge = gable ? L : Math.max(0, L - W) + 4 * hipLen;
+  const capBundles = Math.ceil(ridge / 25 - 1e-9);
+
+  out.set("squares", `${Calc.num(squares, 1)} squares`);
+  out.set("area", `${Calc.num(area, 0)} sq ft`);
+  out.set("bundles", Calc.num(bundles, 0));
+  out.set("rolls", Calc.num(rolls, 0));
+  out.set("drip", `${Calc.num(drip, 0)} ft (${dripPcs} × 10 ft)`);
+  out.set("ridge", `${Calc.num(ridge, 0)} ft (${capBundles} bundle${capBundles === 1 ? "" : "s"})`);
+  out.set("shingleCost", Calc.money(bundles * v.bundlePrice, 0));
+  out.set("installedCost", Calc.money(squares * v.installed, 0));
+
+  if (area <= 0) return;
+  if (v.pitch < 4) {
+    out.note("Below 4/12, shingle makers require a double layer of underlayment (or an ice-and-water membrane), and shingles are not allowed below 2/12. Budget extra underlayment.");
+  } else {
+    out.note(`Includes ${waste}% waste. Ridge cap assumes 25 linear ft per bundle; starter strip, flashing and ice-and-water shield are extra.`);
+  }
+}));
+</script>
+<!-- article -->
+<h2>How roofing is measured</h2>
+<p>Roofing is ordered by the <strong>square</strong>: 100 square feet of finished roof surface. Because a roof slopes,
+its surface is larger than the footprint of the house underneath it. This calculator starts from the footprint you
+can measure on the ground, adds the eave overhang on every side, and multiplies by a <strong>pitch factor</strong>
+that converts flat area into sloped area. The pitch factor is the length of a rafter per foot of horizontal run:
+√(rise² + 12²) ÷ 12. The same factor works for gable and hip roofs, because every plane of an equal-pitch roof has
+the same slope.</p>
+<p>A waste allowance is then added for cut-offs and the starter course: 10% for a simple gable, 15% for a hip roof
+(every hip needs angled cuts on both sides) and 20% for roofs broken up by valleys and dormers. Standard 3-tab and
+architectural shingles come <strong>three bundles to a square</strong>.</p>
+
+<h3>Common pitch factors</h3>
+<table>
+  <tr><th>Pitch</th><th>Factor</th><th>Extra area</th></tr>
+  <tr><td>4/12</td><td>1.054</td><td>+5.4%</td></tr>
+  <tr><td>6/12</td><td>1.118</td><td>+11.8%</td></tr>
+  <tr><td>8/12</td><td>1.202</td><td>+20.2%</td></tr>
+  <tr><td>10/12</td><td>1.302</td><td>+30.2%</td></tr>
+  <tr><td>12/12</td><td>1.414</td><td>+41.4%</td></tr>
+</table>
+
+<h2>The formula</h2>
+<div class="formula">pitch factor = √(rise² + 144) ÷ 12<br>
+roof area = (length + 2 × overhang) × (width + 2 × overhang) × pitch factor<br>
+squares = roof area × (1 + waste %) ÷ 100<br>
+bundles = squares × 3, rounded up<br>
+underlayment rolls = roof area × (1 + waste %) ÷ roll coverage, rounded up</div>
+
+<h2>Example: a 50 × 30 ft ranch house</h2>
+<p>A 50 × 30 ft house with a 6/12 gable roof, 12 inch overhangs, synthetic underlayment, shingles at $42 a
+bundle and an installed price of $550 per square.</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Footprint with overhang (52 × 32 ft)</td><td>1,664 sq ft</td></tr>
+  <tr><td>Roof surface (× 1.118)</td><td>1,860 sq ft</td></tr>
+  <tr><td>Plus 10% waste</td><td>2,046 sq ft</td></tr>
+  <tr><td><strong>Squares to order</strong></td><td><strong>20.5 squares</strong></td></tr>
+  <tr><td>Shingle bundles (20.46 × 3, rounded up)</td><td>62</td></tr>
+  <tr><td>Synthetic underlayment (1,000 sq ft rolls)</td><td>3 rolls</td></tr>
+  <tr><td>Drip edge (104 ft eaves + 72 ft rakes)</td><td>176 ft (18 × 10 ft)</td></tr>
+  <tr><td>Ridge cap (52 ft ridge)</td><td>3 bundles</td></tr>
+  <tr><td>Shingle cost (62 × $42)</td><td>$2,604</td></tr>
+  <tr><td>Installed estimate (20.46 × $550)</td><td>$11,255</td></tr>
+</table>
+<p>Switch the same house to a hip roof and the ridge shrinks to 20 ft, but four 24 ft hips are added, so ridge cap
+rises to 116 ft (5 bundles) and waste goes to 15%.</p>
+
+<h2>Materials beyond the shingles</h2>
+<h3>Underlayment</h3>
+<p>Synthetic underlayment usually comes in 48 in × 250 ft rolls covering 10 squares. Traditional felt covers far less:
+a roll of #15 felt does about 4 squares and #30 felt about 2. On pitches from 2/12 up to 4/12, shingle manufacturers
+require a double layer, so plan on twice the rolls.</p>
+<h3>Drip edge and ridge cap</h3>
+<p>Drip edge is metal trim along the eaves and rakes, sold in 10 ft lengths that overlap a couple of inches, so round
+up. Hip and ridge cap shingles are sold by the linear foot; a bundle such as GAF Seal-A-Ridge covers about 25 ft.
+Check your brand, since some cover only 20 ft.</p>
+<h3>Things this estimate leaves out</h3>
+<p>Starter strip shingles (roughly one bundle per 100 to 120 ft of eave and rake), ice-and-water shield along the eaves
+in cold climates and in valleys, step and chimney flashing, pipe boots, vents and roofing nails. If the old roof has two
+layers to tear off, expect the installed price per square to climb.</p>
+<h3>Measure twice</h3>
+<p>For an L-shaped or T-shaped house, split the footprint into rectangles, run each one, and add the squares. Garages
+and porches with their own roofs count too. A roofer's quote based on an aerial or on-roof measurement will be more
+precise, but this estimate tells you whether a quote is in the right range.</p>

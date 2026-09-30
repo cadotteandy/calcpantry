@@ -1,0 +1,196 @@
+---
+{
+  "title": "Flip Profit Calculator: Reseller ROI, Margin & Max Buy",
+  "description": "Calculate profit, ROI, margin and profit per hour on any flip, with eBay, Poshmark, Mercari and Etsy fee presets, and find the most you should pay for an item.",
+  "h1": "Flip Profit Calculator",
+  "short": "Flip Profit Calculator",
+  "intro": "Enter what you paid, what it sold for and your costs to see your real profit, ROI and hourly rate on a flip, plus the most you should pay next time.",
+  "updated": "September 2026",
+  "related": ["ebay-fee-calculator", "poshmark-fee-calculator", "mercari-fee-calculator", "side-hustle-tax-calculator"],
+  "faq": [
+    {"q": "How do you calculate ROI on a flip?", "a": "Resellers usually calculate ROI as profit divided by what you paid for the item. If you buy a jacket for $12 and make $17.48 after fees, shipping and supplies, your ROI is 17.48 ÷ 12, or 145.7%."},
+    {"q": "What's the difference between ROI and profit margin?", "a": "ROI compares profit to what you paid for the item, so it tells you how hard your buying money worked. Margin compares profit to the sale price, so it tells you how much of each sale you keep. A $2 item that sells for $20 can have a huge ROI but only a moderate margin after fees."},
+    {"q": "What is a good ROI for reselling?", "a": "Many resellers aim for at least 100% ROI (doubling their money after all costs) on low-priced items, because it leaves room for returns, unsold inventory and time. On expensive items, a lower ROI can still mean a large dollar profit."},
+    {"q": "How accurate are the platform presets?", "a": "They use each platform's standard 2026 US rates on the sale price: eBay 13.6% + $0.40, Poshmark 20% ($2.95 under $15), Mercari 10%, and Etsy about 9.5% + $0.45. eBay, Mercari and Etsy also charge on buyer-paid shipping, and eBay on sales tax, so use the platform's own calculator for exact fees."},
+    {"q": "Should I count my time and mileage?", "a": "Yes, if you want to know whether reselling is worth it. Mileage at the IRS rate (76 cents per mile from July 1, 2026) captures the real cost of sourcing trips, and profit per hour shows whether a flip beats the value you put on your time."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="buy">Buy price</label>
+          <div class="input"><span class="unit pre">$</span><input id="buy" name="buy" type="number" min="0" step="0.01" value="12" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="sale">Sale price</label>
+          <div class="input"><span class="unit pre">$</span><input id="sale" name="sale" type="number" min="0" step="0.01" value="45" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="platform">Platform fees</label>
+        <select id="platform" name="platform">
+          <option value="ebay">eBay (13.6% + $0.40)</option>
+          <option value="poshmark">Poshmark (20%, $2.95 under $15)</option>
+          <option value="mercari">Mercari (10%)</option>
+          <option value="etsy">Etsy (≈9.5% + $0.45)</option>
+          <option value="custom">Custom…</option>
+        </select>
+      </div>
+      <div class="row2" data-show="custom" hidden>
+        <div class="field">
+          <label for="customPct">Fee rate</label>
+          <div class="input"><input id="customPct" name="customPct" type="number" min="0" max="50" step="0.1" value="10" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+        <div class="field">
+          <label for="customFixed">Fixed fee</label>
+          <div class="input"><span class="unit pre">$</span><input id="customFixed" name="customFixed" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="shipCost">Shipping you pay</label>
+          <div class="input"><span class="unit pre">$</span><input id="shipCost" name="shipCost" type="number" min="0" step="0.01" value="8" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="supplies">Supplies</label>
+          <div class="input"><span class="unit pre">$</span><input id="supplies" name="supplies" type="number" min="0" step="0.01" value="1" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="miles">Miles driven</label>
+          <div class="input"><input id="miles" name="miles" type="number" min="0" step="1" value="0" inputmode="decimal"><span class="unit">mi</span></div>
+        </div>
+        <div class="field">
+          <label for="mileRate">Cost per mile</label>
+          <div class="input"><span class="unit pre">$</span><input id="mileRate" name="mileRate" type="number" min="0" step="0.01" value="0.76" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="hours">Hours spent</label>
+          <div class="input"><input id="hours" name="hours" type="number" min="0" step="0.25" value="0.5" inputmode="decimal"><span class="unit">hr</span></div>
+        </div>
+        <div class="field">
+          <label for="hourly">Your time is worth</label>
+          <div class="input"><span class="unit pre">$</span><input id="hourly" name="hourly" type="number" min="0" step="1" value="20" inputmode="decimal"><span class="unit">/hr</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="targetRoi">Target ROI</label>
+        <div class="input"><input id="targetRoi" name="targetRoi" type="number" min="0" step="5" value="100" inputmode="decimal"><span class="unit">%</span></div>
+        <div class="hint">Used to find the most you should pay for an item like this.</div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Profit</span><b data-out="profit">—</b></div>
+    <div class="result"><span>ROI (on buy price)</span><b data-out="roi">—</b></div>
+    <div class="result"><span>Profit margin</span><b data-out="margin">—</b></div>
+    <div class="result"><span>Platform fees</span><b data-out="fees">—</b></div>
+    <div class="result" data-show="miles" hidden><span>Mileage cost</span><b data-out="mileage">—</b></div>
+    <div class="result" data-show="hours"><span>Profit per hour</span><b data-out="perHour">—</b></div>
+    <div class="result" data-show="hours"><span>Profit after your time</span><b data-out="afterTime">—</b></div>
+    <div class="result"><span>Max buy price for target ROI</span><b data-out="maxBuy">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const presets = { ebay: [13.6, 0.40], mercari: [10, 0], etsy: [9.5, 0.45] };
+  out.show("custom", v.platform === "custom");
+
+  let fees;
+  if (v.sale <= 0) fees = 0;
+  else if (v.platform === "poshmark") fees = v.sale < 15 ? 2.95 : v.sale * 0.20;
+  else {
+    const [pct, fixed] = v.platform === "custom" ? [v.customPct, v.customFixed] : presets[v.platform];
+    fees = v.sale * pct / 100 + fixed;
+  }
+
+  const mileage = v.miles * v.mileRate;
+  const otherCosts = fees + v.shipCost + v.supplies + mileage;  // everything except the buy price
+  const profit = v.sale - otherCosts - v.buy;
+  const timeCost = v.hours * v.hourly;
+  const maxBuy = (v.sale - otherCosts) / (1 + v.targetRoi / 100);
+
+  out.set("profit", Calc.money(profit), Calc.tone(profit));
+  out.set("roi", v.buy > 0 ? Calc.pct(profit / v.buy) : "—");
+  out.set("margin", v.sale > 0 ? Calc.pct(profit / v.sale) : "—");
+  out.set("fees", Calc.money(fees));
+  out.show("miles", v.miles > 0);
+  out.set("mileage", Calc.money(mileage));
+  out.show("hours", v.hours > 0);
+  out.set("perHour", v.hours > 0 ? Calc.money(profit / v.hours) + "/hr" : "—");
+  out.set("afterTime", Calc.money(profit - timeCost), Calc.tone(profit - timeCost));
+  out.set("maxBuy", Calc.money(Math.max(0, maxBuy)));
+
+  if (v.buy > 0 && v.buy > maxBuy) out.note(`You paid more than the ${Calc.money(Math.max(0, maxBuy))} that would hit a ${Calc.num(v.targetRoi, 0)}% ROI.`);
+  else if (v.hours > 0 && profit / v.hours < v.hourly) out.note(`This flip pays less than your ${Calc.money(v.hourly, 0)}/hr target.`);
+  else if (v.hours > 0) out.note(`This flip beats your ${Calc.money(v.hourly, 0)}/hr target by ${Calc.money(profit / v.hours - v.hourly)} an hour.`);
+}));
+</script>
+<!-- article -->
+<h2>How to calculate profit on a flip</h2>
+<p>The sale price is never what you make. Between the buyer's payment and your pocket sit the platform's fees, the
+shipping label, packing supplies and, if you're honest about it, the gas and time it took to find the item. This
+calculator subtracts all of them, then shows the result three ways:</p>
+<ul>
+  <li><strong>ROI</strong> is profit divided by what you paid for the item. It shows how hard your sourcing money
+  worked, and it's the number most resellers use to decide what to buy.</li>
+  <li><strong>Margin</strong> is profit divided by the sale price: how much of each sale you keep.</li>
+  <li><strong>Profit per hour</strong> divides profit by the time you spent sourcing, listing, packing and shipping.
+  It's the number that tells you whether a flip was worth doing at all.</li>
+</ul>
+<p>The <strong>max buy price</strong> works backward: given the expected sale price and costs, it's the most you can
+pay and still hit your target ROI. It's the number to have in your head when you're standing in a thrift store.</p>
+
+<h2>The formula</h2>
+<div class="formula">costs = platform fees + shipping + supplies + miles × cost per mile<br>
+profit = sale price − costs − buy price<br>
+ROI = profit ÷ buy price<br>
+margin = profit ÷ sale price<br>
+max buy price = (sale price − costs) ÷ (1 + target ROI)</div>
+
+<h2>Example: a $12 jacket sold for $45 on eBay</h2>
+<p>You buy a jacket at a thrift store for $12, sell it on eBay for $45 with free shipping, and pay $8 for the label and
+$1 for a poly mailer. Listing, packing and the post office run take half an hour, and you value your time at $20 an
+hour.</p>
+<table>
+  <tr><th>Line</th><th>Amount</th></tr>
+  <tr><td>eBay fees (13.6% of $45 + $0.40)</td><td>$6.52</td></tr>
+  <tr><td>Shipping and supplies</td><td>$9.00</td></tr>
+  <tr><td>Buy price</td><td>$12.00</td></tr>
+  <tr><td><strong>Profit ($45 − $6.52 − $9 − $12)</strong></td><td><strong>$17.48</strong></td></tr>
+  <tr><td>ROI ($17.48 ÷ $12)</td><td>145.7%</td></tr>
+  <tr><td>Margin ($17.48 ÷ $45)</td><td>38.8%</td></tr>
+  <tr><td>Profit per hour ($17.48 ÷ 0.5 hr)</td><td>$34.96/hr</td></tr>
+  <tr><td>Profit after valuing your time at $20/hr</td><td>$7.48</td></tr>
+  <tr><td>Max buy price for 100% ROI ($29.48 ÷ 2)</td><td>$14.74</td></tr>
+</table>
+<p>Paying up to $14.74 for another jacket like this would still double your money. At $20, the ROI falls to about
+47%, and profit per hour drops to $18.96.</p>
+
+<h3>About the fee presets</h3>
+<p>The presets use each platform's standard US rates for 2026, applied to the sale price: eBay 13.6% + $0.40, Poshmark
+20% (a flat $2.95 under $15), Mercari 10%, and Etsy's 6.5% transaction fee plus 3% + $0.25 processing plus the $0.20
+listing fee. They're built for quick comparisons. eBay and Etsy also charge on shipping and some taxes, and Poshmark
+buyers pay the shipping label, so set "Shipping you pay" to $0 for Poshmark sales.</p>
+
+<h2>Tips for better flips</h2>
+<ul>
+  <li><strong>Decide your max before you shop.</strong> Look up sold listings, plug in the expected price, and let the
+  max buy number keep you from overpaying.</li>
+  <li><strong>Count every trip.</strong> A 20-mile sourcing run at 76 cents per mile costs $15.20, more than many
+  items make.</li>
+  <li><strong>Be wary of cheap items.</strong> A $3 item that sells for $12 shows a big ROI, but fees and a label can
+  leave almost nothing per hour of work.</li>
+  <li><strong>Track your real hourly rate.</strong> If it's consistently below your target, raise your minimum sale
+  price or source in bulk.</li>
+  <li><strong>Keep records for taxes.</strong> Profit from selling items for more than you paid is taxable income, and
+  mileage, supplies and fees are deductible costs.</li>
+</ul>

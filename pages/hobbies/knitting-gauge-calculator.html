@@ -1,0 +1,259 @@
+---
+{
+  "title": "Knitting Gauge Calculator: Cast On & Size Check",
+  "description": "Turn your swatch gauge into stitches to cast on and rows to knit, rounded to a pattern multiple, or see how a different gauge changes a pattern's size.",
+  "h1": "Knitting Gauge Calculator",
+  "short": "Knitting Gauge Calculator",
+  "intro": "Enter your swatch gauge and the size you want to knit. Get the cast-on count, adjusted to your stitch pattern's multiple, and the rows needed, or check what happens when your gauge doesn't match the pattern.",
+  "related": ["blanket-yarn-calculator", "cross-stitch-fabric-calculator", "fabric-yardage-calculator", "quilt-calculator"],
+  "faq": [
+    {"q": "How do I calculate how many stitches to cast on?", "a": "Divide the stitches in your gauge by the width they were measured over to get stitches per inch, then multiply by the finished width you want. At 20 stitches per 4 inches, that is 5 stitches per inch, so a 21 inch wide piece needs 105 stitches. Round to the nearest number that fits your stitch pattern."},
+    {"q": "What does a multiple of 4 plus 2 mean?", "a": "The stitch pattern repeats every 4 stitches, and it needs 2 extra stitches to balance the edges. Valid cast-on counts are 4 times any whole number plus 2, such as 98, 102 or 106. The calculator rounds your target to the closest valid count."},
+    {"q": "What happens if my gauge is off from the pattern?", "a": "Your finished piece changes size in proportion. The pattern's stitch count stays the same, so if you get 22 stitches per 4 inches instead of the pattern's 20, each stitch is narrower and a 40 inch sweater comes out about 36.4 inches. Half a stitch per inch can mean several inches around a body."},
+    {"q": "Should I measure gauge before or after blocking?", "a": "After. Wash and block your swatch the same way you will treat the finished piece, let it dry, then measure. Many yarns, especially wool, superwash and plant fibers, grow or relax when wet, and a swatch measured on the needles can be misleading."},
+    {"q": "How big should a gauge swatch be?", "a": "Knit at least 6 by 6 inches, or about 15 by 15 cm, so you can measure 4 inches or 10 cm in the middle, away from the edges. Measure in a few places and average. Knit the swatch in the stitch pattern the instructions specify."},
+    {"q": "Do I need to match row gauge?", "a": "Stitch gauge matters most because it sets the width. Row gauge matters when a pattern gives lengths in rows, and for shaping like raglan decreases or sock heels. If you can match only one, match stitch gauge and knit lengths to measurement."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="mode">I want to</label>
+          <select id="mode" name="mode">
+            <option value="cast" selected>Plan a cast-on</option>
+            <option value="compare">Compare to pattern gauge</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="unit">Units</label>
+          <select id="unit" name="unit">
+            <option value="in" selected>Inches</option>
+            <option value="cm">Centimeters</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="over">Gauge measured over</label>
+        <div class="input"><input id="over" name="over" type="number" min="0" step="0.5" value="4" inputmode="decimal"><span class="unit" data-out="u">in</span></div>
+        <div class="hint">Usually 4 in or 10 cm.</div>
+      </div>
+
+      <div data-show="cast">
+        <div class="fields">
+          <div class="row2">
+            <div class="field">
+              <label for="sts">Your stitches</label>
+              <div class="input"><input id="sts" name="sts" type="number" min="0" step="0.5" value="20" inputmode="decimal"><span class="unit">sts</span></div>
+            </div>
+            <div class="field">
+              <label for="rows">Your rows</label>
+              <div class="input"><input id="rows" name="rows" type="number" min="0" step="0.5" value="28" inputmode="decimal"><span class="unit">rows</span></div>
+            </div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="width">Finished width</label>
+              <div class="input"><input id="width" name="width" type="number" min="0" step="0.25" value="21" inputmode="decimal"><span class="unit" data-out="u">in</span></div>
+            </div>
+            <div class="field">
+              <label for="length">Finished length</label>
+              <div class="input"><input id="length" name="length" type="number" min="0" step="0.25" value="24" inputmode="decimal"><span class="unit" data-out="u">in</span></div>
+            </div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="mult">Multiple of</label>
+              <div class="input"><input id="mult" name="mult" type="number" min="1" step="1" value="4" inputmode="numeric"><span class="unit">sts</span></div>
+            </div>
+            <div class="field">
+              <label for="plus">Plus</label>
+              <div class="input"><input id="plus" name="plus" type="number" min="0" step="1" value="2" inputmode="numeric"><span class="unit">sts</span></div>
+            </div>
+          </div>
+          <div class="hint">Use multiple 1, plus 0 for plain stockinette or garter.</div>
+        </div>
+      </div>
+
+      <div data-show="compare" hidden>
+        <div class="fields">
+          <div class="row2">
+            <div class="field">
+              <label for="pSts">Pattern stitches</label>
+              <div class="input"><input id="pSts" name="pSts" type="number" min="0" step="0.5" value="20" inputmode="decimal"><span class="unit">sts</span></div>
+            </div>
+            <div class="field">
+              <label for="pRows">Pattern rows</label>
+              <div class="input"><input id="pRows" name="pRows" type="number" min="0" step="0.5" value="28" inputmode="decimal"><span class="unit">rows</span></div>
+            </div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="ySts">Your stitches</label>
+              <div class="input"><input id="ySts" name="ySts" type="number" min="0" step="0.5" value="22" inputmode="decimal"><span class="unit">sts</span></div>
+            </div>
+            <div class="field">
+              <label for="yRows">Your rows</label>
+              <div class="input"><input id="yRows" name="yRows" type="number" min="0" step="0.5" value="30" inputmode="decimal"><span class="unit">rows</span></div>
+            </div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="pWidth">Pattern width</label>
+              <div class="input"><input id="pWidth" name="pWidth" type="number" min="0" step="0.25" value="40" inputmode="decimal"><span class="unit" data-out="u">in</span></div>
+            </div>
+            <div class="field">
+              <label for="pLength">Pattern length</label>
+              <div class="input"><input id="pLength" name="pLength" type="number" min="0" step="0.25" value="24" inputmode="decimal"><span class="unit" data-out="u">in</span></div>
+            </div>
+          </div>
+          <div class="hint">Finished measurements from the pattern's schematic or size chart.</div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div data-show="cast">
+      <div class="result big"><span>Stitches to cast on</span><b data-out="castOn">—</b></div>
+      <div class="result"><span>Exact for your width</span><b data-out="raw">—</b></div>
+      <div class="result"><span>Actual finished width</span><b data-out="actualW">—</b></div>
+      <div class="result"><span>Rows to knit</span><b data-out="rowsNeeded">—</b></div>
+      <div class="result"><span>Stitches per <span data-out="u1">inch</span></span><b data-out="spu">—</b></div>
+      <div class="result"><span>Rows per <span data-out="u2">inch</span></span><b data-out="rpu">—</b></div>
+    </div>
+    <div data-show="compare" hidden>
+      <div class="result big"><span>Your finished width</span><b data-out="yourW">—</b></div>
+      <div class="result"><span>Width difference</span><b data-out="diffW">—</b></div>
+      <div class="result"><span>Pattern stitch count</span><b data-out="pCount">—</b></div>
+      <div class="result"><span>Length if you knit by rows</span><b data-out="yourL">—</b></div>
+      <div class="result"><span>Length difference</span><b data-out="diffL">—</b></div>
+      <div class="result"><span>Stitches for the pattern width</span><b data-out="fixSts">—</b></div>
+    </div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // Convert the length fields when the unit changes (runs before Calc's own change handler).
+  const unitSel = document.getElementById("unit");
+  let lastUnit = unitSel.value;
+  unitSel.addEventListener("change", () => {
+    if (unitSel.value === lastUnit) return;
+    const toCm = unitSel.value === "cm";
+    const over = document.getElementById("over");
+    const ov = parseFloat(over.value) || 0;
+    if (toCm && ov === 4) over.value = 10;
+    else if (!toCm && ov === 10) over.value = 4;
+    else over.value = +(toCm ? ov * 2.54 : ov / 2.54).toFixed(1);
+    for (const id of ["width", "length", "pWidth", "pLength"]) {
+      const el = document.getElementById(id), x = parseFloat(el.value) || 0;
+      el.value = +(toCm ? x * 2.54 : x / 2.54).toFixed(1);
+    }
+    lastUnit = unitSel.value;
+  });
+
+  Calc.run((v, out) => {
+    const cm = v.unit === "cm", u = cm ? "cm" : "in", word = cm ? "cm" : "inch";
+    out.set("u", u); out.set("u1", word); out.set("u2", word);
+    const cast = v.mode === "cast";
+    out.show("cast", cast); out.show("compare", !cast);
+    const signed = (x, d) => (x > 0 ? "+" : x < 0 ? "−" : "") + Calc.num(Math.abs(x), d);
+    if (v.over <= 0) { out.note("Enter the width your gauge was measured over."); return; }
+
+    if (cast) {
+      if (v.sts <= 0 || v.width <= 0) { out.note("Enter your stitch gauge and the finished width."); return; }
+      const spu = v.sts / v.over, rpu = v.rows / v.over;
+      const raw = v.width * spu;
+      const m = Math.max(1, Math.round(v.mult)), r = Math.max(0, Math.round(v.plus));
+      const k = Math.max(0, Math.round((raw - r) / m));
+      const count = k * m + r;
+      const lower = Math.max(r, Math.floor((raw - r) / m) * m + r);
+      const upper = Math.ceil((raw - r) / m) * m + r;
+      const rowsNeeded = Math.round(v.length * rpu);
+      out.set("castOn", `${count} sts`);
+      out.set("raw", `${Calc.num(raw, 1)} sts`);
+      out.set("actualW", `${Calc.num(count / spu, 2)} ${u}`);
+      out.set("rowsNeeded", v.rows > 0 && v.length > 0 ? `${rowsNeeded} rows` : "—");
+      out.set("spu", Calc.num(spu, 2));
+      out.set("rpu", v.rows > 0 ? Calc.num(rpu, 2) : "—");
+      if (m > 1 && lower !== upper) {
+        out.note(`Closest counts that fit a multiple of ${m} + ${r}: ${lower} sts (${Calc.num(lower / spu, 2)} ${u}) or ${upper} sts (${Calc.num(upper / spu, 2)} ${u}). Add edge or selvage stitches on top if your pattern calls for them.`);
+      } else {
+        out.note("Measure gauge on a washed and blocked swatch, over the middle of the fabric. Add selvage stitches if your pattern calls for them.");
+      }
+    } else {
+      if (v.pSts <= 0 || v.ySts <= 0 || v.pWidth <= 0) { out.note("Enter both stitch gauges and the pattern width."); return; }
+      const pCount = v.pWidth * v.pSts / v.over;
+      const yourW = v.pWidth * v.pSts / v.ySts;
+      const dW = yourW - v.pWidth;
+      out.set("yourW", `${Calc.num(yourW, 2)} ${u}`);
+      out.set("diffW", `${signed(dW, 2)} ${u} (${signed(dW / v.pWidth * 100, 1)}%)`, Math.abs(dW / v.pWidth) < 0.02 ? "pos" : "neg");
+      out.set("pCount", `${Calc.num(pCount, 0)} sts`);
+      if (v.pRows > 0 && v.yRows > 0 && v.pLength > 0) {
+        const yourL = v.pLength * v.pRows / v.yRows, dL = yourL - v.pLength;
+        out.set("yourL", `${Calc.num(yourL, 2)} ${u}`);
+        out.set("diffL", `${signed(dL, 2)} ${u}`);
+      } else { out.set("yourL", "—"); out.set("diffL", "—"); }
+      out.set("fixSts", `${Calc.num(v.pWidth * v.ySts / v.over, 0)} sts at your gauge`);
+      const tighter = v.ySts > v.pSts;
+      out.note(v.ySts === v.pSts ? "Your stitch gauge matches the pattern."
+        : `You have ${tighter ? "more" : "fewer"} stitches per ${v.over} ${u} than the pattern, so your fabric comes out ${tighter ? "smaller" : "larger"}. Try a needle ${tighter ? "one or two sizes larger" : "one or two sizes smaller"}, or follow a different size's stitch counts. Lengths worked "to measurement" are unaffected by row gauge.`);
+    }
+  });
+});
+</script>
+<!-- article -->
+<h2>How knitting gauge turns into stitch counts</h2>
+<p>Gauge is the number of stitches and rows in a set width of knitted fabric, usually 4 inches or 10 cm. It depends on
+your yarn, your needles and your hands, so two knitters following the same pattern can get noticeably different
+sizes. Once you know your gauge, every measurement becomes simple arithmetic: stitches per inch times the width you
+want gives the cast-on, and rows per inch times the length gives the rows to knit.</p>
+<p>Most stitch patterns only work with certain stitch counts. A pattern written as "a multiple of 4 + 2" repeats
+every 4 stitches and needs 2 extra to balance the edges, so the cast-on must be 4 × something + 2. The calculator
+rounds your exact target to the nearest valid count and shows the next count up and down so you can choose.</p>
+
+<h2>The formulas</h2>
+<div class="formula">stitches per inch = gauge stitches ÷ gauge width<br>
+target stitches = finished width × stitches per inch<br>
+cast on = multiple × round((target − plus) ÷ multiple) + plus<br>
+rows = round(finished length × rows per inch)<br>
+your width = pattern width × pattern gauge ÷ your gauge</div>
+
+<h2>Example: a 21 inch wide piece in a 4 + 2 pattern</h2>
+<p>Your blocked swatch measures 20 stitches and 28 rows over 4 inches. You want a piece 21 inches wide and 24 inches
+long in a rib that needs a multiple of 4 + 2 stitches.</p>
+<table>
+  <tr><th>Step</th><th>Working</th><th>Result</th></tr>
+  <tr><td>Stitches per inch</td><td>20 ÷ 4</td><td>5</td></tr>
+  <tr><td>Exact stitches</td><td>21 × 5</td><td>105</td></tr>
+  <tr><td>Round to 4 + 2</td><td>4 × round(103 ÷ 4) + 2</td><td><strong>106 sts</strong></td></tr>
+  <tr><td>Actual width</td><td>106 ÷ 5</td><td>21.2 in</td></tr>
+  <tr><td>Rows per inch</td><td>28 ÷ 4</td><td>7</td></tr>
+  <tr><td>Rows to knit</td><td>24 × 7</td><td>168 rows</td></tr>
+</table>
+<p>The other nearby option is 102 stitches, which gives 20.4 inches. For a scarf either is fine; for a fitted
+garment, pick whichever is closer to the ease you want.</p>
+
+<h2>When your gauge doesn't match the pattern</h2>
+<p>Switch to "Compare to pattern gauge" to see the consequences. A pattern's stitch counts are fixed, so if you
+knit them at a different gauge the whole piece scales. Say a sweater is written for 20 stitches and 28 rows per 4
+inches with a 40 inch chest, and you get 22 stitches and 30 rows:</p>
+<table>
+  <tr><th>Measurement</th><th>Pattern</th><th>Yours</th></tr>
+  <tr><td>Stitches around chest</td><td>200</td><td>200</td></tr>
+  <tr><td>Chest width</td><td>40 in</td><td>36.36 in (−9.1%)</td></tr>
+  <tr><td>Length if knit by row count</td><td>24 in</td><td>22.4 in</td></tr>
+</table>
+<p>That is 3.64 inches too small, enough to turn a relaxed fit into a snug one. To fix it, go up a needle size and
+swatch again, or follow the stitch counts for a larger size. At your gauge a 40 inch chest needs 220 stitches.</p>
+
+<h2>Tips for an accurate swatch</h2>
+<ul>
+  <li><strong>Swatch bigger than you think.</strong> At least 6 × 6 inches (15 × 15 cm), so you can measure the middle and ignore the edges.</li>
+  <li><strong>Block it first.</strong> Wash and dry it the way you'll treat the finished item. Wool relaxes and cotton can grow.</li>
+  <li><strong>Use the right stitch and method.</strong> Knit in the pattern stitch, and in the round if the project is in the round, because many knitters purl looser than they knit.</li>
+  <li><strong>Count partial stitches.</strong> Half a stitch over 4 inches changes a 40 inch garment by about an inch.</li>
+</ul>

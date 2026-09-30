@@ -1,0 +1,147 @@
+---
+{
+  "title": "Mercari Fee Calculator 2026: 10% Fee, Payout & Profit",
+  "description": "Calculate Mercari's 10% selling fee, your payout and real profit after item cost, shipping and the optional $3 Instant Pay fee. Updated for 2026.",
+  "h1": "Mercari Fee Calculator",
+  "short": "Mercari Fee Calculator",
+  "intro": "Enter your sale price, who pays shipping and your costs to see Mercari's fee, your payout and what you actually make.",
+  "updated": "September 2026",
+  "related": ["poshmark-fee-calculator", "ebay-fee-calculator", "etsy-fee-calculator", "side-hustle-tax-calculator"],
+  "faq": [
+    {"q": "How much does Mercari take from a sale in 2026?", "a": "Mercari charges sellers a flat 10% selling fee on the item price plus any shipping the buyer pays. There is no separate payment processing fee on listings created or updated since January 6, 2025. On a $40 sale with seller-paid shipping, the fee is $4.00."},
+    {"q": "Does Mercari charge the 10% fee on shipping?", "a": "Only on shipping the buyer pays. If the buyer pays $7 for shipping on a $40 item, the fee is 10% of $47. If you offer free shipping, the fee is 10% of the item price, but the label cost comes out of your earnings instead."},
+    {"q": "Does Mercari still charge a 2.9% + $0.50 processing fee?", "a": "Not on current listings. It was dropped for listings created or edited on or after January 6, 2025. Older listings that were never edited stay on the previous structure, where the seller pays no selling fee and the buyer pays the processing fee. Editing the listing moves it to the 10% structure."},
+    {"q": "How much is Mercari Instant Pay?", "a": "Instant Pay costs a flat $3 per transfer and sends your balance to an eligible debit card within minutes. Standard direct deposit to a bank account is free but takes a few business days."},
+    {"q": "Is Mercari cheaper than Poshmark or eBay?", "a": "For most sales, yes. Mercari's 10% is half of Poshmark's 20% commission and lower than eBay's 13.6% plus $0.40 in most categories. The trade-off is that Mercari charges its fee on buyer-paid shipping, and its audience is smaller than eBay's."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="price">Sold price</label>
+        <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="40" inputmode="decimal"></div>
+      </div>
+      <div class="field">
+        <label for="shipPayer">Who pays shipping?</label>
+        <select id="shipPayer" name="shipPayer">
+          <option value="seller">I pay (free shipping for buyer)</option>
+          <option value="buyer">Buyer pays</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="shipCost">Shipping label cost</label>
+        <div class="input"><span class="unit pre">$</span><input id="shipCost" name="shipCost" type="number" min="0" step="0.01" value="7.50" inputmode="decimal"></div>
+        <div class="hint" data-show="buyerShip" hidden>The buyer pays this, and Mercari's 10% fee applies to it.</div>
+        <div class="hint" data-show="sellerShip">Deducted from your earnings. Not included in the 10% fee.</div>
+      </div>
+      <div class="field">
+        <label for="itemCost">Item cost</label>
+        <div class="input"><span class="unit pre">$</span><input id="itemCost" name="itemCost" type="number" min="0" step="0.01" value="10" inputmode="decimal"></div>
+      </div>
+      <label class="check"><input type="checkbox" name="instantPay"> Cash out with Instant Pay ($3)</label>
+      <label class="check"><input type="checkbox" name="oldListing"> Listed before Jan 6, 2025 and never edited</label>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Profit</span><b data-out="profit">—</b></div>
+    <div class="result"><span>Mercari selling fee</span><b data-out="fee">—</b></div>
+    <div class="result" data-show="sellerShip"><span>Shipping label</span><b data-out="label">—</b></div>
+    <div class="result" data-show="instant" hidden><span>Instant Pay fee</span><b data-out="instantFee">—</b></div>
+    <div class="result"><span>Payout from Mercari</span><b data-out="payout">—</b></div>
+    <div class="result"><span>Profit margin</span><b data-out="margin">—</b></div>
+    <div class="result"><span>Break-even sold price</span><b data-out="breakeven">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const buyerShip = v.shipPayer === "buyer";
+  out.show("buyerShip", buyerShip);
+  out.show("sellerShip", !buyerShip);
+  out.show("instant", v.instantPay);
+
+  const rate = v.oldListing ? 0 : 0.10;
+  const feeBase = v.price + (buyerShip ? v.shipCost : 0);   // fee covers buyer-paid shipping only
+  const fee = v.price > 0 ? feeBase * rate : 0;
+  const label = buyerShip ? 0 : v.shipCost;
+  const instantFee = v.instantPay ? 3 : 0;
+  const payout = v.price - fee - label - instantFee;
+  const profit = payout - v.itemCost;
+
+  // Break-even price p: p - rate*(p + buyer shipping) - label - instant fee - item cost = 0
+  const breakeven = (v.itemCost + label + instantFee + (buyerShip ? rate * v.shipCost : 0)) / (1 - rate);
+
+  out.set("profit", Calc.money(profit), Calc.tone(profit));
+  out.set("fee", Calc.money(fee));
+  out.set("label", Calc.money(label));
+  out.set("instantFee", Calc.money(instantFee));
+  out.set("payout", Calc.money(payout));
+  out.set("margin", v.price > 0 ? Calc.pct(profit / v.price) : "—");
+  out.set("breakeven", Calc.money(breakeven));
+
+  if (v.oldListing) {
+    out.note("Old-structure listings carry no selling fee; the buyer pays a 2.9% + $0.50 processing fee instead. Editing the listing switches it to the 10% fee.");
+  } else if (buyerShip && v.price > 0) {
+    out.note(`Buyer-paid shipping adds ${Calc.money(v.shipCost * rate)} to your fee, since Mercari charges 10% on it too.`);
+  } else if (v.price > 0) {
+    out.note(`Mercari and shipping together take ${Calc.pct((fee + label) / v.price)} of your sold price.`);
+  }
+}));
+</script>
+<!-- article -->
+<h2>How Mercari fees work in 2026</h2>
+<p>Mercari US charges sellers one fee: a flat <strong>10% selling fee</strong>. It applies to the item price plus
+any shipping the buyer pays. Listing is free, there's no monthly charge, and since <strong>January 6, 2025</strong>
+there's no separate payment processing fee. The old 2.9% + $0.50 charge was dropped when the 10% fee came back.</p>
+<p>Buyers pay their own Buyer Protection fee at checkout. That doesn't come out of your earnings, so it isn't part
+of this calculator.</p>
+
+<h3>Buyer-paid vs. seller-paid shipping</h3>
+<p>This is where most Mercari math goes wrong. When the <strong>buyer pays shipping</strong>, the label cost is
+covered at checkout, but your 10% fee is calculated on the item price <em>plus</em> that shipping. When you offer
+<strong>free shipping</strong>, the fee applies to the item price only, and the full label cost is deducted from
+your earnings. Free shipping usually sells faster, so many sellers build the label into the price.</p>
+
+<h3>Older listings</h3>
+<p>Listings created before January 6, 2025 and never edited since stay on the previous structure. On those, the
+seller pays no selling fee and the buyer pays a 2.9% + $0.50 processing fee. Any edit moves the listing to the
+current 10% fee. Tick the box in the calculator if this applies to you.</p>
+
+<h3>Getting paid</h3>
+<p>Direct deposit to your bank is free. <strong>Instant Pay</strong> sends your balance to a debit card in minutes
+for a flat <strong>$3 per transfer</strong>. Because the fee is per transfer, not per sale, cash out several sales
+at once if you use it.</p>
+
+<h2>The formula</h2>
+<div class="formula">selling fee = (sold price + buyer-paid shipping) × 10%<br>
+payout = sold price − selling fee − seller-paid label − Instant Pay fee<br>
+profit = payout − item cost</div>
+
+<h2>Example: a $40 sale with free shipping</h2>
+<p>You sell a pair of sneakers you paid $10 for. You offer free shipping, and the label costs $7.50. You use free
+direct deposit.</p>
+<table>
+  <tr><th>Line</th><th>Amount</th></tr>
+  <tr><td>Sold price</td><td>$40.00</td></tr>
+  <tr><td>Selling fee (10% of $40)</td><td>$4.00</td></tr>
+  <tr><td>Shipping label (you pay)</td><td>$7.50</td></tr>
+  <tr><td><strong>Payout from Mercari</strong></td><td><strong>$28.50</strong></td></tr>
+  <tr><td>Minus item cost ($10)</td><td><strong>$18.50 profit</strong></td></tr>
+</table>
+<p>The lowest price that covers your costs here is $19.44. If the buyer paid the $7.50 shipping instead, your fee
+would rise to $4.75, but you'd skip the label, and profit would be $25.25.</p>
+
+<h2>Tips for Mercari sellers</h2>
+<ul>
+  <li><strong>Compare shipping options before you list.</strong> Mercari's prepaid labels are priced by weight; weigh
+  the packed item so you don't pick a tier that's too light.</li>
+  <li><strong>Price for offers.</strong> Buyers expect to negotiate. Set your floor at the break-even price plus the
+  profit you want.</li>
+  <li><strong>Batch your Instant Pay transfers.</strong> $3 on a $15 sale is 20% of the sale; spread over five sales
+  it barely registers.</li>
+  <li><strong>Relist carefully.</strong> Editing an old, never-updated listing moves it to the 10% fee.</li>
+  <li><strong>Track your cost basis.</strong> You'll need it at tax time if Mercari sends a 1099-K.</li>
+</ul>

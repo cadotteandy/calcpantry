@@ -1,0 +1,197 @@
+---
+{
+  "title": "Lease vs Buy Car Calculator: Which Costs Less?",
+  "description": "Compare the true cost of leasing versus financing a car over the same period, including down payment, sales tax, mileage overage fees and resale equity.",
+  "h1": "Lease vs Buy Calculator",
+  "short": "Lease vs Buy Calculator",
+  "intro": "Enter a loan offer and a lease offer for the same car to see which one costs less over the lease term, counting what the car is still worth if you buy.",
+  "updated": "September 2026",
+  "related": ["side-hustle-tax-calculator", "freelance-rate-calculator"],
+  "faq": [
+    {"q": "Is it cheaper to lease or buy a car?", "a": "Over a typical three-year window, leasing and buying often cost within a few thousand dollars of each other once you count the car's resale value. Buying usually wins the longer you keep the car, because payments end but the car keeps working. Leasing tends to win if you want a new car every few years, drive few miles, or the manufacturer is subsidizing the lease."},
+    {"q": "How much does a new car depreciate in 3 years?", "a": "Most new cars lose roughly 40% to 50% of their value in the first three years, so a resale value of 50% to 60% of the purchase price is a reasonable starting point. Trucks and some popular SUVs hold value better; luxury cars and many EVs lose more."},
+    {"q": "What happens if I go over the lease mileage limit?", "a": "You pay a fee for every mile over the allowance when you return the car, commonly 15 to 30 cents per mile. Driving 3,000 miles a year over a 12,000-mile allowance on a 36-month lease at 25 cents per mile adds $2,250. If you know you'll drive more, buying extra miles upfront is usually cheaper."},
+    {"q": "Should I put money down on a lease?", "a": "Keep it small. A big cap cost reduction lowers the monthly payment but doesn't lower the total cost much, and if the car is totaled early, gap coverage typically won't refund that money. Many advisors suggest paying only the first month, fees and taxes at signing."},
+    {"q": "How is sales tax handled on a lease versus a purchase?", "a": "When you buy, most states charge sales tax on the full price upfront. On a lease, most states tax each monthly payment instead, so you only pay tax on the part of the car you use. This calculator assumes your lease payment already includes tax."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="price">Car price</label>
+        <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="500" value="35000" inputmode="decimal"></div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="down">Down payment</label>
+          <div class="input"><span class="unit pre">$</span><input id="down" name="down" type="number" min="0" step="500" value="4000" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="salesTax">Sales tax</label>
+          <div class="input"><input id="salesTax" name="salesTax" type="number" min="0" max="15" step="0.1" value="7" inputmode="decimal"><span class="unit">%</span></div>
+          <div class="hint">Paid upfront when buying.</div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="apr">Loan APR</label>
+          <div class="input"><input id="apr" name="apr" type="number" min="0" max="30" step="0.1" value="6.5" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+        <div class="field">
+          <label for="loanTerm">Loan term</label>
+          <div class="input"><input id="loanTerm" name="loanTerm" type="number" min="1" max="96" step="1" value="60" inputmode="decimal"><span class="unit">mo</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="resalePct">Resale value at end of lease term</label>
+        <div class="input"><input id="resalePct" name="resalePct" type="number" min="0" max="100" step="1" value="55" inputmode="decimal"><span class="unit">% of price</span></div>
+        <div class="hint">Typical: about 50–60% after 3 years, 40–50% after 4.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="leasePay">Lease payment</label>
+          <div class="input"><span class="unit pre">$</span><input id="leasePay" name="leasePay" type="number" min="0" step="10" value="450" inputmode="decimal"><span class="unit">/ mo</span></div>
+          <div class="hint">Including tax.</div>
+        </div>
+        <div class="field">
+          <label for="leaseTerm">Lease term</label>
+          <div class="input"><input id="leaseTerm" name="leaseTerm" type="number" min="1" max="60" step="1" value="36" inputmode="decimal"><span class="unit">mo</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="dueSigning">Lease due at signing</label>
+        <div class="input"><span class="unit pre">$</span><input id="dueSigning" name="dueSigning" type="number" min="0" step="100" value="3000" inputmode="decimal"></div>
+        <div class="hint">Down payment, fees and first month, as quoted.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="allowance">Lease miles allowed</label>
+          <div class="input"><input id="allowance" name="allowance" type="number" min="0" step="1000" value="12000" inputmode="decimal"><span class="unit">/ yr</span></div>
+        </div>
+        <div class="field">
+          <label for="miles">Miles you'll drive</label>
+          <div class="input"><input id="miles" name="miles" type="number" min="0" step="1000" value="12000" inputmode="decimal"><span class="unit">/ yr</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="overFee">Overage fee</label>
+        <div class="input"><span class="unit pre">$</span><input id="overFee" name="overFee" type="number" min="0" step="0.01" value="0.25" inputmode="decimal"><span class="unit">/ mile</span></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Over the lease term</h2>
+    <div class="result big"><span data-out="verdictLabel">Result</span><b data-out="verdict">—</b></div>
+    <div class="result"><span>Total cost to buy</span><b data-out="buyTotal">—</b></div>
+    <div class="result"><span>Total cost to lease</span><b data-out="leaseTotal">—</b></div>
+    <div class="result"><span>Monthly loan payment</span><b data-out="pmt">—</b></div>
+    <div class="result"><span>Loan payments during term</span><b data-out="paid">—</b></div>
+    <div class="result"><span>Loan balance at term end</span><b data-out="balance">—</b></div>
+    <div class="result"><span>Car's resale value</span><b data-out="resale">—</b></div>
+    <div class="result"><span>Your equity</span><b data-out="equity">—</b></div>
+    <div class="result" data-show="overage" hidden><span>Mileage overage fees</span><b data-out="overage">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+// Monthly payment for a fully amortizing loan.
+function loanPayment(principal, monthlyRate, months) {
+  if (months <= 0) return 0;
+  if (monthlyRate === 0) return principal / months;
+  return principal * monthlyRate / (1 - Math.pow(1 + monthlyRate, -months));
+}
+// Balance left after k payments.
+function loanBalance(principal, monthlyRate, payment, k) {
+  if (monthlyRate === 0) return Math.max(0, principal - payment * k);
+  const g = Math.pow(1 + monthlyRate, k);
+  return Math.max(0, principal * g - payment * (g - 1) / monthlyRate);
+}
+
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const months = Math.round(v.leaseTerm);
+  const loanMonths = Math.round(v.loanTerm);
+  const principal = Math.max(0, v.price - v.down);
+  const r = v.apr / 100 / 12;
+
+  // Buying: down + tax + payments made during the lease term − equity at the end.
+  const pmt = loanPayment(principal, r, loanMonths);
+  const k = Math.min(months, loanMonths);
+  const paid = pmt * k;
+  const balance = months >= loanMonths ? 0 : loanBalance(principal, r, pmt, months);
+  const resale = v.price * v.resalePct / 100;
+  const equity = resale - balance;
+  const tax = v.price * v.salesTax / 100;
+  const buyTotal = v.down + tax + paid - equity;
+
+  // Leasing: due at signing + payments + mileage overage at turn-in.
+  // (Many leases include the first payment in the amount due at signing; enter the quote you were given.)
+  const overage = Math.max(0, v.miles - v.allowance) * (months / 12) * v.overFee;
+  const leaseTotal = v.dueSigning + v.leasePay * months + overage;
+
+  const diff = leaseTotal - buyTotal;
+  if (Math.abs(diff) < 0.005) {
+    out.set("verdictLabel", "Result");
+    out.set("verdict", "It's a tie");
+  } else {
+    out.set("verdictLabel", `${diff > 0 ? "Buying" : "Leasing"} saves you over ${months} months`);
+    out.set("verdict", Calc.money(Math.abs(diff)), "pos");
+  }
+  out.set("buyTotal", Calc.money(buyTotal));
+  out.set("leaseTotal", Calc.money(leaseTotal));
+  out.set("pmt", Calc.money(pmt));
+  out.set("paid", Calc.money(paid));
+  out.set("balance", Calc.money(balance));
+  out.set("resale", Calc.money(resale));
+  out.set("equity", Calc.money(equity), Calc.tone(equity));
+  out.show("overage", overage > 0);
+  out.set("overage", Calc.money(overage));
+
+  if (equity < 0) out.note("You'd owe more than the car is worth at the end of the term (negative equity). A bigger down payment or shorter loan helps.");
+  else if (loanMonths > k) out.note(`Keep the car and you have ${Calc.num(loanMonths - k, 0)} more loan payments of ${Calc.money(pmt)}, then no payments at all. Buying gets cheaper every year you keep driving.`);
+  else out.note("The loan is paid off by the end of the lease term, so from here on the bought car costs only insurance, fuel and upkeep.");
+}));
+</script>
+<!-- article -->
+<h2>How to compare a lease and a loan fairly</h2>
+<p>Monthly payments are the wrong way to compare. A lease payment is almost always lower, because you're only paying for the part of the car you use. The honest comparison is the <strong>total cost over the same period</strong>, and for a buyer that has to include what the car is still worth at the end.</p>
+<p>This calculator uses the lease term as the window. For buying, it adds up your down payment, the sales tax and the loan payments you'd make during that time, then subtracts your equity: the car's resale value minus whatever you still owe on the loan. For leasing, it adds the amount due at signing, every monthly payment, and any mileage overage fee at turn-in.</p>
+
+<h2>The formula</h2>
+<div class="formula">loan payment = P × r ÷ (1 − (1 + r)^−n)<br>
+balance after k months = P × (1 + r)^k − payment × ((1 + r)^k − 1) ÷ r<br>
+buy cost = down + sales tax + payments in term − (resale − balance)<br>
+lease cost = due at signing + lease payment × months + overage</div>
+<p>P is the amount financed (price minus down payment), r is the APR divided by 12 and n is the loan term in months.</p>
+
+<h2>Example: a $35,000 car over 36 months</h2>
+<p>The loan offer is 6.5% APR for 60 months with $4,000 down. The lease is $450 a month for 36 months with $3,000 due at signing and 12,000 miles a year, which matches your driving. Sales tax is 7%, and the car is expected to be worth 55% of its price after three years.</p>
+<table>
+  <tr><th>Buying</th><th>Amount</th></tr>
+  <tr><td>Down payment</td><td>$4,000.00</td></tr>
+  <tr><td>Sales tax (7% of $35,000)</td><td>$2,450.00</td></tr>
+  <tr><td>36 payments of $606.55</td><td>$21,835.82</td></tr>
+  <tr><td>Minus equity ($19,250.00 resale − $13,616.20 still owed)</td><td>−$5,633.80</td></tr>
+  <tr><td><strong>Total cost to buy</strong></td><td><strong>$22,652.02</strong></td></tr>
+  <tr><th>Leasing</th><th>Amount</th></tr>
+  <tr><td>Due at signing</td><td>$3,000.00</td></tr>
+  <tr><td>36 payments of $450</td><td>$16,200.00</td></tr>
+  <tr><td><strong>Total cost to lease</strong></td><td><strong>$19,200.00</strong></td></tr>
+</table>
+<p>Here leasing saves $3,452.02 over the three years. The buyer absorbs $15,750 of depreciation, $4,452.02 of loan interest and sales tax on the full $35,000 price, while the lease payments are taxed only on the part of the car used. Change the resale value to 62%, or the APR to 2.9%, and the gap shrinks to about $1,000.</p>
+
+<h2>What the calculator doesn't see</h2>
+<ul>
+  <li><strong>The years after the lease.</strong> If you'd keep a bought car for eight or ten years, buying usually wins by a wide margin, because you drive payment-free once the loan ends.</li>
+  <li><strong>Wear-and-tear charges.</strong> Lease returns can include fees for dents, worn tires and interior damage, plus a disposition fee of a few hundred dollars.</li>
+  <li><strong>Insurance and maintenance.</strong> Leases often require higher coverage limits; a newer car under warranty may cost less to maintain.</li>
+</ul>
+
+<h2>Tips before you sign</h2>
+<ul>
+  <li><strong>Negotiate the price first,</strong> for either option. A lease payment is based on the negotiated price (cap cost), not MSRP.</li>
+  <li><strong>Ask for the money factor.</strong> Multiply it by 2,400 to get the lease's equivalent APR and compare it with your loan offer.</li>
+  <li><strong>Be realistic about miles.</strong> Buying extra miles upfront is usually cheaper than paying overage at the end.</li>
+  <li><strong>Check the resale value</strong> of the exact model on a pricing guide for three-year-old cars; it's the biggest swing factor in this comparison.</li>
+</ul>

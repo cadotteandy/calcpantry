@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ site.name }}: Free Calculators for Sellers, Home Projects, Pets & Money{% endblock %}
+{% block description %}Free, fast calculators: marketplace fees and profit, paint and concrete amounts, dog food portions, 3D print costs, side hustle taxes and more.{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Quick answers to everyday math.</h1>
+  <p>Free calculators for sellers, home projects, pets, hobbies and money. No sign-up, and they work on your phone.</p>
+</section>
+{% for key, c in categories.items() %}
+<section class="cat-block">
+  <h2><a href="/{{ key }}/">{{ c.icon }} {{ c.name }}</a></h2>
+  <p>{{ c.blurb }}</p>
+  <div class="cards">
+    {% for p in by_cat[key] %}<a class="card" href="{{ p.path }}"><b>{{ p.short or p.h1 }}</b><span>{{ p.description }}</span></a>{% endfor %}
+  </div>
+</section>
+{% endfor %}
+{% endblock %}

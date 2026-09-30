@@ -1,0 +1,227 @@
+---
+{
+  "title": "Pet Cost Calculator: Yearly & Lifetime Dog or Cat Cost",
+  "description": "Estimate what a dog or cat really costs per year, per month, in the first year and over its lifetime, with editable food, vet, insurance and care costs.",
+  "h1": "Pet Cost Calculator",
+  "short": "Pet Cost Calculator",
+  "intro": "Pick a dog or cat and a size to load typical US costs, then edit any line to match your area and plans. You'll see the annual and monthly cost, the first-year total and a lifetime estimate.",
+  "updated": "September 2026",
+  "related": ["dog-food-calculator", "cat-food-calculator", "emergency-fund-calculator", "savings-goal-calculator"],
+  "faq": [
+    {"q": "How much does a dog cost per year?", "a": "Typical US estimates run from about $1,400 to over $5,000 a year depending on size, health and how much care you pay for, according to Rover's 2025 cost survey. This calculator's medium dog preset, including pet insurance and some pet sitting, comes to $2,925 a year, or about $244 a month."},
+    {"q": "How much does a cat cost per year?", "a": "Rover's 2025 survey puts annual cat costs at roughly $830 to $3,095. The cat preset here, with insurance, litter and some pet sitting, totals $1,995 a year. Skipping insurance and boarding brings a healthy indoor cat closer to $1,300."},
+    {"q": "Why is the first year more expensive?", "a": "The first year adds one-time costs on top of normal care: an adoption fee, spay or neuter surgery if it is not included, and start-up supplies such as a crate, bed, bowls, leash or litter box and carrier. Puppies and kittens also need a series of vaccine boosters in the first months."},
+    {"q": "Is pet insurance worth including?", "a": "It depends on how you would handle a large bill. According to NAPHIA's 2025 industry report, accident and illness cover averaged about $749 a year for dogs and $386 for cats in 2024. If you skip it, set the line to zero, but consider setting aside a similar amount in an emergency fund, since a single surgery can cost thousands."},
+    {"q": "Does the lifetime estimate include inflation or emergencies?", "a": "No. It multiplies today's annual cost by the expected lifespan and adds first-year costs. Real costs usually rise with inflation and as pets age, and older pets often need dental work, bloodwork and medications, so treat the lifetime figure as a floor rather than a ceiling."},
+    {"q": "How can I lower the cost of owning a pet?", "a": "Adopt from a shelter where spay, neuter, vaccines and a microchip are often included, use low-cost vaccine clinics, buy preventatives in multi-month packs, groom at home, and keep your pet at a healthy weight, which reduces food costs and future vet bills."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="species">Pet</label>
+          <select id="species" name="species">
+            <option value="dog" selected>Dog</option>
+            <option value="cat">Cat</option>
+          </select>
+        </div>
+        <div class="field" data-show="dogsize">
+          <label for="size">Dog size</label>
+          <select id="size" name="size">
+            <option value="small">Small (under 25 lb)</option>
+            <option value="medium" selected>Medium (25–50 lb)</option>
+            <option value="large">Large (50–90 lb)</option>
+            <option value="giant">Giant (90+ lb)</option>
+          </select>
+        </div>
+      </div>
+      <div class="hint">Changing pet or size reloads typical costs. Then edit any line below.</div>
+      <h3 style="margin: 8px 0 0; font-size: 16px;">Yearly costs</h3>
+      <div class="row2">
+        <div class="field">
+          <label for="food">Food</label>
+          <div class="input"><span class="unit pre">$</span><input id="food" name="food" type="number" min="0" step="10" value="500" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="vet">Vet checkups</label>
+          <div class="input"><span class="unit pre">$</span><input id="vet" name="vet" type="number" min="0" step="10" value="275" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="vaccines">Vaccines</label>
+          <div class="input"><span class="unit pre">$</span><input id="vaccines" name="vaccines" type="number" min="0" step="10" value="110" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="prevent">Flea, tick &amp; worm prevention</label>
+          <div class="input"><span class="unit pre">$</span><input id="prevent" name="prevent" type="number" min="0" step="10" value="360" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="insurance">Pet insurance</label>
+          <div class="input"><span class="unit pre">$</span><input id="insurance" name="insurance" type="number" min="0" step="10" value="750" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="grooming">Grooming</label>
+          <div class="input"><span class="unit pre">$</span><input id="grooming" name="grooming" type="number" min="0" step="10" value="200" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="toys">Toys &amp; treats</label>
+          <div class="input"><span class="unit pre">$</span><input id="toys" name="toys" type="number" min="0" step="10" value="250" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="boarding">Boarding / pet sitting</label>
+          <div class="input"><span class="unit pre">$</span><input id="boarding" name="boarding" type="number" min="0" step="10" value="400" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="license">License</label>
+          <div class="input"><span class="unit pre">$</span><input id="license" name="license" type="number" min="0" step="1" value="20" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="supplies" data-out="suppliesLabel">Poop bags &amp; supplies</label>
+          <div class="input"><span class="unit pre">$</span><input id="supplies" name="supplies" type="number" min="0" step="10" value="60" inputmode="decimal"></div>
+        </div>
+      </div>
+      <h3 style="margin: 8px 0 0; font-size: 16px;">First-year one-time costs</h3>
+      <div class="row2">
+        <div class="field">
+          <label for="adoption">Adoption fee</label>
+          <div class="input"><span class="unit pre">$</span><input id="adoption" name="adoption" type="number" min="0" step="10" value="250" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="spay">Spay / neuter</label>
+          <div class="input"><span class="unit pre">$</span><input id="spay" name="spay" type="number" min="0" step="10" value="300" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="startup">Start-up supplies</label>
+          <div class="input"><span class="unit pre">$</span><input id="startup" name="startup" type="number" min="0" step="10" value="400" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="lifespan">Expected lifespan</label>
+          <div class="input"><input id="lifespan" name="lifespan" type="number" min="1" max="30" step="1" value="12" inputmode="decimal"><span class="unit">years</span></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Yearly cost</span><b data-out="annual">—</b></div>
+    <div class="result"><span>Per month</span><b data-out="monthly">—</b></div>
+    <div class="result"><span>One-time costs</span><b data-out="oneTime">—</b></div>
+    <div class="result"><span>First-year total</span><b data-out="first">—</b></div>
+    <div class="result"><span data-out="lifeLabel">Lifetime estimate</span><b data-out="lifetime">—</b></div>
+    <div class="result"><span>Biggest yearly cost</span><b data-out="biggest">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+(() => {
+  // Typical US yearly and one-time costs (see article for sources). Order matches FIELDS.
+  const FIELDS = ["food", "vet", "vaccines", "prevent", "insurance", "grooming", "toys", "boarding", "license", "supplies", "adoption", "spay", "startup", "lifespan"];
+  const PRESETS = {
+    "dog-small":  [300, 250, 100, 280, 600, 250, 200, 350, 20, 60, 250, 250, 300, 14],
+    "dog-medium": [500, 275, 110, 360, 750, 200, 250, 400, 20, 60, 250, 300, 400, 12],
+    "dog-large":  [750, 300, 120, 440, 900, 250, 300, 450, 20, 60, 250, 400, 500, 11],
+    "dog-giant":  [1100, 325, 120, 520, 1050, 300, 350, 500, 20, 60, 250, 500, 600, 9],
+    "cat":        [450, 225, 90, 180, 390, 40, 120, 300, 0, 200, 150, 200, 250, 15],
+  };
+  const LABELS = { food: "Food", vet: "Vet checkups", vaccines: "Vaccines", prevent: "Prevention", insurance: "Insurance",
+    grooming: "Grooming", toys: "Toys & treats", boarding: "Boarding / sitting", license: "License", supplies: "Supplies" };
+  let lastPreset = "dog-medium";   // matches the values written in the HTML
+
+  document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+    const isDog = v.species !== "cat";
+    const key = isDog ? `dog-${v.size}` : "cat";
+    out.show("dogsize", isDog);
+    out.set("suppliesLabel", isDog ? "Poop bags & supplies" : "Litter & supplies");
+
+    if (key !== lastPreset && PRESETS[key]) {
+      PRESETS[key].forEach((val, i) => {
+        document.getElementById(FIELDS[i]).value = val;
+        v[FIELDS[i]] = val;
+      });
+      lastPreset = key;
+    }
+
+    const yearly = Object.keys(LABELS);
+    const annual = yearly.reduce((s, k) => s + v[k], 0);
+    const oneTime = v.adoption + v.spay + v.startup;
+    const first = annual + oneTime;
+    const years = Math.max(1, Math.round(v.lifespan) || 1);
+    const lifetime = first + annual * (years - 1);
+    const top = yearly.reduce((a, k) => (v[k] > v[a] ? k : a), yearly[0]);
+
+    out.set("annual", Calc.money(annual, 0));
+    out.set("monthly", Calc.money(annual / 12));
+    out.set("oneTime", Calc.money(oneTime, 0));
+    out.set("first", Calc.money(first, 0));
+    out.set("lifeLabel", `Lifetime estimate (${years} years)`);
+    out.set("lifetime", Calc.money(lifetime, 0));
+    out.set("biggest", annual > 0 ? `${LABELS[top]} (${Calc.pct(v[top] / annual, 0)})` : "—");
+
+    if (v.insurance === 0) out.note("Without insurance, a single emergency such as surgery or a foreign-body removal can cost $2,000–$5,000 or more. Consider saving a similar amount in a pet emergency fund.");
+    else out.note("Excludes emergencies not covered by insurance, deductibles, training classes, daycare and inflation. Older pets usually cost more each year than young ones.");
+  }));
+})();
+</script>
+<!-- article -->
+<h2>What goes into the cost of a pet</h2>
+<p>Most of what you spend on a dog or cat is predictable once you list it out: food, routine vet care, parasite
+prevention, grooming, toys and treats, and care while you travel. On top of that sit optional but increasingly common
+costs such as pet insurance, plus a bump in the first year for adoption, spay or neuter surgery and start-up supplies.</p>
+<p>Published surveys give wide ranges. Rover's 2025 cost report put dogs at about <strong>$1,390 to $5,295 a year</strong>
+and cats at about <strong>$830 to $3,095</strong>, with shelter adoption fees of roughly $30 to $455 for dogs. The low end
+is a healthy pet with no insurance, no boarding and home grooming; the high end includes premium food, insurance, regular
+grooming and frequent pet sitting. This calculator's presets sit in the middle and are meant to be edited.</p>
+
+<h2>The formula</h2>
+<div class="formula">yearly cost = food + vet + vaccines + prevention + insurance + grooming + toys &amp; treats + boarding + license + supplies<br>
+monthly cost = yearly cost ÷ 12<br>
+first-year total = yearly cost + adoption + spay/neuter + start-up supplies<br>
+lifetime estimate = first-year total + yearly cost × (lifespan − 1)</div>
+
+<h2>Example: a medium-size dog</h2>
+<p>Using the default medium dog (25–50 lb) preset with a 12-year expected lifespan:</p>
+<table>
+  <tr><th>Cost</th><th>Amount</th></tr>
+  <tr><td>Food</td><td>$500</td></tr>
+  <tr><td>Vet checkups + vaccines</td><td>$275 + $110</td></tr>
+  <tr><td>Flea, tick &amp; heartworm prevention</td><td>$360</td></tr>
+  <tr><td>Pet insurance</td><td>$750</td></tr>
+  <tr><td>Grooming, toys &amp; treats</td><td>$200 + $250</td></tr>
+  <tr><td>Boarding / pet sitting</td><td>$400</td></tr>
+  <tr><td>License + poop bags &amp; supplies</td><td>$20 + $60</td></tr>
+  <tr><td><strong>Yearly cost</strong></td><td><strong>$2,925</strong> ($243.75 a month)</td></tr>
+  <tr><td>One-time: adoption + spay/neuter + supplies</td><td>$250 + $300 + $400 = $950</td></tr>
+  <tr><td>First-year total</td><td>$3,875</td></tr>
+  <tr><td>Lifetime (12 years) = $3,875 + $2,925 × 11</td><td>$36,050</td></tr>
+</table>
+<p>Insurance is the biggest single line here, about 26% of the yearly total. Drop it and the same dog costs $2,175 a
+year. For comparison, the cat preset comes to $1,995 a year and about $30,525 over 15 years.</p>
+
+<h2>Where the preset numbers come from</h2>
+<ul>
+  <li><strong>Insurance:</strong> NAPHIA's 2025 State of the Industry report lists average accident and illness premiums of about $749 a year for dogs and $386 for cats in 2024. Presets scale the dog figure by size, because larger breeds usually cost more to insure.</li>
+  <li><strong>Overall ranges and adoption fees:</strong> Rover's 2025 True Cost of Pet Parenthood survey of 1,000 US pet parents.</li>
+  <li><strong>Food:</strong> scales with calories. A giant dog can eat four times what a small dog does; use the <a href="/pets/dog-food-calculator/">dog food calculator</a> to price your own brand.</li>
+  <li><strong>Lifespan:</strong> small dogs commonly live 13–16 years, medium dogs 10–13, large dogs 10–12 and giant breeds 8–10; indoor cats often reach 13–17.</li>
+</ul>
+
+<h2>Tips for budgeting</h2>
+<ul>
+  <li><strong>Price your own area.</strong> Call a local vet for exam and vaccine prices; urban clinics can charge twice as much as rural ones.</li>
+  <li><strong>Check what the adoption fee includes.</strong> Many shelters include spay or neuter, first vaccines and a microchip, so set those lines to zero if they're covered.</li>
+  <li><strong>Plan for age.</strong> Senior pets often need dental cleanings ($300–$1,000+), bloodwork and daily medication, so budget more for the last third of their life.</li>
+  <li><strong>Build an emergency cushion.</strong> Whether or not you insure, keep $1,000–$2,000 set aside for deductibles and surprises.</li>
+</ul>
+<p><em>Costs are typical US estimates for planning, not quotes. Prices vary widely by region, breed and health.</em></p>

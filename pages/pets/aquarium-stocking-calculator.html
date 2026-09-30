@@ -1,0 +1,208 @@
+---
+{
+  "title": "Aquarium Stocking Calculator: How Many Fish?",
+  "description": "Check how stocked your freshwater tank is. Pick common fish and quantities, add tank size and filter rating, and get a stocking level plus school-size warnings.",
+  "h1": "Aquarium Stocking Calculator",
+  "short": "Aquarium Stocking Calculator",
+  "intro": "Choose up to five species and how many of each, enter your tank and filter size, and see how full your tank is, with warnings for school sizes and minimum tank sizes.",
+  "updated": "September 2026",
+  "related": ["dog-food-calculator", "cat-age-calculator", "gravel-calculator", "3d-print-cost-calculator"],
+  "faq": [
+    {"q": "How many fish can I put in a 20 gallon tank?", "a": "By the classic one-inch-per-gallon rule, about 20 inches of adult small, slender fish, for example a school of 10 neon tetras plus a few other small fish. Bulky fish, messy eaters and territorial species take up more of that budget, and good filtration and regular water changes let you stock a little more safely."},
+    {"q": "Is the one inch per gallon rule accurate?", "a": "Only as a rough starting point for small, slim community fish up to about 3 inches. It breaks down for large or deep-bodied fish, whose waste grows with body mass rather than length, and it ignores swimming space, territory and water change habits. This calculator adjusts for body bulk, but treat the result as a guide, not a guarantee."},
+    {"q": "Do I count fish at their current size or adult size?", "a": "Always adult size. Most fish in stores are juveniles. A bristlenose pleco sold at 1.5 inches will reach about 5 inches, and angelfish grow to around 6 inches long and 8 or more inches tall."},
+    {"q": "How many neon tetras should be kept together?", "a": "At least six, and 10 or more is better. Neon tetras are schooling fish that become stressed, hide and lose color in small groups."},
+    {"q": "Does a bigger filter let me keep more fish?", "a": "A little. Extra filtration helps process waste, which is why this calculator gives up to a 20% bonus for a filter rated at twice your tank size. It does not add swimming space or remove nitrate, so water changes still matter."},
+    {"q": "How fast should I add fish to a new tank?", "a": "Cycle the tank first so beneficial bacteria are established, then add fish a few at a time over several weeks, testing for ammonia and nitrite between additions. Adding a full stocking list at once is a common cause of fish loss."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="volume">Tank volume</label>
+          <div class="input"><input id="volume" name="volume" type="number" min="0" step="1" value="20" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="vunit">Unit</label>
+          <select id="vunit" name="vunit">
+            <option value="gal">US gallons</option>
+            <option value="L">liters</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="filter">Filter rated for</label>
+        <div class="input"><input id="filter" name="filter" type="number" min="0" step="1" value="30" inputmode="decimal"><span class="unit" data-out="funit">gal</span></div>
+        <div class="hint">The tank size on the filter box. Enter 0 if unknown.</div>
+      </div>
+      <!-- five fixed rows; "none" rows are ignored -->
+      <div class="row2">
+        <div class="field"><label for="sp1">Fish 1</label><select id="sp1" name="sp1" class="species"></select></div>
+        <div class="field"><label for="q1">How many</label><div class="input"><input id="q1" name="q1" type="number" min="0" step="1" value="10" inputmode="numeric"></div></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label for="sp2">Fish 2</label><select id="sp2" name="sp2" class="species"></select></div>
+        <div class="field"><label for="q2">How many</label><div class="input"><input id="q2" name="q2" type="number" min="0" step="1" value="1" inputmode="numeric"></div></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label for="sp3">Fish 3</label><select id="sp3" name="sp3" class="species"></select></div>
+        <div class="field"><label for="q3">How many</label><div class="input"><input id="q3" name="q3" type="number" min="0" step="1" value="0" inputmode="numeric"></div></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label for="sp4">Fish 4</label><select id="sp4" name="sp4" class="species"></select></div>
+        <div class="field"><label for="q4">How many</label><div class="input"><input id="q4" name="q4" type="number" min="0" step="1" value="0" inputmode="numeric"></div></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label for="sp5">Fish 5</label><select id="sp5" name="sp5" class="species"></select></div>
+        <div class="field"><label for="q5">How many</label><div class="input"><input id="q5" name="q5" type="number" min="0" step="1" value="0" inputmode="numeric"></div></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Tank stocked</span><b data-out="pct">—</b></div>
+    <div class="result"><span>Stocking level</span><b data-out="status">—</b></div>
+    <div class="result"><span>Stocking length used</span><b data-out="used">—</b></div>
+    <div class="result"><span>Adjusted capacity</span><b data-out="cap">—</b></div>
+    <div class="result"><span>Room left</span><b data-out="left">—</b></div>
+    <div class="result"><span>Total fish</span><b data-out="count">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+// len = typical adult length (in), bulk = bioload factor for body mass, group = minimum number, tank = minimum US gallons
+const FISH = {
+  neon:     { name: "Neon tetra",          len: 1.5,  bulk: 1.0,  group: 6, tank: 10 },
+  guppy:    { name: "Guppy",               len: 2.0,  bulk: 1.0,  group: 3, tank: 10 },
+  betta:    { name: "Betta (male)",        len: 2.5,  bulk: 1.0,  group: 1, tank: 5 },
+  cory:     { name: "Corydoras catfish",   len: 2.5,  bulk: 1.0,  group: 6, tank: 20 },
+  platy:    { name: "Platy",               len: 2.5,  bulk: 1.25, group: 3, tank: 20 },
+  molly:    { name: "Molly",               len: 4.0,  bulk: 1.5,  group: 3, tank: 30 },
+  danio:    { name: "Zebra danio",         len: 2.0,  bulk: 1.0,  group: 6, tank: 20 },
+  cherry:   { name: "Cherry barb",         len: 2.0,  bulk: 1.0,  group: 6, tank: 20 },
+  harlequin:{ name: "Harlequin rasbora",   len: 2.0,  bulk: 1.0,  group: 8, tank: 20 },
+  dwarfg:   { name: "Dwarf gourami",       len: 3.5,  bulk: 1.25, group: 1, tank: 10 },
+  bnpleco:  { name: "Bristlenose pleco",   len: 5.0,  bulk: 1.5,  group: 1, tank: 30 },
+  angel:    { name: "Angelfish",           len: 6.0,  bulk: 2.0,  group: 1, tank: 29 },
+  kuhli:    { name: "Kuhli loach",         len: 3.5,  bulk: 0.5,  group: 6, tank: 20 },
+  honeyg:   { name: "Honey gourami",       len: 2.0,  bulk: 1.25, group: 1, tank: 10 },
+  oto:      { name: "Otocinclus",          len: 1.75, bulk: 1.0,  group: 6, tank: 20 },
+};
+const DEFAULTS = ["neon", "honeyg", "none", "none", "none"];
+document.querySelectorAll("select.species").forEach((sel, i) => {
+  sel.innerHTML = '<option value="none">None</option>' + Object.entries(FISH)
+    .map(([k, f]) => `<option value="${k}">${f.name} (${f.len}")</option>`).join("");
+  sel.value = DEFAULTS[i];
+});
+
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const metric = v.vunit === "L";
+  const toGal = (x) => metric ? x / 3.785411784 : x;
+  const gal = toGal(v.volume);
+  out.set("funit", metric ? "L" : "gal");
+
+  // Filtration adjustment: -30% at most for an undersized filter, +20% at most for one rated 2x the tank.
+  const r = v.filter > 0 && gal > 0 ? toGal(v.filter) / gal : 1;
+  const mult = r < 1 ? Math.max(0.7, r) : Math.min(1.2, 1 + (r - 1) * 0.2);
+  const cap = gal * mult;                              // "inches of fish" the tank can support
+
+  const counts = {};
+  let used = 0, fish = 0;
+  for (let i = 1; i <= 5; i++) {
+    const key = v["sp" + i], q = Math.max(0, Math.round(v["q" + i]));
+    if (key === "none" || !FISH[key] || !q) continue;
+    counts[key] = (counts[key] || 0) + q;
+    used += FISH[key].len * FISH[key].bulk * q;
+    fish += q;
+  }
+  const pct = cap > 0 ? used / cap : NaN;
+  const status = !isFinite(pct) ? "—" : pct < 0.6 ? "Understocked" : pct <= 1 ? "Good"
+    : pct <= 1.3 ? "Heavily stocked" : "Overstocked";
+
+  const len = (inch) => metric ? Calc.num(inch * 2.54, 1) + " cm" : Calc.num(inch, 1) + " in";
+  out.set("pct", Calc.pct(pct, 0), pct > 1.3 ? "neg" : pct <= 1 && pct >= 0.6 ? "pos" : "");
+  out.set("status", status);
+  out.set("used", len(used));
+  out.set("cap", len(cap) + (mult !== 1 ? ` (${mult > 1 ? "+" : "−"}${Calc.num(Math.abs(mult - 1) * 100, 0)}% filter)` : ""));
+  out.set("left", len(Math.max(0, cap - used)));
+  out.set("count", Calc.num(fish, 0));
+
+  const warn = [];
+  for (const [k, q] of Object.entries(counts)) {
+    const f = FISH[k];
+    if (gal < f.tank) warn.push(`${f.name} needs at least a ${f.tank} gallon tank${k === "angel" ? " (a tall one)" : ""}.`);
+    if (q < f.group) warn.push(`${f.name} should be kept in groups of ${f.group}+ (you have ${q}).`);
+  }
+  if ((counts.betta || 0) > 1) warn.push("Male bettas fight: keep only one per tank.");
+  if (counts.betta && (counts.dwarfg || counts.honeyg)) warn.push("Bettas and gouramis often clash; not a recommended mix.");
+  if ((counts.dwarfg || 0) > 1 && gal < 30) warn.push("Male dwarf gouramis are territorial; keep one unless the tank is 30+ gallons.");
+  if (counts.angel && counts.neon) warn.push("Adult angelfish often eat neon tetras.");
+  if (counts.oto) warn.push("Otocinclus need a mature tank with algae and biofilm to graze.");
+  out.note(warn.length ? warn.join(" ") : fish ? "No school-size or tank-size warnings for this mix. Add fish gradually to a cycled tank." : "");
+}));
+</script>
+<!-- article -->
+<h2>How this stocking calculator works</h2>
+<p>The starting point is the old hobby rule of thumb: <strong>one inch of adult fish per US gallon</strong> of water.
+It's crude, but for small, slim community fish it gives a sensible first answer. On its own it has two big flaws, so this
+calculator makes two adjustments.</p>
+<p><strong>1. Body bulk.</strong> Waste output tracks body mass, not length. A 6-inch angelfish weighs many times more than
+four 1.5-inch neon tetras. Each species gets a bioload factor: 1.0 for slim fish, 1.25 for deeper-bodied fish like platies
+and gouramis, 1.5 for mollies and bristlenose plecos, 2.0 for angelfish, and 0.5 for the thin, eel-like kuhli loach.</p>
+<p><strong>2. Filtration.</strong> A filter rated for more water than your tank processes waste with some headroom. A filter rated
+at 1.5× your tank adds 10% capacity, 2× or more adds the maximum 20%. An undersized filter reduces capacity (down to −30%).</p>
+
+<h2>The formula</h2>
+<div class="formula">stocking length = Σ (adult length × bioload factor × quantity)<br>
+filter ratio = filter rating ÷ tank volume<br>
+capacity = tank gallons × (1 + 0.2 × (ratio − 1)), capped between 0.7× and 1.2×<br>
+% stocked = stocking length ÷ capacity</div>
+<p>Under 60% is <strong>understocked</strong> (room to add), 60–100% is <strong>good</strong>, 100–130% is <strong>heavily stocked</strong>
+(workable with strong filtration and weekly water changes), and over 130% is <strong>overstocked</strong>.</p>
+
+<h2>Example: a 20 gallon community tank</h2>
+<p>A 20 gallon tank with a filter rated for 30 gallons, holding 10 neon tetras and one honey gourami:</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Neon tetras: 1.5" × 1.0 × 10</td><td>15.0 in</td></tr>
+  <tr><td>Honey gourami: 2" × 1.25 × 1</td><td>2.5 in</td></tr>
+  <tr><td>Stocking length used</td><td>17.5 in</td></tr>
+  <tr><td>Filter ratio 30 ÷ 20 = 1.5, so +10%</td><td>capacity 22.0 in</td></tr>
+  <tr><td><strong>% stocked = 17.5 ÷ 22</strong></td><td><strong>80% (Good)</strong></td></tr>
+  <tr><td>Room left</td><td>4.5 in</td></tr>
+</table>
+<p>That leaves room for, say, a small group of otocinclus once the tank is mature.</p>
+
+<h2>Species data used</h2>
+<table>
+  <tr><th>Fish</th><th>Adult size</th><th>Min. group</th><th>Min. tank</th></tr>
+  <tr><td>Neon tetra</td><td>1.5"</td><td>6</td><td>10 gal</td></tr>
+  <tr><td>Guppy</td><td>2"</td><td>3</td><td>10 gal</td></tr>
+  <tr><td>Betta (male)</td><td>2.5"</td><td>1 only</td><td>5 gal</td></tr>
+  <tr><td>Corydoras</td><td>2.5"</td><td>6</td><td>20 gal</td></tr>
+  <tr><td>Platy</td><td>2.5"</td><td>3</td><td>20 gal</td></tr>
+  <tr><td>Molly</td><td>4"</td><td>3</td><td>30 gal</td></tr>
+  <tr><td>Zebra danio / cherry barb</td><td>2"</td><td>6</td><td>20 gal</td></tr>
+  <tr><td>Harlequin rasbora</td><td>2"</td><td>8</td><td>20 gal</td></tr>
+  <tr><td>Dwarf gourami</td><td>3.5"</td><td>1</td><td>10 gal</td></tr>
+  <tr><td>Honey gourami</td><td>2"</td><td>1</td><td>10 gal</td></tr>
+  <tr><td>Bristlenose pleco</td><td>5"</td><td>1</td><td>30 gal</td></tr>
+  <tr><td>Angelfish</td><td>6" long, 8"+ tall</td><td>1 (pairs or 5+)</td><td>29 gal tall</td></tr>
+  <tr><td>Kuhli loach</td><td>3.5"</td><td>6</td><td>20 gal</td></tr>
+  <tr><td>Otocinclus</td><td>1.75"</td><td>6</td><td>20 gal</td></tr>
+</table>
+<p>Sizes are typical aquarium adults; individual fish and strains vary. Minimum tanks reflect common care-guide advice
+and lean conservative.</p>
+
+<h2>What the rule can't tell you</h2>
+<ul>
+  <li><strong>Swimming space and shape.</strong> Danios need length to swim; angelfish need height. Gallons alone don't capture that.</li>
+  <li><strong>Temperament.</strong> A tank can be "good" on paper and still fail if fish fight. Research compatibility.</li>
+  <li><strong>Your maintenance.</strong> Weekly 25–30% water changes support more fish than monthly ones. Test nitrate to see how you're really doing.</li>
+  <li><strong>Real water volume.</strong> Gravel and decor displace water; a "20 gallon" tank often holds 16–18.</li>
+</ul>
+<p><em>This is a planning guide, not a guarantee of fish health. Cycle your tank before adding fish, stock gradually, and ask
+a knowledgeable fish store or aquatic vet about specific species.</em></p>

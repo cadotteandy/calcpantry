@@ -1,0 +1,176 @@
+---
+{
+  "title": "Quilt Calculator: Backing, Binding & Batting Size",
+  "description": "Work out quilt backing yardage and panel layout, binding strips and yardage, and the right pre-cut batting size from your quilt top width and length.",
+  "h1": "Quilt Backing, Binding & Batting Calculator",
+  "short": "Quilt Calculator",
+  "intro": "Enter your finished quilt top size and fabric width to see how much backing to buy, how to piece it, how many binding strips to cut and which batting package fits.",
+  "updated": "September 2026",
+  "related": ["fabric-yardage-calculator", "blanket-yarn-calculator", "cross-stitch-fabric-calculator", "etsy-fee-calculator"],
+  "faq": [
+    {"q": "How much bigger should quilt backing be than the top?", "a": "The usual rule is 4 inches larger on every side, so 8 inches added to both the width and the length. Longarm quilters often ask for 4 to 6 inches per side because the frame clamps need something to grip. Check with your quilter before you buy."},
+    {"q": "How do I calculate yardage for a pieced backing?", "a": "Add twice the overhang to the quilt width and length. Divide the backing width by the usable fabric width, allowing about an inch per seam, and round up to get the number of panels. Multiply the panels by the backing length and divide by 36 for yards. Compare that with running the seams the other way and use whichever needs less fabric."},
+    {"q": "How many binding strips do I need?", "a": "Add up the four sides of the quilt, add about 12 inches for mitered corners and the final join, and divide by 40, the usable length of a strip cut across 42 to 44 inch fabric. Round up. A 60 by 72 inch quilt needs 276 inches, which is 7 strips."},
+    {"q": "What width should I cut binding strips?", "a": "2.5 inches is the most common width for double-fold binding and finishes about 3/8 inch wide on the front. Some quilters prefer 2.25 inches for a snugger binding on thin cotton batting, or 2.75 inches for thick, high-loft batting."},
+    {"q": "Is wide backing fabric worth it?", "a": "Wide backing, usually 108 inches wide, lets you back most quilts up to about 100 inches in one piece with no seam. It costs more per yard, but you buy far fewer yards and skip the piecing. For large quilts it is often cheaper overall."},
+    {"q": "What size batting do I need for a quilt?", "a": "Batting should be at least as big as the backing, about 4 inches larger than the top on every side. Standard pre-cut packages include crib 45 by 60, twin 72 by 90, full 90 by 96, queen 90 by 108 and king 120 by 124 inches, although sizes vary a little between brands."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="w">Quilt top width</label>
+          <div class="input"><input id="w" name="w" type="number" min="0" step="0.5" value="60" inputmode="decimal"><span class="unit">in</span></div>
+        </div>
+        <div class="field">
+          <label for="l">Quilt top length</label>
+          <div class="input"><input id="l" name="l" type="number" min="0" step="0.5" value="72" inputmode="decimal"><span class="unit">in</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="fabric">Backing fabric width</label>
+        <select id="fabric" name="fabric">
+          <option value="40" selected>42–44 in quilting cotton (40 in usable)</option>
+          <option value="42">44 in cotton, full width (42 in usable)</option>
+          <option value="58">60 in fabric (58 in usable)</option>
+          <option value="104">108 in wide backing (104 in usable)</option>
+        </select>
+        <div class="hint">Usable width after trimming selvages and pre-wash shrinkage.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="over">Backing overhang</label>
+          <div class="input"><input id="over" name="over" type="number" min="0" step="0.5" value="4" inputmode="decimal"><span class="unit">in/side</span></div>
+        </div>
+        <div class="field">
+          <label for="sw">Binding strip width</label>
+          <div class="input"><input id="sw" name="sw" type="number" min="0" step="0.25" value="2.5" inputmode="decimal"><span class="unit">in</span></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Backing fabric to buy</span><b data-out="backYd">—</b></div>
+    <div class="result"><span>Backing size needed</span><b data-out="backSize">—</b></div>
+    <div class="result"><span>Panels</span><b data-out="panels">—</b></div>
+    <div class="result"><span>Seams</span><b data-out="seams">—</b></div>
+    <div class="result"><span>Binding length</span><b data-out="bindLen">—</b></div>
+    <div class="result"><span>Binding strips</span><b data-out="strips">—</b></div>
+    <div class="result"><span>Binding fabric</span><b data-out="bindYd">—</b></div>
+    <div class="result"><span>Batting package</span><b data-out="batting">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const SEAM = 1;          // 1/2" seam allowance on each panel edge
+  const STRIP_LEN = 40;    // usable length of a strip cut across 42-44" fabric
+  const BATTING = [[34, 45, "Craft"], [45, 60, "Crib"], [72, 90, "Twin"], [90, 96, "Full"],
+                   [90, 108, "Queen"], [120, 124, "King"]];
+  const yd = (inches) => {
+    const e = Math.ceil(inches / 36 * 8 - 1e-6);
+    const whole = Math.floor(e / 8), rem = e % 8;
+    const g = rem % 4 === 0 ? 4 : rem % 2 === 0 ? 2 : 1;
+    const frac = rem ? `${rem / g}/${8 / g}` : "";
+    return e === 0 ? "0 yd" : `${whole ? whole : ""}${whole && frac ? " " : ""}${frac} yd`;
+  };
+  const F = parseFloat(v.fabric);
+  if (v.w <= 0 || v.l <= 0) { out.note("Enter the quilt top width and length."); return; }
+  const bw = v.w + 2 * v.over, bl = v.l + 2 * v.over;
+
+  const opts = [];
+  if (bw <= F) opts.push({ n: 1, len: bl, dir: "none" });
+  if (bl <= F) opts.push({ n: 1, len: bw, dir: "turned" });
+  const nv = Math.ceil((bw - SEAM) / (F - SEAM) - 1e-9);
+  const nh = Math.ceil((bl - SEAM) / (F - SEAM) - 1e-9);
+  if (nv > 1) opts.push({ n: nv, len: bl, dir: "vertical" });
+  if (nh > 1) opts.push({ n: nh, len: bw, dir: "horizontal" });
+  const best = opts.reduce((a, b) => (b.n * b.len < a.n * a.len - 1e-9 ? b : a));
+  const backIn = best.n * best.len;
+
+  const per = 2 * (v.w + v.l);
+  const bindLen = per + 12;
+  const strips = Math.ceil(bindLen / STRIP_LEN - 1e-9);
+  const bindIn = strips * v.sw;
+
+  const bat = BATTING.find(([a, b]) => (bw <= a && bl <= b) || (bw <= b && bl <= a));
+
+  out.set("backYd", yd(backIn));
+  out.set("backSize", `${Calc.num(bw, 1)} × ${Calc.num(bl, 1)} in`);
+  out.set("panels", best.n === 1 ? `1 piece, ${Calc.num(best.len, 1)} in long`
+    : `${best.n} × ${Calc.num(best.len, 1)} in long`);
+  const s = best.n - 1;
+  out.set("seams", best.dir === "vertical" ? `${s} vertical (top to bottom)`
+    : best.dir === "horizontal" ? `${s} horizontal (side to side)` : "None");
+  out.set("bindLen", `${Calc.num(bindLen, 1)} in (${Calc.num(bindLen / 36, 1)} yd)`);
+  out.set("strips", `${strips} × ${Calc.num(v.sw, 2)} in`);
+  out.set("bindYd", yd(bindIn));
+  out.set("batting", bat ? `${bat[2]}, ${bat[0]} × ${bat[1]} in` : "Buy by the yard");
+
+  let note = `Backing ${Calc.num(backIn, 1)} in of fabric in total (${Calc.num(backIn / 36, 2)} yd), rounded up to the next 1/8 yard.`;
+  if (best.dir === "turned") note += " The backing is turned sideways on the bolt so the quilt length runs across the fabric width.";
+  if (F < 100 && Math.min(bw, bl) <= 104 && best.n > 1) note += " A 108 in wide backing would avoid the seam.";
+  note += ` Binding strips are cut across 42–44 in fabric (${STRIP_LEN} in usable) and include 12 in for corners and joins.`;
+  if (!bat) note += " Larger than a king pre-cut: buy batting off the roll or join two pieces.";
+  out.note(note);
+}));
+</script>
+<!-- article -->
+<h2>How the backing, binding and batting are worked out</h2>
+<p>Every quilt sandwich needs three things beyond the top: a backing, a layer of batting and a binding to finish
+the edges. The backing and batting are cut larger than the top because quilting pulls the layers in slightly and
+because a longarm frame or your hands need something to hold. Four inches of overhang on each side is the common
+standard; many longarm quilters ask for 4 to 6 inches, so check before you buy.</p>
+<p>Standard quilting cotton is 42 to 44 inches wide, but once you trim the selvages and allow for pre-wash
+shrinkage, 40 inches is the safe usable width. Most backings wider than that must be pieced from two or more
+lengths. The calculator tries both seam directions, allowing an inch for each seam, and picks whichever uses less
+fabric. Binding strips are cut across the width of fabric, so each strip gives about 40 inches of binding.</p>
+
+<h2>The formulas</h2>
+<div class="formula">backing size = (top width + 2 × overhang) × (top length + 2 × overhang)<br>
+panels = ceil((backing width − 1) ÷ (usable width − 1)) &nbsp; (or the same across the length)<br>
+backing yards = panels × panel length ÷ 36, rounded up to 1/8 yd<br>
+binding length = 2 × (width + length) + 12<br>
+strips = ceil(binding length ÷ 40) &nbsp;·&nbsp; binding yards = strips × strip width ÷ 36</div>
+
+<h2>Example: a 60 × 72 inch throw quilt</h2>
+<p>With 4 inches of overhang, backing from 42–44 inch cotton, and 2.5 inch binding strips:</p>
+<table>
+  <tr><th>Step</th><th>Working</th><th>Result</th></tr>
+  <tr><td>Backing size</td><td>60 + 8 by 72 + 8</td><td>68 × 80 in</td></tr>
+  <tr><td>Vertical seams</td><td>2 panels × 80 in</td><td>160 in</td></tr>
+  <tr><td>Horizontal seams</td><td>3 panels × 68 in</td><td>204 in</td></tr>
+  <tr><td>Backing to buy</td><td>160 ÷ 36 = 4.44 yd</td><td><strong>4 1/2 yd</strong></td></tr>
+  <tr><td>Binding length</td><td>2 × (60 + 72) + 12</td><td>276 in</td></tr>
+  <tr><td>Binding strips</td><td>276 ÷ 40 = 6.9</td><td>7 strips</td></tr>
+  <tr><td>Binding fabric</td><td>7 × 2.5 = 17.5 in</td><td>1/2 yd</td></tr>
+  <tr><td>Batting</td><td>needs 68 × 80 in</td><td>Twin, 72 × 90 in</td></tr>
+</table>
+<p>Switch the fabric to 108 inch wide backing and the same quilt needs a single 68 inch length, which rounds up to
+2 yards with no seam at all.</p>
+
+<h2>Standard batting sizes</h2>
+<p>Pre-cut batting is sold in bed-size packages. Sizes vary slightly by brand; these are the Warm &amp; Natural
+cotton sizes, which are typical:</p>
+<table>
+  <tr><th>Package</th><th>Size</th></tr>
+  <tr><td>Craft</td><td>34 × 45 in</td></tr>
+  <tr><td>Crib</td><td>45 × 60 in</td></tr>
+  <tr><td>Twin</td><td>72 × 90 in</td></tr>
+  <tr><td>Full</td><td>90 × 96 in</td></tr>
+  <tr><td>Queen</td><td>90 × 108 in</td></tr>
+  <tr><td>King</td><td>120 × 124 in</td></tr>
+</table>
+
+<h2>Tips for piecing and binding</h2>
+<ul>
+  <li><strong>Cut off the selvages</strong> before seaming backing panels. Selvages are woven tighter and can pucker.</li>
+  <li><strong>Press backing seams open</strong> to reduce bulk, and use a slightly shorter stitch so the seam survives quilting tension.</li>
+  <li><strong>Mark the top edge</strong> of a directional backing print before you send the quilt out.</li>
+  <li><strong>Join binding strips on the diagonal</strong> so the joins spread their bulk. The 12 inch allowance covers the joins and mitered corners.</li>
+  <li><strong>Buy a little extra if you pre-wash.</strong> Cotton can shrink a few percent, which eats into a 4 inch overhang.</li>
+</ul>

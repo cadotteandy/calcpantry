@@ -1,0 +1,155 @@
+---
+{
+  "title": "Cross Stitch Fabric Calculator: Aida & Evenweave Size",
+  "description": "Find the finished size of a cross stitch design and how much Aida or evenweave to cut, from the stitch count, fabric count and margin, in inches and cm.",
+  "h1": "Cross Stitch Fabric Calculator",
+  "short": "Cross Stitch Fabric Calculator",
+  "intro": "Enter your chart's width and height in stitches, pick your fabric count and margin, and see the finished design size and the piece of fabric to cut.",
+  "updated": "September 2026",
+  "related": ["fabric-yardage-calculator", "blanket-yarn-calculator", "etsy-fee-calculator", "3d-print-cost-calculator"],
+  "faq": [
+    {"q": "How do I calculate fabric size for cross stitch?", "a": "Divide the design's stitch width by the fabric count to get inches, then add your margin to both sides. Do the same for the height. A 140 by 100 stitch design on 14 count Aida is 10 by 7.1 inches, so with 3 inch margins you need a piece at least 16 by 13.1 inches."},
+    {"q": "What does 28 count over 2 mean?", "a": "Evenweave and linen are counted in threads per inch, and cross stitches on them are usually worked over two threads each way. That halves the stitch count, so 28 count over 2 gives 14 stitches per inch, the same finished size as 14 count Aida. Worked over one thread, the same fabric gives 28 stitches per inch and a design half the size."},
+    {"q": "How much margin should I leave around a cross stitch?", "a": "Three inches on each side is the standard allowance for framing, and it leaves room for a hoop or scroll frame. Use 2 inches for small pieces going into ornaments or cards, and 4 to 5 inches for large pieces you plan to lace over a board or have professionally framed."},
+    {"q": "Does changing the fabric count change the design size?", "a": "Yes. The stitch count stays the same, but higher counts pack more stitches into each inch. A 140 stitch wide design is 12.7 inches on 11 count, 10 inches on 14 count and 7.8 inches on 18 count. Lower counts are easier on the eyes; higher counts give finer detail and a smaller piece."},
+    {"q": "What size is a fat quarter of cross stitch fabric?", "a": "A fat quarter is a quarter yard cut across half the width, commonly about 18 by 27 inches for 55 inch wide evenweave and linen, though some brands cut 19 by 27 or similar. Check the exact size on the listing before you buy."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="sw">Design width</label>
+          <div class="input"><input id="sw" name="sw" type="number" min="0" step="1" value="140" inputmode="numeric"><span class="unit">st</span></div>
+        </div>
+        <div class="field">
+          <label for="sh">Design height</label>
+          <div class="input"><input id="sh" name="sh" type="number" min="0" step="1" value="100" inputmode="numeric"><span class="unit">st</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="count">Fabric count</label>
+        <select id="count" name="count">
+          <option value="11a">11 count Aida</option>
+          <option value="14a" selected>14 count Aida</option>
+          <option value="16a">16 count Aida</option>
+          <option value="18a">18 count Aida</option>
+          <option value="20a">20 count Aida</option>
+          <option value="22h">22 count Hardanger</option>
+          <option value="12.5e">25 count evenweave, over 2</option>
+          <option value="14e">28 count evenweave/linen, over 2</option>
+          <option value="16e">32 count evenweave/linen, over 2</option>
+          <option value="18e">36 count linen, over 2</option>
+          <option value="20e">40 count linen, over 2</option>
+          <option value="28o">28 count, over 1</option>
+          <option value="32o">32 count, over 1</option>
+        </select>
+        <div class="hint">"Over 2" counts are shown as threads per inch; the calculator uses half.</div>
+      </div>
+      <div class="field">
+        <label for="margin">Margin on each side</label>
+        <div class="input"><input id="margin" name="margin" type="number" min="0" step="0.5" value="3" inputmode="decimal"><span class="unit">in</span></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Fabric needed</span><b data-out="fabric">—</b></div>
+    <div class="result"><span>Fabric in cm</span><b data-out="fabricCm">—</b></div>
+    <div class="result"><span>Finished design</span><b data-out="design">—</b></div>
+    <div class="result"><span>Finished design in cm</span><b data-out="designCm">—</b></div>
+    <div class="result"><span>Stitches per inch</span><b data-out="spi">—</b></div>
+    <div class="result"><span>Cut size (rounded up)</span><b data-out="cut">—</b></div>
+    <div class="result"><span>Smallest common pre-cut</span><b data-out="precut">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const CM = 2.54;
+  const PRECUTS = [[12, 18, "12 × 18 in"], [15, 18, "15 × 18 in"], [18, 27, "Fat quarter, about 18 × 27 in"],
+                   [27, 36, "Fat half, about 27 × 36 in"], [36, 55, "1 yard of 55 in wide, 36 × 55 in"]];
+  const spi = parseFloat(v.count);
+  const overTwo = v.count.endsWith("e");
+  const dw = v.sw / spi, dh = v.sh / spi;
+  const fw = dw + 2 * v.margin, fh = dh + 2 * v.margin;
+  const cw = Math.ceil(fw - 1e-9), ch = Math.ceil(fh - 1e-9);
+  const fit = PRECUTS.find(([a, b]) => (fw <= a && fh <= b) || (fw <= b && fh <= a));
+
+  const inch = (w, h) => `${Calc.num(w, 1)} × ${Calc.num(h, 1)} in`;
+  const cm = (w, h) => `${Calc.num(w * CM, 1)} × ${Calc.num(h * CM, 1)} cm`;
+  out.set("fabric", inch(fw, fh));
+  out.set("fabricCm", cm(fw, fh));
+  out.set("design", inch(dw, dh));
+  out.set("designCm", cm(dw, dh));
+  out.set("spi", Calc.num(spi, 1) + (overTwo ? ` (${Calc.num(spi * 2, 0)} ct over 2)` : ""));
+  out.set("cut", `${cw} × ${ch} in`);
+  out.set("precut", fit ? fit[2] : "Buy by the yard");
+
+  if (overTwo) out.note(`Each stitch covers 2 × 2 threads, so ${Calc.num(spi * 2, 0)} count fabric gives ${Calc.num(spi, 1)} stitches per inch, the same size as ${Calc.num(spi, 1)} count Aida.`);
+  else if (v.margin < 2) out.note("Margins under 2 in leave little room for a hoop or for framing. Use 3 in if the piece will be framed.");
+  else out.note("Pre-cut sizes vary by brand. Check the listing, and keep the grain straight when you cut.");
+}));
+</script>
+<!-- article -->
+<h2>How cross stitch fabric size is worked out</h2>
+<p>A cross stitch chart gives the design size in stitches, not inches. How big it comes out depends on the fabric
+count: the number of stitches that fit in one inch. Divide the stitch count by the stitches per inch and you have
+the finished design size. Then add a margin on every side for hooping, handling and framing. That margin
+matters as much as the design itself; skimping on it is the most common reason a finished piece can't be framed
+properly.</p>
+
+<h2>The formula</h2>
+<div class="formula">stitches per inch = Aida count, or evenweave count ÷ 2 when stitched over 2<br>
+design width (in) = stitches wide ÷ stitches per inch<br>
+fabric width (in) = design width + 2 × margin<br>
+(same for height) · cm = inches × 2.54</div>
+
+<h2>Aida vs evenweave, and "over 2"</h2>
+<p><strong>Aida</strong> is woven in blocks with visible holes, and its count is stitches per inch: 14 count Aida
+holds 14 stitches in an inch. <strong>Evenweave and linen</strong> are woven from single threads, and their count
+is threads per inch. Cross stitches on them are normally worked over two threads in each direction, which is
+called "over 2." That halves the count, so 28 count evenweave over 2 gives 14 stitches per inch, the same size
+as 14 count Aida. Stitching "over 1" on 28 count gives 28 stitches per inch and a design half as wide, which suits
+tiny motifs or very fine detail.</p>
+<table>
+  <tr><th>Fabric</th><th>Stitches per inch</th><th>140 stitches wide</th></tr>
+  <tr><td>11 count Aida</td><td>11</td><td>12.7 in</td></tr>
+  <tr><td>14 count Aida or 28 count over 2</td><td>14</td><td>10 in</td></tr>
+  <tr><td>16 count Aida or 32 count over 2</td><td>16</td><td>8.75 in</td></tr>
+  <tr><td>18 count Aida or 36 count over 2</td><td>18</td><td>7.8 in</td></tr>
+  <tr><td>28 count over 1</td><td>28</td><td>5 in</td></tr>
+</table>
+
+<h2>Example: a 140 × 100 stitch design</h2>
+<p>On 14 count Aida with the standard 3 inch margin on each side:</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Design width: 140 ÷ 14</td><td>10 in (25.4 cm)</td></tr>
+  <tr><td>Design height: 100 ÷ 14</td><td>7.1 in (18.1 cm)</td></tr>
+  <tr><td>Fabric: 10 + 6 by 7.1 + 6</td><td><strong>16 × 13.1 in</strong> (40.6 × 33.4 cm)</td></tr>
+  <tr><td>Cut size, rounded up</td><td>16 × 14 in</td></tr>
+  <tr><td>Smallest common pre-cut</td><td>15 × 18 in (turned sideways)</td></tr>
+</table>
+
+<h2>Choosing a margin</h2>
+<ul>
+  <li><strong>3 inches per side</strong> is the usual default for anything that will be framed, and what most
+  chart designers assume.</li>
+  <li><strong>2 inches</strong> is enough for ornaments, cards and small pieces finished into pillows or flat folds.</li>
+  <li><strong>4–5 inches</strong> for large pieces that will be laced or stretched over board, or if you use a
+  large scroll frame that needs extra fabric to grip.</li>
+</ul>
+
+<h2>Tips before you cut</h2>
+<ul>
+  <li><strong>Stitch a small test</strong> if you're swapping to a different count from the chart. Heavier or
+  lighter coverage may need more or fewer strands of floss.</li>
+  <li><strong>Keep the grain straight.</strong> Cut along a single row of holes or threads so the design sits square.</li>
+  <li><strong>Secure the edges</strong> with masking tape, zigzag stitching or fray check. Evenweave and linen fray
+  much faster than Aida.</li>
+  <li><strong>Find the center first.</strong> Fold the fabric in quarters and start stitching from the chart's
+  center so the margins come out even.</li>
+</ul>

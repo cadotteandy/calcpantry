@@ -1,0 +1,185 @@
+---
+{
+  "title": "Side Hustle Tax Calculator 2026: What You Really Keep",
+  "description": "Estimate 2026 self-employment tax, federal and state income tax on side gig income, your real take-home, and how much to set aside for quarterly payments.",
+  "h1": "Side Hustle Tax Calculator",
+  "short": "Side Hustle Tax Calculator",
+  "intro": "Enter your side income, expenses and day-job pay to estimate the extra tax your side gig creates in 2026, what you actually keep, and how much to set aside.",
+  "updated": "September 2026",
+  "related": ["freelance-rate-calculator", "ebay-fee-calculator", "etsy-fee-calculator", "lease-vs-buy-calculator"],
+  "faq": [
+    {"q": "How much should I set aside for taxes on side hustle income?", "a": "Most people with a full-time job should set aside 25% to 35% of side gig profit. Self-employment tax alone is about 14.1% of profit, and your side income is taxed at your top federal bracket on top of that, plus state tax. The calculator above gives a per-$100 figure for your situation."},
+    {"q": "Do I have to pay taxes on side hustle income under $600?", "a": "Yes. All side income is taxable no matter how small, whether or not you get a 1099. The 1099 reporting threshold only controls when a payer must send a form. Self-employment tax kicks in once net self-employment earnings reach $400 for the year."},
+    {"q": "What is the self-employment tax rate for 2026?", "a": "It is 15.3% on 92.35% of your net profit: 12.4% for Social Security and 2.9% for Medicare. The Social Security part stops once your W-2 wages plus self-employment earnings reach the 2026 wage base of $184,500. You can deduct half of the self-employment tax when figuring income tax."},
+    {"q": "Do I need to make quarterly estimated tax payments for a side gig?", "a": "Generally yes, if you expect to owe $1,000 or more when you file. For 2026 income the due dates are April 15, June 15 and September 15, 2026, and January 15, 2027. Instead of quarterly payments, you can raise the withholding at your day job to cover the side gig tax."},
+    {"q": "Can I deduct mileage for my side hustle?", "a": "Yes, for business driving such as deliveries, rideshare or trips to buy inventory, but not your commute. For 2026 the IRS standard mileage rate is 72.5 cents per mile for January through June and 76 cents per mile from July 1. Keep a log with dates, miles and purpose."},
+    {"q": "Does the side hustle qualify for the 20% QBI deduction?", "a": "Usually. Sole proprietors can deduct up to 20% of qualified business income, and the deduction was made permanent in 2025. Below the 2026 taxable income threshold of $201,750 (single or head of household) or $403,500 (married filing jointly), most side businesses get the full deduction."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="gross">Side gig income</label>
+          <div class="input"><span class="unit pre">$</span><input id="gross" name="gross" type="number" min="0" step="100" value="20000" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="expenses">Business expenses</label>
+          <div class="input"><span class="unit pre">$</span><input id="expenses" name="expenses" type="number" min="0" step="50" value="2000" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="status">Filing status</label>
+        <select id="status" name="status">
+          <option value="single">Single</option>
+          <option value="mfj">Married filing jointly</option>
+          <option value="hoh">Head of household</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="w2">W-2 job income (household)</label>
+        <div class="input"><span class="unit pre">$</span><input id="w2" name="w2" type="number" min="0" step="1000" value="60000" inputmode="decimal"></div>
+        <div class="hint">Wages from Box 1 of your W-2 (both spouses if filing jointly). Enter 0 if the side gig is your only income.</div>
+      </div>
+      <div class="field">
+        <label for="stateRate">State income tax rate</label>
+        <div class="input"><input id="stateRate" name="stateRate" type="number" min="0" max="15" step="0.1" value="5" inputmode="decimal"><span class="unit">%</span></div>
+        <div class="hint">Your state's top rate on this income. Use 0 in states with no income tax.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="miles1">Business miles Jan–Jun</label>
+          <div class="input"><input id="miles1" name="miles1" type="number" min="0" step="10" value="1000" inputmode="decimal"><span class="unit">mi</span></div>
+          <div class="hint">72.5¢ per mile</div>
+        </div>
+        <div class="field">
+          <label for="miles2">Business miles Jul–Dec</label>
+          <div class="input"><input id="miles2" name="miles2" type="number" min="0" step="10" value="1000" inputmode="decimal"><span class="unit">mi</span></div>
+          <div class="hint">76¢ per mile</div>
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" name="qbi" checked> Take the 20% QBI deduction</label>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your 2026 estimate</h2>
+    <div class="result big"><span>Take-home from your side gig</span><b data-out="takehome">—</b></div>
+    <div class="result"><span>Net profit</span><b data-out="net">—</b></div>
+    <div class="result"><span>Total tax on side income</span><b data-out="total">—</b></div>
+    <div class="result"><span>Self-employment tax</span><b data-out="se">—</b></div>
+    <div class="result"><span>Extra federal income tax</span><b data-out="fed">—</b></div>
+    <div class="result"><span>State income tax</span><b data-out="state">—</b></div>
+    <div class="result"><span>Effective rate on profit</span><b data-out="eff">—</b></div>
+    <div class="result"><span>Set aside per $100 earned</span><b data-out="per100">—</b></div>
+    <div class="result"><span>Quarterly estimated payment</span><b data-out="quarterly">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+// ---- 2026 federal figures (Rev. Proc. 2025-32, SSA, IRS Notice 2026-10 / Announcement 2026-11). Update yearly. ----
+const BRACKETS_2026 = {           // [top of bracket, rate]
+  single: [[12400, 0.10], [50400, 0.12], [105700, 0.22], [201775, 0.24], [256225, 0.32], [640600, 0.35], [Infinity, 0.37]],
+  mfj:    [[24800, 0.10], [100800, 0.12], [211400, 0.22], [403550, 0.24], [512450, 0.32], [768700, 0.35], [Infinity, 0.37]],
+  hoh:    [[17700, 0.10], [67450, 0.12], [105700, 0.22], [201750, 0.24], [256200, 0.32], [640600, 0.35], [Infinity, 0.37]],
+};
+const STANDARD_DEDUCTION_2026 = { single: 16100, mfj: 32200, hoh: 24150 };
+const QBI_THRESHOLD_2026 = { single: 201750, mfj: 403500, hoh: 201750 };
+const SS_WAGE_BASE_2026 = 184500;
+const SS_RATE = 0.124, MEDICARE_RATE = 0.029, SE_EARNINGS_FACTOR = 0.9235;
+const MILEAGE_RATE_H1_2026 = 0.725, MILEAGE_RATE_H2_2026 = 0.76;
+
+function incomeTax(taxable, status) {
+  let tax = 0, lower = 0;
+  for (const [top, rate] of BRACKETS_2026[status]) {
+    if (taxable > lower) tax += (Math.min(taxable, top) - lower) * rate;
+    lower = top;
+  }
+  return tax;
+}
+
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const status = BRACKETS_2026[v.status] ? v.status : "single";
+  const std = STANDARD_DEDUCTION_2026[status];
+  const mileage = v.miles1 * MILEAGE_RATE_H1_2026 + v.miles2 * MILEAGE_RATE_H2_2026;
+  const net = v.gross - v.expenses - mileage;
+
+  // Self-employment tax: 15.3% of 92.35% of profit; Social Security part capped by wage base minus W-2 wages.
+  let seEarnings = Math.max(0, net) * SE_EARNINGS_FACTOR;
+  if (seEarnings < 400) seEarnings = 0;
+  const ssRoom = Math.max(0, SS_WAGE_BASE_2026 - v.w2);
+  const seTax = SS_RATE * Math.min(seEarnings, ssRoom) + MEDICARE_RATE * seEarnings;
+  const halfSe = seTax / 2;
+
+  // Federal income tax with and without the side gig; the difference is what the gig costs you.
+  const taxWithout = incomeTax(Math.max(0, v.w2 - std), status);
+  const beforeQbi = Math.max(0, v.w2 + net - halfSe - std);
+  let qbi = 0;
+  const overThreshold = beforeQbi > QBI_THRESHOLD_2026[status];
+  if (v.qbi && net > 0 && !overThreshold) qbi = Math.min(0.2 * (net - halfSe), 0.2 * beforeQbi);
+  const fed = incomeTax(Math.max(0, beforeQbi - qbi), status) - taxWithout;
+
+  const state = Math.max(0, net) * v.stateRate / 100;
+  const total = seTax + fed + state;
+  const takehome = net - total;
+
+  out.set("takehome", Calc.money(takehome), Calc.tone(takehome));
+  out.set("net", Calc.money(net));
+  out.set("total", Calc.money(total));
+  out.set("se", Calc.money(seTax));
+  out.set("fed", Calc.money(fed));
+  out.set("state", Calc.money(state));
+  out.set("eff", net > 0 ? Calc.pct(total / net) : "—");
+  out.set("per100", v.gross > 0 ? Calc.money(Math.max(0, total) / v.gross * 100) : "—");
+  out.set("quarterly", Calc.money(Math.max(0, total) / 4));
+
+  if (net <= 0) out.note("No profit, no self-employment tax. A loss can reduce the tax on your W-2 income, but check the hobby-loss rules first.");
+  else if (v.qbi && overThreshold) out.note("Your taxable income is above the 2026 QBI threshold, so the 20% deduction is left out here; limits may reduce or remove it. Estimate only, not tax advice.");
+  else if (total < 1000) out.note("You'll likely owe under $1,000, so quarterly payments are probably not required. Estimate only, not tax advice.");
+  else out.note(`Mileage deduction: ${Calc.money(mileage)}. Estimate only, not tax advice: credits, other income and the 0.9% Additional Medicare Tax are not included.`);
+}));
+</script>
+<!-- article -->
+<p><strong>This is an estimate, not tax advice.</strong> It covers the most common situation: a W-2 job plus a sole-proprietor side gig. It leaves out tax credits, other income, itemized deductions, the 0.9% Additional Medicare Tax on high earners and local taxes. For decisions that matter, check with a tax professional or IRS Publication 334.</p>
+
+<h2>How side hustle income is taxed in 2026</h2>
+<p>Side gig profit gets hit by three separate taxes:</p>
+<ul>
+  <li><strong>Self-employment tax.</strong> 15.3% on 92.35% of your net profit. It's the Social Security and Medicare that an employer would normally split with you. The 12.4% Social Security part stops at the 2026 wage base of <strong>$184,500</strong>, counting your W-2 wages first.</li>
+  <li><strong>Federal income tax.</strong> Side income stacks on top of your salary, so it's taxed at your highest bracket. The calculator works out your tax with and without the gig and shows only the difference.</li>
+  <li><strong>State income tax.</strong> Entered as a flat rate on your profit.</li>
+</ul>
+<p>Two deductions soften the blow: you deduct half of your self-employment tax, and most side businesses also get the <strong>20% qualified business income (QBI) deduction</strong>. The calculator simplifies QBI to 20% of profit minus half the SE tax, and only while taxable income stays under $201,750 (single or head of household) or $403,500 (married filing jointly).</p>
+
+<h2>The formula</h2>
+<div class="formula">net profit = income − expenses − (miles × IRS rate)<br>
+SE tax = net profit × 92.35% × 15.3%<br>
+taxable income = W-2 + net profit − ½ SE tax − standard deduction − QBI<br>
+federal tax on gig = tax(with gig) − tax(W-2 only)<br>
+take-home = net profit − SE tax − federal tax − state tax</div>
+<p>Take-home treats your driving as a real cost at the IRS rate, since that rate is meant to cover gas, wear and depreciation.</p>
+
+<h2>Example: $20,000 of gig income on top of a $60,000 job</h2>
+<p>A single filer earns $20,000 from deliveries, spends $2,000 on supplies and fees, and drives 1,000 business miles in each half of the year. State tax is 5%.</p>
+<table>
+  <tr><th>Step</th><th>Amount</th></tr>
+  <tr><td>Mileage deduction (1,000 × $0.725 + 1,000 × $0.76)</td><td>$1,485.00</td></tr>
+  <tr><td>Net profit ($20,000 − $2,000 − $1,485)</td><td>$16,515.00</td></tr>
+  <tr><td>Self-employment tax ($16,515 × 92.35% × 15.3%)</td><td>$2,333.50</td></tr>
+  <tr><td>QBI deduction</td><td>$3,069.65</td></tr>
+  <tr><td>Extra federal income tax ($7,071.29 − $5,020.00)</td><td>$2,051.29</td></tr>
+  <tr><td>State tax (5% of $16,515)</td><td>$825.75</td></tr>
+  <tr><td><strong>Total tax on the side gig</strong></td><td><strong>$5,210.54</strong></td></tr>
+  <tr><td><strong>Take-home</strong></td><td><strong>$11,304.46</strong></td></tr>
+</table>
+<p>That's an effective rate of 31.6% on profit, or about $26.05 of every $100 the gig brings in. Spread over four quarterly payments, it's $1,302.63 each.</p>
+
+<h2>Practical tips</h2>
+<ul>
+  <li><strong>Set aside on every payout.</strong> Move the per-$100 amount into a separate savings account the day money arrives. It's much easier than finding $1,300 in September.</li>
+  <li><strong>Withholding can replace quarterly payments.</strong> Raising the withholding on your W-2 job (Form W-4, line 4c) counts as paid evenly through the year and is easier to automate.</li>
+  <li><strong>Track mileage from January 1.</strong> In 2026 the rate went from 72.5¢ to 76¢ on July 1, so log dates as well as miles. At these rates, every 1,000 business miles saves this example filer roughly $270 in tax.</li>
+  <li><strong>Deduct the obvious costs:</strong> platform fees, supplies, a share of your phone bill, software and equipment. Keep receipts.</li>
+  <li><strong>Know the safe harbor.</strong> You avoid underpayment penalties by paying at least 100% of last year's total tax (110% if your AGI was over $150,000) through withholding and estimates.</li>
+</ul>

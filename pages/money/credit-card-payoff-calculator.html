@@ -1,0 +1,192 @@
+---
+{
+  "title": "Credit Card Payoff Calculator: Months & Interest",
+  "description": "See how many months it takes to pay off a credit card, total interest, and how much you save versus minimum payments, or find the payment for a target date.",
+  "h1": "Credit Card Payoff Calculator",
+  "short": "Credit Card Payoff Calculator",
+  "intro": "Enter your balance and APR, then choose a monthly payment or a target payoff date to see when you'll be debt-free and how much interest you'll pay.",
+  "updated": "September 2026",
+  "related": ["emergency-fund-calculator", "savings-goal-calculator", "hourly-to-salary-calculator", "side-hustle-tax-calculator"],
+  "faq": [
+    {"q": "How long will it take to pay off my credit card?", "a": "It depends on your balance, APR and payment. A $5,000 balance at 22% APR takes 34 months at $200 a month and costs about $1,750 in interest. Paying only a typical minimum of 1% plus interest stretches the same balance to more than 19 years."},
+    {"q": "How is the credit card minimum payment calculated?", "a": "Each issuer sets its own formula, found in your cardholder agreement. Common versions are 1% of the balance plus that month's interest and fees, or a flat 2% to 3% of the balance, with a floor of around $25 to $35. The comparison in this calculator uses 1% plus interest with a $25 floor."},
+    {"q": "Why is my balance barely going down?", "a": "Most of a small payment goes to interest. At 22% APR, a $5,000 balance builds up about $92 of interest in the first month, so a $100 payment only reduces the balance by about $8. If your payment is at or below the monthly interest, the balance never goes down."},
+    {"q": "Is monthly interest calculated exactly like this calculator?", "a": "Close, but not exactly. Most cards charge interest daily on your average daily balance, using APR ÷ 365. Dividing the APR by 12 each month is a standard approximation and usually lands within a few dollars of your statements."},
+    {"q": "Should I pay off credit card debt or build savings first?", "a": "A common approach is to keep a small starter emergency fund, often $1,000 or one month of expenses, so a surprise bill doesn't go back on the card, then put every extra dollar toward cards charging 20% or more. Few savings accounts come close to that rate."},
+    {"q": "Does a balance transfer help?", "a": "It can. A 0% intro APR transfer card lets every payment go to principal, but most charge a 3% to 5% transfer fee and the rate jumps when the intro period ends. Divide the balance by the intro months to find the payment that clears it in time."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="balance">Card balance</label>
+          <div class="input"><span class="unit pre">$</span><input id="balance" name="balance" type="number" min="0" step="100" value="5000" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="apr">APR</label>
+          <div class="input"><input id="apr" name="apr" type="number" min="0" max="60" step="0.1" value="22" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="mode">I want to…</label>
+        <select id="mode" name="mode">
+          <option value="payment">Pay a fixed amount each month</option>
+          <option value="months">Be debt-free in a set number of months</option>
+        </select>
+      </div>
+      <div class="field" data-show="payment">
+        <label for="payment">Monthly payment</label>
+        <div class="input"><span class="unit pre">$</span><input id="payment" name="payment" type="number" min="0" step="10" value="200" inputmode="decimal"></div>
+      </div>
+      <div class="field" data-show="months" hidden>
+        <label for="months">Months to pay off</label>
+        <div class="input"><input id="months" name="months" type="number" min="1" max="600" step="1" value="24" inputmode="decimal"><span class="unit">months</span></div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="startMonth">First payment</label>
+          <select id="startMonth" name="startMonth">
+            <option value="0">January</option><option value="1">February</option><option value="2">March</option>
+            <option value="3">April</option><option value="4">May</option><option value="5">June</option>
+            <option value="6">July</option><option value="7">August</option><option value="8">September</option>
+            <option value="9" selected>October</option><option value="10">November</option><option value="11">December</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="startYear">Year</label>
+          <div class="input"><input id="startYear" name="startYear" type="number" min="2000" max="2100" step="1" value="2026" inputmode="numeric"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your payoff plan</h2>
+    <div class="result big"><span>Debt-free in</span><b data-out="headline">—</b></div>
+    <div class="result"><span>Last payment</span><b data-out="date">—</b></div>
+    <div class="result" data-show="months" hidden><span>Required monthly payment</span><b data-out="reqPay">—</b></div>
+    <div class="result"><span>Total interest</span><b data-out="interest">—</b></div>
+    <div class="result"><span>Total paid</span><b data-out="total">—</b></div>
+    <div class="result"><span>Minimum payments only: time</span><b data-out="minTime">—</b></div>
+    <div class="result"><span>Minimum payments only: interest</span><b data-out="minInterest">—</b></div>
+    <div class="result"><span>Interest you save vs minimum</span><b data-out="saved">—</b></div>
+    <div data-show="timeline">
+      <h2>Balance by year</h2>
+      <div data-timeline></div>
+    </div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+// Comparison minimum payment: 1% of balance + that month's interest, at least $25 (a common issuer formula).
+const MIN_PCT = 0.01, MIN_FLOOR = 25, MAX_MONTHS = 1200;
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+// Monthly simulation with APR/12 compounding. payFn(balance, interest) returns the payment for that month.
+function simulate(balance, apr, payFn) {
+  const r = apr / 100 / 12;
+  let bal = balance, months = 0, interest = 0, paid = 0;
+  const yearly = [];
+  while (bal > 0.005 && months < MAX_MONTHS) {
+    const i = bal * r;
+    const p = payFn(bal, i);
+    if (p <= i) return null;               // payment never gets ahead of interest
+    bal += i; interest += i;
+    const pay = Math.min(p, bal);
+    bal -= pay; paid += pay; months++;
+    if (months % 12 === 0 && bal > 0.005) yearly.push(bal);
+  }
+  if (bal > 0.005) return null;
+  return { months, interest, paid, yearly };
+}
+
+function span(m) {
+  const y = Math.floor(m / 12), mo = m % 12;
+  const parts = [];
+  if (y) parts.push(y + (y === 1 ? " year" : " years"));
+  if (mo || !y) parts.push(mo + (mo === 1 ? " month" : " months"));
+  return parts.join(" ");
+}
+
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const byMonths = v.mode === "months";
+  out.show("payment", !byMonths);
+  out.show("months", byMonths);
+  const timelineEl = document.querySelector("[data-timeline]");
+  const r = v.apr / 100 / 12;
+
+  let payment = v.payment;
+  if (byMonths) {
+    const n = Math.max(1, Math.round(v.months));
+    payment = r > 0 ? v.balance * r / (1 - Math.pow(1 + r, -n)) : v.balance / n;
+    out.set("reqPay", Calc.money(payment));
+  }
+
+  const blank = ["headline", "date", "interest", "total", "saved"];
+  const plan = v.balance > 0 ? simulate(v.balance, v.apr, () => payment) : null;
+  const min = v.balance > 0 ? simulate(v.balance, v.apr, (b, i) => Math.max(MIN_PCT * b + i, MIN_FLOOR)) : null;
+
+  out.set("minTime", min ? span(min.months) : "—");
+  out.set("minInterest", min ? Calc.money(min.interest) : "—");
+
+  if (!plan) {
+    blank.forEach((k) => out.set(k, "—"));
+    out.show("timeline", false);
+    if (v.balance <= 0) out.note("Enter your card balance to see a payoff plan.");
+    else out.note(`Your payment doesn't cover the monthly interest (about ${Calc.money(v.balance * r)} in the first month), so this balance will never be paid off. Pay more than that to start reducing the debt.`);
+    return;
+  }
+
+  const idx = v.startMonth + plan.months - 1;
+  const endMonth = ((idx % 12) + 12) % 12;
+  const endYear = v.startYear + Math.floor(idx / 12);
+  out.set("headline", span(plan.months));
+  out.set("date", `${MONTHS[endMonth]} ${endYear}`);
+  out.set("interest", Calc.money(plan.interest));
+  out.set("total", Calc.money(plan.paid));
+  const saved = min ? min.interest - plan.interest : NaN;
+  out.set("saved", Calc.money(saved), Calc.tone(saved));
+
+  out.show("timeline", plan.yearly.length > 0);
+  timelineEl.innerHTML = plan.yearly.slice(0, 10).map((b, k) =>
+    `<div class="result"><span>After ${(k + 1) * 12} payments</span><b>${Calc.money(b)}</b></div>`).join("");
+
+  const firstMin = Math.max(MIN_PCT * v.balance + v.balance * r, MIN_FLOOR);
+  if (payment < firstMin) out.note(`Your payment is below a typical minimum of about ${Calc.money(firstMin)} for this balance. Check your statement for your card's actual minimum.`);
+  else out.note(`About ${Calc.pct(plan.interest / plan.paid)} of what you pay goes to interest. Uses APR ÷ 12 each month; your card's daily interest may differ slightly. Not financial advice.`);
+}));
+</script>
+<!-- article -->
+<p><strong>This is an estimate, not financial advice.</strong> Your card's exact interest, fees, new purchases and promotional rates will change the numbers. It assumes you stop adding charges to the card.</p>
+
+<h2>How the payoff is calculated</h2>
+<p>Each month the calculator adds interest at your APR divided by 12, then subtracts your payment. It repeats until the balance hits zero, with a smaller final payment to finish it off. In target mode it solves for the fixed payment that clears the balance in exactly the months you choose.</p>
+<div class="formula">monthly rate r = APR ÷ 12<br>
+new balance = balance × (1 + r) − payment<br>
+payment for n months = balance × r ÷ (1 − (1 + r)<sup>−n</sup>)</div>
+<p>For comparison, it also runs a minimum-payment plan using a common issuer formula: 1% of the balance plus that month's interest, never less than $25. Because the minimum shrinks as the balance falls, that plan takes years longer.</p>
+
+<h2>Example: $5,000 at 22% APR</h2>
+<p>The average APR on cards that charge interest is around 22%, according to the Federal Reserve's G.19 consumer credit data. Here's a $5,000 balance paid at $200 a month, starting October 2026.</p>
+<table>
+  <tr><th>Plan</th><th>Result</th></tr>
+  <tr><td>First month's interest ($5,000 × 22% ÷ 12)</td><td>$91.67</td></tr>
+  <tr><td>Balance after 12 payments</td><td>$3,560.57</td></tr>
+  <tr><td>Balance after 24 payments</td><td>$1,770.49</td></tr>
+  <tr><td><strong>Debt-free in</strong></td><td><strong>2 years 10 months (July 2029)</strong></td></tr>
+  <tr><td>Total interest / total paid</td><td>$1,749.88 / $6,749.88</td></tr>
+  <tr><td>Minimum payments only</td><td>19 years 2 months, $8,099.77 interest</td></tr>
+  <tr><td>Interest saved by paying $200</td><td>$6,349.89</td></tr>
+</table>
+<p>Want it gone in 24 months instead? Switch the mode: the required payment is $259.39, and total interest falls to $1,225.38.</p>
+
+<h2>Ways to pay it off faster</h2>
+<ul>
+  <li><strong>Pay a fixed amount, not the minimum.</strong> Minimums fall as your balance falls, which is exactly what stretches payoff out for decades. Set a fixed autopay amount and leave it.</li>
+  <li><strong>Avalanche or snowball.</strong> With several cards, pay minimums on all and throw extra at either the highest APR (avalanche, least interest) or the smallest balance (snowball, quicker wins).</li>
+  <li><strong>Ask for a lower rate.</strong> If you pay on time, call your issuer. Even a few points off a 22% APR saves real money on a multi-year payoff.</li>
+  <li><strong>Consider a 0% balance transfer</strong> if your credit is good, and divide the balance plus the transfer fee by the intro months to set your payment.</li>
+  <li><strong>Stop new charges.</strong> The plan only works if the balance isn't growing behind you. Keep a small emergency fund so surprises don't land on the card.</li>
+</ul>

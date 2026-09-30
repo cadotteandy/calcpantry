@@ -1,0 +1,174 @@
+---
+{
+  "title": "Wallpaper Calculator: How Many Rolls Do I Need?",
+  "description": "Count the wallpaper rolls a room needs using the strip method, with pattern repeat, trim allowance, doors and windows, roll size and total cost.",
+  "h1": "Wallpaper Calculator",
+  "short": "Wallpaper Calculator",
+  "intro": "Enter your wall width, height, roll size and pattern repeat to see how many strips you'll hang and how many rolls to order.",
+  "updated": "September 2026",
+  "related": ["paint-calculator", "drywall-calculator", "tile-calculator", "flooring-calculator"],
+  "faq": [
+    {"q": "How big is a roll of wallpaper?", "a": "Most American wallpaper is about 20.5 to 21 inches wide and sold in double rolls about 33 feet long, roughly 56 square feet. A single roll is half that length. European rolls are usually 20.5 inches by about 33 feet as a single roll, and many designer papers are 27 inches wide. Always enter the size on the label."},
+    {"q": "Why is wallpaper priced per single roll but sold in double rolls?", "a": "It is an industry habit. Many American wallpapers are quoted per single roll but only shipped as double rolls, so a listing of 45 dollars per roll can mean 90 dollars per double roll you actually receive. Enter the price of the roll length you entered above."},
+    {"q": "What is a pattern repeat?", "a": "The repeat is the vertical distance before the design starts again, printed on the label as a number in inches. To line strips up, each one has to start at the same point in the pattern, so every strip is cut to a multiple of the repeat. Large repeats waste more paper per strip."},
+    {"q": "Should I subtract doors and windows for wallpaper?", "a": "Only partly. A door takes out close to a full strip width, but windows still need short pieces above and below, and those rarely come entirely from scraps. This calculator removes 3 feet of width per door and 1.5 feet per window."},
+    {"q": "How many extra rolls of wallpaper should I buy?", "a": "Buy at least one roll more than the calculated number if the room has lots of corners, or if you are new to hanging paper. Order every roll from the same print run, called the batch or dye lot, because a later batch may not match in color."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="width">Total wall width</label>
+          <div class="input"><input id="width" name="width" type="number" min="0" step="0.1" value="48" inputmode="decimal"><span class="unit">ft</span></div>
+          <div class="hint">Add up every wall you'll paper.</div>
+        </div>
+        <div class="field">
+          <label for="height">Wall height</label>
+          <div class="input"><input id="height" name="height" type="number" min="0" step="0.1" value="8" inputmode="decimal"><span class="unit">ft</span></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="doors">Doors</label>
+          <div class="input"><input id="doors" name="doors" type="number" min="0" step="1" value="1" inputmode="numeric"></div>
+          <div class="hint">Removes 3 ft of width each.</div>
+        </div>
+        <div class="field">
+          <label for="windows">Windows</label>
+          <div class="input"><input id="windows" name="windows" type="number" min="0" step="1" value="2" inputmode="numeric"></div>
+          <div class="hint">Removes 1.5 ft of width each.</div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="rollW">Roll width</label>
+          <div class="input"><input id="rollW" name="rollW" type="number" min="1" step="0.25" value="20.5" inputmode="decimal"><span class="unit">in</span></div>
+        </div>
+        <div class="field">
+          <label for="rollL">Roll length</label>
+          <div class="input"><input id="rollL" name="rollL" type="number" min="1" step="0.5" value="33" inputmode="decimal"><span class="unit">ft</span></div>
+          <div class="hint">US double roll ≈ 33 ft.</div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="repeat">Pattern repeat</label>
+          <div class="input"><input id="repeat" name="repeat" type="number" min="0" step="0.25" value="21" inputmode="decimal"><span class="unit">in</span></div>
+          <div class="hint">0 for plain or random-match paper.</div>
+        </div>
+        <div class="field">
+          <label for="trim">Trim allowance</label>
+          <div class="input"><input id="trim" name="trim" type="number" min="0" step="0.5" value="4" inputmode="decimal"><span class="unit">in</span></div>
+          <div class="hint">Extra per strip for trimming top and bottom.</div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="price">Price per roll</label>
+        <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="50" inputmode="decimal"></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Rolls to buy</span><b data-out="rolls">—</b></div>
+    <div class="result"><span>Strips needed</span><b data-out="strips">—</b></div>
+    <div class="result"><span>Cut length per strip</span><b data-out="cut">—</b></div>
+    <div class="result"><span>Strips per roll</span><b data-out="perRoll">—</b></div>
+    <div class="result"><span>Width to cover</span><b data-out="net">—</b></div>
+    <div class="result"><span>Estimated cost</span><b data-out="cost">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  // Cut length: wall height + trim, rounded up to a whole number of pattern repeats.
+  let cut = v.height * 12 + v.trim;
+  if (v.repeat > 0) cut = Math.ceil(cut / v.repeat - 1e-9) * v.repeat;
+  const perRoll = cut > 0 ? Math.floor((v.rollL * 12) / cut + 1e-9) : 0;
+  const net = Math.max(0, v.width - v.doors * 3 - v.windows * 1.5);
+  const strips = v.rollW > 0 ? Math.ceil((net * 12) / v.rollW - 1e-9) : 0;
+  const rolls = perRoll > 0 ? Math.ceil(strips / perRoll - 1e-9) : 0;
+
+  const ftIn = (inches) => {
+    const ft = Math.floor(inches / 12 + 1e-9);
+    const rem = inches - ft * 12;
+    return `${ft} ft ${Calc.num(rem, 2)} in`;
+  };
+
+  out.set("rolls", perRoll === 0 && strips > 0 ? "Roll too short" : rolls === 1 ? "1 roll" : `${Calc.num(rolls, 0)} rolls`);
+  out.set("strips", Calc.num(strips, 0));
+  out.set("cut", ftIn(cut));
+  out.set("perRoll", Calc.num(perRoll, 0));
+  out.set("net", `${Calc.num(net, 1)} ft`);
+  out.set("cost", Calc.money(rolls * v.price));
+
+  if (strips <= 0) return;
+  if (perRoll === 0) { out.note("One strip is longer than the roll. Check the roll length and wall height."); return; }
+  const leftover = v.rollL * 12 - perRoll * cut;
+  const spare = rolls * perRoll - strips;
+  out.note(`Each roll leaves about ${ftIn(leftover)} of offcut, useful above doors and below windows. ` +
+    `You'll have ${spare} full strip${spare === 1 ? "" : "s"} to spare.`);
+}));
+</script>
+<!-- article -->
+<h2>Why wallpaper is counted in strips</h2>
+<p>Dividing wall area by the square footage on the label almost always comes up short. Wallpaper is hung in vertical
+strips, each cut a little longer than the wall and matched to the pattern, and the leftover at the end of each roll is
+usually too short for another full strip. The strip method used here, the same one paperhangers use, counts how many
+full-height strips you need and how many you can cut from each roll.</p>
+<ol>
+  <li><strong>Cut length.</strong> Wall height plus a trim allowance (4 in is standard: 2 in at the ceiling, 2 in at the
+  baseboard), rounded up to a whole number of pattern repeats so every strip starts at the same point in the design.</li>
+  <li><strong>Strips per roll.</strong> Roll length divided by cut length, rounded down.</li>
+  <li><strong>Strips needed.</strong> Wall width divided by roll width, rounded up. Doors remove 3 ft of width each;
+  windows remove 1.5 ft, because the space above and below still needs short pieces.</li>
+  <li><strong>Rolls.</strong> Strips needed divided by strips per roll, rounded up.</li>
+</ol>
+
+<h2>The formula</h2>
+<div class="formula">cut length = height + trim, rounded up to a multiple of the repeat<br>
+strips per roll = roll length ÷ cut length, rounded down<br>
+strips needed = (wall width − 3 ft × doors − 1.5 ft × windows) ÷ roll width, rounded up<br>
+rolls = strips needed ÷ strips per roll, rounded up</div>
+<p>A common shortcut is strips per roll = roll length ÷ (height + repeat). It gives the same or a slightly more
+cautious answer, and is a good sanity check if you don't know the exact repeat.</p>
+
+<h2>Example: a 12 × 12 ft bedroom</h2>
+<p>Four 12 ft walls (48 ft total), 8 ft high, one door and two windows, standard US double rolls (20.5 in × 33 ft) with
+a 21 in repeat and 4 in trim allowance, at $50 per double roll.</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Cut length (96 + 4 = 100 in, rounded up to 5 × 21 in)</td><td>105 in (8 ft 9 in)</td></tr>
+  <tr><td>Strips per roll (396 in ÷ 105 = 3.77)</td><td>3</td></tr>
+  <tr><td>Width to cover (48 − 3 − 3)</td><td>42 ft</td></tr>
+  <tr><td>Strips needed (504 in ÷ 20.5 = 24.6)</td><td>25</td></tr>
+  <tr><td><strong>Rolls (25 ÷ 3 = 8.3)</strong></td><td><strong>9 rolls</strong></td></tr>
+  <tr><td>Estimated cost (9 × $50)</td><td>$450.00</td></tr>
+</table>
+<p>With a plain paper (repeat 0), each strip is 100 in, a roll yields 3 strips (3.96 rounded down) and you still need
+9 rolls. Set the trim to 0 as well and a roll seems to give 4 strips of exactly 96 in, cutting the order to 7 rolls,
+but with no margin for an uneven ceiling you'd likely run short. Keep the trim allowance.</p>
+
+<h3>Typical roll sizes</h3>
+<table>
+  <tr><th>Type</th><th>Width</th><th>Length</th><th>Area</th></tr>
+  <tr><td>US double roll</td><td>20.5–21 in</td><td>33 ft</td><td>≈ 56 sq ft</td></tr>
+  <tr><td>US single roll</td><td>20.5–21 in</td><td>16.5 ft</td><td>≈ 28 sq ft</td></tr>
+  <tr><td>Euro roll</td><td>20.5 in</td><td>33 ft</td><td>≈ 56 sq ft</td></tr>
+  <tr><td>Wide / commercial</td><td>27 in</td><td>27 ft</td><td>≈ 61 sq ft</td></tr>
+</table>
+
+<h2>Tips before you order</h2>
+<ul>
+  <li><strong>Check how it's priced.</strong> Many US retailers quote a single-roll price but ship only double rolls.
+  Enter the price for the roll length you entered.</li>
+  <li><strong>Watch for half-drop matches.</strong> On a half-drop pattern every other strip starts half a repeat lower;
+  adding half the repeat to the trim allowance covers it.</li>
+  <li><strong>Buy one batch, plus one.</strong> Rolls from different print runs can differ in shade. An extra roll is
+  cheaper than a mismatched wall.</li>
+  <li><strong>Measure each wall.</strong> Add widths rather than using the room perimeter if you are skipping an accent
+  wall or a wall of built-ins.</li>
+</ul>

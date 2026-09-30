@@ -1,0 +1,149 @@
+---
+{
+  "title": "Freelance Rate Calculator: Find Your Minimum Hourly Rate",
+  "description": "Work out the hourly, day and monthly rate you need as a freelancer to hit your income goal after taxes, expenses, time off and unbillable hours.",
+  "h1": "Freelance Rate Calculator",
+  "short": "Freelance Rate Calculator",
+  "intro": "Start from the income you want to take home and work backward to the minimum hourly rate that gets you there, once taxes, expenses and unbillable time are counted.",
+  "updated": "September 2026",
+  "related": ["side-hustle-tax-calculator", "lease-vs-buy-calculator", "3d-print-cost-calculator", "etsy-fee-calculator"],
+  "faq": [
+    {"q": "How do I calculate my freelance hourly rate?", "a": "Add the income you want before tax to your yearly business expenses, then divide by the hours you can actually bill in a year. Billable hours are your working weeks times the hours per week spent on paid client work, not total hours worked."},
+    {"q": "Why can't I just divide my old salary by 2,080?", "a": "Because 2,080 assumes you bill 40 hours every week of the year. Freelancers pay for their own time off, equipment, software and insurance, pay both halves of Social Security and Medicare, and spend a big share of the week on unpaid work like sales and admin. That's why freelance rates are usually two to three times the salary-based number."},
+    {"q": "How many billable hours per week is realistic for a freelancer?", "a": "Most full-time freelancers bill 20 to 30 hours a week. The rest goes to finding clients, emails, invoicing, bookkeeping and learning. Planning on 40 billable hours a week almost always leaves you short."},
+    {"q": "How much should a freelancer set aside for taxes?", "a": "A common range is 25% to 35% of profit. That covers federal income tax, 15.3% self-employment tax on most of your profit, and state tax. Use our side hustle tax calculator for an estimate based on your actual income and filing status."},
+    {"q": "Should I charge a day rate or an hourly rate?", "a": "Day and project rates reward you for working efficiently and reduce haggling over hours, but you still need an hourly floor to price them. Estimate the hours a project will take, multiply by your minimum rate, and add a buffer for revisions."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="income">Income goal</label>
+        <div class="input"><span class="unit pre">$</span><input id="income" name="income" type="number" min="0" step="1000" value="60000" inputmode="decimal"><span class="unit">/ year</span></div>
+      </div>
+      <div class="field">
+        <label for="mode">That number is my…</label>
+        <select id="mode" name="mode">
+          <option value="takehome">Take-home pay after tax</option>
+          <option value="salary">Salary equivalent (before tax)</option>
+        </select>
+      </div>
+      <div class="field" data-show="takehome">
+        <label for="taxRate">Tax set-aside</label>
+        <div class="input"><input id="taxRate" name="taxRate" type="number" min="0" max="60" step="1" value="28" inputmode="decimal"><span class="unit">%</span></div>
+        <div class="hint">Share of pre-tax income kept for federal, state and self-employment tax.</div>
+      </div>
+      <div class="field">
+        <label for="expenses">Business expenses</label>
+        <div class="input"><span class="unit pre">$</span><input id="expenses" name="expenses" type="number" min="0" step="100" value="6000" inputmode="decimal"><span class="unit">/ year</span></div>
+        <div class="hint">Software, equipment, health insurance, accounting, coworking, marketing.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="weeksOff">Weeks off per year</label>
+          <div class="input"><input id="weeksOff" name="weeksOff" type="number" min="0" max="51" step="1" value="6" inputmode="decimal"><span class="unit">wk</span></div>
+          <div class="hint">Vacation, holidays and sick days.</div>
+        </div>
+        <div class="field">
+          <label for="hours">Billable hours per week</label>
+          <div class="input"><input id="hours" name="hours" type="number" min="1" max="80" step="1" value="25" inputmode="decimal"><span class="unit">h</span></div>
+          <div class="hint">Paid client time only. 100% billable is unrealistic.</div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="margin">Profit margin</label>
+        <div class="input"><input id="margin" name="margin" type="number" min="0" max="80" step="1" value="10" inputmode="decimal"><span class="unit">%</span></div>
+        <div class="hint">Buffer for slow months, savings and growth. Use 0 for a bare minimum.</div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your rates</h2>
+    <div class="result big"><span>Minimum hourly rate</span><b data-out="rate">—</b></div>
+    <div class="result"><span>Day rate (8 hours)</span><b data-out="day">—</b></div>
+    <div class="result"><span>Weekly revenue target</span><b data-out="week">—</b></div>
+    <div class="result"><span>Monthly revenue target</span><b data-out="month">—</b></div>
+    <div class="result"><span>Annual revenue needed</span><b data-out="annual">—</b></div>
+    <div class="result"><span>Billable hours per year</span><b data-out="billHours">—</b></div>
+    <div class="result"><span>Naive rate (salary ÷ 2,080)</span><b data-out="naive">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+const WEEKS_PER_YEAR = 52;
+const FULL_TIME_HOURS = 2080;          // 40 h × 52 weeks: the salary-to-hourly shortcut
+const EMPLOYER_FICA = 0.0765;          // share of Social Security + Medicare an employer would have paid
+const DAY_HOURS = 8;
+
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const salaryMode = v.mode === "salary";
+  out.show("takehome", !salaryMode);
+
+  // Pre-tax income the business must pay you (salary equivalent).
+  const taxShare = Math.min(v.taxRate, 95) / 100;
+  const preTax = salaryMode ? v.income * (1 + EMPLOYER_FICA) : v.income / (1 - taxShare);
+  const salaryEquivalent = salaryMode ? v.income : preTax;
+  const beforeMargin = preTax + v.expenses;
+  const annual = beforeMargin / (1 - Math.min(v.margin, 95) / 100);
+
+  const weeks = Math.max(0, WEEKS_PER_YEAR - v.weeksOff);
+  const billHours = weeks * v.hours;
+  const rate = billHours > 0 ? annual / billHours : NaN;
+  const naive = salaryEquivalent / FULL_TIME_HOURS;
+
+  out.set("rate", Calc.money(rate));
+  out.set("day", Calc.money(rate * DAY_HOURS));
+  out.set("week", weeks > 0 ? Calc.money(annual / weeks) : "—");
+  out.set("month", Calc.money(annual / 12));
+  out.set("annual", Calc.money(annual));
+  out.set("billHours", Calc.num(billHours, 0));
+  out.set("naive", Calc.money(naive));
+
+  if (billHours <= 0) out.note("Add some working weeks and billable hours to see a rate.");
+  else if (v.hours > 35) out.note("More than 35 billable hours a week is hard to sustain once sales, email and admin are counted.");
+  else if (naive > 0) out.note(`Your minimum rate is ${Calc.num(rate / naive, 1)}× the salary ÷ 2,080 shortcut.`);
+}));
+</script>
+<!-- article -->
+<h2>Why freelance rates look high</h2>
+<p>Dividing a salary by 2,080 hours is the most common way new freelancers underprice themselves. That number assumes 40 paid hours every week of the year. As a freelancer you pay for your own vacation and sick days, your own equipment and insurance, and both halves of Social Security and Medicare. On top of that, a good chunk of every week goes to work nobody pays for: finding clients, writing proposals, invoicing and bookkeeping.</p>
+<p>This calculator works backward from what you want to keep. It grosses your income goal up for taxes, adds your business costs and an optional profit margin, then spreads the total over the hours you can realistically bill.</p>
+
+<h2>The formula</h2>
+<div class="formula">pre-tax income = take-home ÷ (1 − tax set-aside %)<br>
+annual revenue = (pre-tax income + expenses) ÷ (1 − profit margin %)<br>
+billable hours = (52 − weeks off) × billable hours per week<br>
+minimum hourly rate = annual revenue ÷ billable hours</div>
+<p>If you enter a salary equivalent instead, the calculator adds 7.65% to it: the Social Security and Medicare an employer would have paid on your behalf, which you now pay yourself through self-employment tax.</p>
+
+<h2>Example: $60,000 take-home</h2>
+<p>You want $60,000 a year after tax, expect $6,000 in business costs, take 6 weeks off, bill 25 hours a week and want a 10% margin.</p>
+<table>
+  <tr><th>Step</th><th>Amount</th></tr>
+  <tr><td>Pre-tax income ($60,000 ÷ 0.72)</td><td>$83,333.33</td></tr>
+  <tr><td>Plus expenses</td><td>$89,333.33</td></tr>
+  <tr><td>Annual revenue with 10% margin (÷ 0.90)</td><td>$99,259.26</td></tr>
+  <tr><td>Billable hours (46 weeks × 25)</td><td>1,150</td></tr>
+  <tr><td><strong>Minimum hourly rate</strong></td><td><strong>$86.31</strong></td></tr>
+  <tr><td>Day rate (8 hours)</td><td>$690.50</td></tr>
+  <tr><td>Weekly / monthly revenue target</td><td>$2,157.81 / $8,271.60</td></tr>
+  <tr><td>Naive rate ($83,333.33 ÷ 2,080)</td><td>$40.06</td></tr>
+</table>
+<p>The realistic rate is 2.2 times the shortcut. Charging $40 an hour would leave this freelancer with well under half of the income they planned for.</p>
+
+<h2>Getting the inputs right</h2>
+<h3>Billable hours</h3>
+<p>Most full-time freelancers bill 20 to 30 hours a week. If you're just starting and still building a client list, 15 to 20 is more honest. Track your time for a month to find your real number.</p>
+<h3>Expenses</h3>
+<p>Include everything an employer used to cover: health insurance premiums, retirement contributions you want to match, laptop replacement spread over three years, software subscriptions, professional fees and marketing.</p>
+<h3>Tax set-aside</h3>
+<p>28% is a reasonable middle estimate for a single filer in a state with income tax. If you live in a no-income-tax state or earn less, it may be closer to 22–25%; high earners in high-tax states may need 35% or more.</p>
+
+<h2>Using the number</h2>
+<ul>
+  <li><strong>Treat it as a floor,</strong> not a target. Market rates for your skill may be higher, and you should charge them.</li>
+  <li><strong>Quote projects, not hours,</strong> when you can. Estimate hours, multiply by your rate and add 15–20% for revisions and scope creep.</li>
+  <li><strong>Revisit it yearly.</strong> Raise rates for new clients first, and give existing clients notice before an increase.</li>
+</ul>
