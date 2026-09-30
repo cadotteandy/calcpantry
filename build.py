@@ -29,7 +29,8 @@ SITE = {
     "name": "CalcPantry",
     "tagline": "Free calculators for sellers, home projects, pets, hobbies and money",
     "url": "https://calcpantry.com",
-    "adsense_client": "",                 # e.g. "ca-pub-1234567890" — ads stay hidden until set
+    "adsense_client": "ca-pub-6857897091548503",  # loads Google's ad script (Auto ads) on every page
+    "adsense_slot": "",                   # ad unit ID from AdSense; the fixed ad spaces stay empty until set
     "contact_email": "kagegarasu@gmail.com",
     "year": date.today().year,
 }
