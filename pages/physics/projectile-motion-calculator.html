@@ -1,0 +1,175 @@
+---
+{
+  "title": "Projectile Motion Calculator: Range, Max Height & Flight Time",
+  "description": "Enter launch speed, angle and starting height to get time of flight, maximum height, horizontal range and impact speed. Handles launches from above the ground, ignoring air resistance.",
+  "h1": "Projectile Motion Calculator",
+  "short": "Projectile Motion",
+  "intro": "Enter how fast something is launched, at what angle, and from what height. See how long it flies, how high it goes, how far it lands and how fast it hits, with every step shown.",
+  "updated": "October 2026",
+  "related": ["acceleration-calculator", "speed-distance-time-calculator", "potential-energy-calculator", "kinetic-energy-calculator"],
+  "faq": [
+    {"q": "What angle gives the maximum range?", "a": "On level ground with no air resistance, 45° gives the longest range. When you launch from above the landing point the best angle is a little lower, and this calculator shows it for your height. With real air resistance, the best angle for a ball is usually lower still, often 35° to 42°."},
+    {"q": "How do you calculate time of flight from a height?", "a": "Split the launch speed into vertical (v·sin θ) and horizontal (v·cos θ) parts. The vertical motion gives t = (v·sin θ + √((v·sin θ)² + 2gh)) ÷ g, where h is the launch height above the landing level. When h = 0 this reduces to the familiar t = 2v·sin θ ÷ g."},
+    {"q": "Why doesn't the horizontal speed change?", "a": "With no air resistance, the only force is gravity, which acts straight down. Nothing pushes the projectile sideways, so its horizontal velocity stays at v·cos θ the whole flight. That's why range is just horizontal speed × time of flight."},
+    {"q": "Does air resistance matter?", "a": "For slow, heavy objects over short distances, not much. For fast or light objects like baseballs, golf balls and arrows, drag cuts the range a lot, sometimes by half or more. This calculator assumes no air resistance, so treat its results as an upper limit."},
+    {"q": "Does the mass of the projectile matter?", "a": "Not without air resistance. Every object falls with the same acceleration, g = 9.80665 m/s² on Earth, so a heavy ball and a light ball launched the same way follow the same path."},
+    {"q": "Why is the impact speed faster than the launch speed?", "a": "When you launch from a height, the projectile falls farther than it rose, so gravity adds energy on the way down. By conservation of energy the impact speed is √(v² + 2gh), whatever the angle. Launched from ground level, it lands at the same speed it left."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="v">Launch speed</label>
+          <input id="v" name="v" type="number" min="0" step="any" value="20" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="vUnit">Unit</label>
+          <select id="vUnit" name="vUnit">
+            <option value="1" selected>m/s</option>
+            <option value="0.2777777777777778">km/h</option>
+            <option value="0.44704">mph</option>
+            <option value="0.3048">ft/s</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="angle">Launch angle</label>
+        <div class="input"><input id="angle" name="angle" type="number" min="-90" max="90" step="any" value="45" inputmode="decimal"><span class="unit">degrees</span></div>
+        <div class="hint">Above horizontal. Use 0 for a horizontal throw, a negative angle for a downward throw.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="h">Launch height</label>
+          <input id="h" name="h" type="number" step="any" value="1.5" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="lUnit">Length unit</label>
+          <select id="lUnit" name="lUnit">
+            <option value="1" selected>meters</option>
+            <option value="0.3048">feet</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><div class="hint" style="margin-top:-8px">Launch height is measured above the landing point: 0 for level ground, negative if it lands higher up.</div></div>
+      <div class="field">
+        <label for="planet">Gravity (g)</label>
+        <select id="planet" name="planet">
+          <option value="9.80665" selected>Earth, 9.80665 m/s² (standard)</option>
+          <option value="1.62">Moon, 1.62 m/s²</option>
+          <option value="3.71">Mars, 3.71 m/s²</option>
+        </select>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Horizontal range</span><b data-out="range">—</b></div>
+    <div class="result"><span>Time of flight</span><b data-out="tof">—</b></div>
+    <div class="result"><span>Maximum height</span><b data-out="hmax">—</b></div>
+    <div class="result"><span>Time to maximum height</span><b data-out="tpeak">—</b></div>
+    <div class="result"><span>Impact speed</span><b data-out="vimp">—</b></div>
+    <div class="result"><span>Impact angle (below horizontal)</span><b data-out="aimp">—</b></div>
+    <div class="result"><span>Horizontal / vertical launch speed</span><b data-out="comp">—</b></div>
+    <div class="result"><span>Best angle from this height</span><b data-out="best">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const SUP = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+  const fmt = (x, s = 4) => {
+    if (!isFinite(x)) return "—";
+    if (x === 0) return "0";
+    const a = Math.abs(x);
+    if (a >= 1e9 || a < 1e-3) {
+      const [m, e] = x.toExponential(s - 1).split("e");
+      return parseFloat(m) + " × 10" + String(parseInt(e, 10)).replace(/./g, (c) => SUP[c]);
+    }
+    return Calc.num(x, Math.max(0, s - 1 - Math.floor(Math.log10(a))));
+  };
+  const g = parseFloat(v.planet);
+  const L = parseFloat(v.lUnit), LU = L === 1 ? "m" : "ft";
+  const VU = { "1": "m/s", "0.2777777777777778": "km/h", "0.44704": "mph", "0.3048": "ft/s" }[v.vUnit];
+  const k = parseFloat(v.vUnit);
+  const speed = Math.abs(v.v) * k;                 // m/s
+  const th = Math.max(-90, Math.min(90, v.angle)) * Math.PI / 180;
+  const h = v.h * L;                               // m above landing level
+  const vx = speed * Math.cos(th), vy = speed * Math.sin(th);
+
+  const disc = vy * vy + 2 * g * h;
+  const t = disc >= 0 ? (vy + Math.sqrt(disc)) / g : NaN;   // time to reach landing level
+  const R = vx * t;
+  const tPeak = vy > 0 ? vy / g : 0;
+  const hMax = vy > 0 ? h + vy * vy / (2 * g) : h;
+  const vyImp = vy - g * t;                          // negative = moving down
+  const vImp = Math.sqrt(vx * vx + vyImp * vyImp);
+  const aImp = Math.atan2(-vyImp, vx) * 180 / Math.PI;
+  const len = (m) => `${fmt(m / L)} ${LU}`;
+  const spd = (ms) => `${fmt(ms / k)} ${VU}`;
+
+  out.set("range", isFinite(t) && t >= 0 ? len(R) : "—");
+  out.set("tof", isFinite(t) ? fmt(t) + " s" : "—");
+  out.set("hmax", len(hMax));
+  out.set("tpeak", fmt(tPeak) + " s");
+  out.set("vimp", isFinite(t) ? spd(vImp) : "—");
+  out.set("aimp", isFinite(t) ? fmt(aImp) + "°" : "—");
+  out.set("comp", `${spd(vx)} / ${spd(vy)}`);
+
+  const q = speed * speed + 2 * g * h;
+  if (speed > 0 && q > 0) {
+    const best = Math.atan(speed / Math.sqrt(q)) * 180 / Math.PI;
+    out.set("best", `${fmt(best)}° → ${len(speed / g * Math.sqrt(q))}`);
+  } else out.set("best", "—");
+
+  if (!(speed > 0) && h <= 0) out.note("Enter a launch speed above zero.");
+  else if (!isFinite(t)) out.note("The projectile never rises as high as the landing point. Launch faster or steeper, or raise the launch height.");
+  else out.note(`No air resistance. g = ${Calc.num(g, 5)} m/s². Height is measured above the landing point.`);
+}));
+</script>
+<!-- article -->
+<h2>How projectile motion works</h2>
+<p>Once something is thrown, kicked or fired, gravity is the only force acting on it (if we ignore air resistance).
+The trick to solving any projectile problem is to treat the horizontal and vertical motion separately:</p>
+<ul>
+  <li><strong>Horizontally</strong>, nothing pushes or pulls, so the speed stays at v·cos θ the whole time.</li>
+  <li><strong>Vertically</strong>, the projectile starts at v·sin θ upward and gravity slows it, stops it at the top, then
+  speeds it up downward at g = 9.80665 m/s² (standard gravity on Earth).</li>
+</ul>
+<p>The vertical motion decides how long the flight lasts. Multiply that time by the horizontal speed and you have the range.
+This calculator assumes no air resistance and level landing ground at height zero.</p>
+
+<h2>The formula</h2>
+<div class="formula">vx = v·cos θ &nbsp;&nbsp; vy = v·sin θ<br>
+time of flight t = (vy + √(vy² + 2·g·h)) ÷ g<br>
+range R = vx · t<br>
+max height = h + vy² ÷ (2·g)<br>
+time to max height = vy ÷ g<br>
+impact speed = √(v² + 2·g·h)<br>
+best angle θ* = arctan(v ÷ √(v² + 2·g·h))</div>
+<p>Here <em>h</em> is the launch height above the landing point. When h = 0 the flight time simplifies to 2·v·sin θ ÷ g and
+the range to v²·sin 2θ ÷ g, which is why 45° is best on level ground.</p>
+
+<h2>Example: a ball thrown at 20 m/s and 45° from 1.5 m</h2>
+<p>A ball leaves your hand 1.5 m above the ground at 20 m/s, angled 45° upward (the default values).</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>vx = vy = 20 × cos 45°</td><td>14.14 m/s</td></tr>
+  <tr><td>Time to top: 14.14 ÷ 9.80665</td><td>1.442 s</td></tr>
+  <tr><td>Max height: 1.5 + 14.14² ÷ (2 × 9.80665)</td><td>11.7 m</td></tr>
+  <tr><td>Flight time: (14.14 + √(14.14² + 2 × 9.80665 × 1.5)) ÷ 9.80665</td><td>2.987 s</td></tr>
+  <tr><td>Range: 14.14 × 2.987</td><td><strong>42.24 m</strong></td></tr>
+  <tr><td>Impact speed: √(20² + 2 × 9.80665 × 1.5)</td><td>20.72 m/s</td></tr>
+  <tr><td>Best angle from 1.5 m</td><td>43.98°, giving 42.26 m</td></tr>
+</table>
+<p>From 1.5 m up, the ideal angle is just under 45°, but the gain is tiny. From a cliff it would matter much more.</p>
+
+<h2>Common mistakes</h2>
+<ul>
+  <li><strong>Using the level-ground formula from a height.</strong> R = v²·sin 2θ ÷ g only works when launch and landing are at the same height. It underestimates the range from a height.</li>
+  <li><strong>Calculator in radians.</strong> If you work by hand, make sure your calculator is in degree mode for sin 45°.</li>
+  <li><strong>Forgetting the launch height in max height.</strong> The peak above the ground is the launch height plus the rise.</li>
+  <li><strong>Expecting real balls to match.</strong> Air resistance shortens real flights, often a lot. Use these numbers as the no-drag ideal.</li>
+</ul>

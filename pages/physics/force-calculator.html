@@ -1,0 +1,162 @@
+---
+{
+  "title": "Force Calculator: F = m × a (Newton's Second Law)",
+  "description": "Solve Newton's second law for force, mass or acceleration in newtons, kilonewtons or pound-force, kilograms or pounds. Also shows the object's weight on Earth.",
+  "h1": "Force Calculator (F = ma)",
+  "short": "Force Calculator",
+  "intro": "Choose force, mass or acceleration to solve for, then enter the other two. Results are shown in metric and US units, along with the object's weight under standard gravity.",
+  "updated": "October 2026",
+  "related": ["acceleration-calculator", "pressure-calculator", "power-calculator", "kinetic-energy-calculator"],
+  "faq": [
+    {"q": "What is Newton's second law?", "a": "The net force on an object equals its mass times its acceleration: F = m × a. Push twice as hard and the acceleration doubles; push the same on something twice as heavy and the acceleration halves. With mass in kilograms and acceleration in m/s², the force comes out in newtons."},
+    {"q": "What is a newton?", "a": "One newton is the force that gives a 1 kg mass an acceleration of 1 m/s². It's a small force: holding a medium apple (about 100 grams) against gravity takes roughly 1 newton."},
+    {"q": "What is the difference between mass and weight?", "a": "Mass is how much matter an object has, in kilograms, and it's the same everywhere. Weight is the force gravity pulls it with, in newtons: weight = m × g. On Earth, a 70 kg person weighs about 686 N; on the Moon the same person still has 70 kg of mass but weighs only about 113 N."},
+    {"q": "How do I convert newtons to pound-force?", "a": "Divide newtons by 4.448222. So 4,500 N is about 1,012 lbf. One pound-force is the weight of a 1-pound mass under standard gravity, which is why a 1,500 kg car (3,307 lb) weighs 3,307 lbf."},
+    {"q": "Is F = ma the net force or any force?", "a": "It's the net force, the total of all forces acting on the object added up with their directions. If you push a box with 100 N and friction pushes back with 60 N, only the 40 N difference accelerates the box."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="solve">Solve for</label>
+        <select id="solve" name="solve">
+          <option value="F" selected>Force (F)</option>
+          <option value="m">Mass (m)</option>
+          <option value="a">Acceleration (a)</option>
+        </select>
+      </div>
+      <div class="row2" data-show="FIn" hidden>
+        <div class="field">
+          <label for="F">Force (F)</label>
+          <input id="F" name="F" type="number" step="any" value="4500" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="FUnit">Unit</label>
+          <select id="FUnit" name="FUnit">
+            <option value="1">N</option>
+            <option value="1000">kN</option>
+            <option value="4.4482216152605">lbf</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="mIn">
+        <div class="field">
+          <label for="m">Mass (m)</label>
+          <input id="m" name="m" type="number" min="0" step="any" value="1500" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="mUnit">Unit</label>
+          <select id="mUnit" name="mUnit">
+            <option value="1">kg</option>
+            <option value="0.001">g</option>
+            <option value="0.45359237">lb</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="aIn">
+        <div class="field">
+          <label for="a">Acceleration (a)</label>
+          <input id="a" name="a" type="number" step="any" value="3" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="aUnit">Unit</label>
+          <select id="aUnit" name="aUnit">
+            <option value="1">m/s²</option>
+            <option value="9.80665">g</option>
+            <option value="0.3048">ft/s²</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="bigLabel">Force</span><b data-out="big">—</b></div>
+    <div class="result"><span>Force</span><b data-out="force">—</b></div>
+    <div class="result"><span>Force (US)</span><b data-out="forceUS">—</b></div>
+    <div class="result"><span>Mass</span><b data-out="mass">—</b></div>
+    <div class="result"><span>Acceleration</span><b data-out="acc">—</b></div>
+    <div class="result"><span>Weight on Earth (m × g)</span><b data-out="weight">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const SUP = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+  const fmt = (x, s = 4) => {
+    if (!isFinite(x)) return "—";
+    if (x === 0) return "0";
+    const a = Math.abs(x);
+    if (a >= 1e9 || a < 1e-3) {
+      const [m, e] = x.toExponential(s - 1).split("e");
+      return parseFloat(m) + " × 10" + String(parseInt(e, 10)).replace(/./g, (c) => SUP[c]);
+    }
+    return Calc.num(x, Math.max(0, s - 1 - Math.floor(Math.log10(a))));
+  };
+  const G = 9.80665, LBF = 4.4482216152605, LB = 0.45359237;
+  const FU = { "1": "N", "1000": "kN", "4.4482216152605": "lbf" }[v.FUnit];
+  const MU = { "1": "kg", "0.001": "g", "0.45359237": "lb" }[v.mUnit];
+  const AU = { "1": "m/s²", "9.80665": "g", "0.3048": "ft/s²" }[v.aUnit];
+  const S = v.solve;
+  ["F", "m", "a"].forEach((k) => out.show(k + "In", S !== k));
+
+  let F = v.F * parseFloat(v.FUnit), m = v.m * parseFloat(v.mUnit), a = v.a * parseFloat(v.aUnit);
+  if (S === "F") F = m * a;
+  else if (S === "m") m = a !== 0 ? F / a : NaN;
+  else a = m > 0 ? F / m : NaN;
+
+  out.set("bigLabel", { F: "Force", m: "Mass", a: "Acceleration" }[S]);
+  out.set("big", {
+    F: fmt(F / parseFloat(v.FUnit)) + " " + FU,
+    m: fmt(m / parseFloat(v.mUnit)) + " " + MU,
+    a: fmt(a / parseFloat(v.aUnit)) + " " + AU,
+  }[S]);
+  out.set("force", `${fmt(F)} N · ${fmt(F / 1000)} kN`);
+  out.set("forceUS", fmt(F / LBF) + " lbf");
+  out.set("mass", `${fmt(m)} kg · ${fmt(m / LB)} lb`);
+  out.set("acc", `${fmt(a)} m/s² · ${fmt(a / G)} g`);
+  out.set("weight", `${fmt(m * G)} N (${fmt(m * G / LBF)} lbf)`);
+
+  if (S === "m" && a === 0) out.note("Acceleration can't be zero when solving for mass.");
+  else if (S === "a" && !(m > 0)) out.note("Mass must be greater than zero.");
+  else if (S === "m" && m < 0) out.note("Mass came out negative: the force and acceleration should point the same way (same sign).");
+  else out.note("F is the net force. Weight uses standard gravity, g = 9.80665 m/s².");
+}));
+</script>
+<!-- article -->
+<h2>What Newton's second law says</h2>
+<p>A force changes how an object moves. Newton's second law puts a number on it: the net force equals the mass
+times the acceleration it produces. A heavier object needs more force to speed up at the same rate, which is why a
+loaded truck accelerates more slowly than an empty one with the same engine.</p>
+<p>Weight is a special case. Gravity accelerates every falling object at about 9.81 m/s², so the force of gravity on
+a mass, its weight, is m × g. This calculator uses standard gravity, g = 9.80665 m/s².</p>
+
+<h2>The formula</h2>
+<div class="formula">F = m × a<br>
+m = F ÷ a<br>
+a = F ÷ m<br>
+weight W = m × g, with g = 9.80665 m/s²</div>
+<p>Use kilograms and m/s² to get newtons. Conversions: 1 lb = 0.45359237 kg, 1 lbf = 4.448222 N, 1 ft/s² = 0.3048 m/s².</p>
+
+<h2>Example: pushing a 1,500 kg car to 3 m/s²</h2>
+<p>What net force does it take to accelerate a 1,500 kg car at 3 m/s²? These are the default values.</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>F = 1,500 × 3</td><td><strong>4,500 N</strong></td></tr>
+  <tr><td>In kilonewtons: 4,500 ÷ 1,000</td><td>4.5 kN</td></tr>
+  <tr><td>In pound-force: 4,500 ÷ 4.448222</td><td>1,012 lbf</td></tr>
+  <tr><td>Acceleration in g: 3 ÷ 9.80665</td><td>0.3059 g</td></tr>
+  <tr><td>Car's weight: 1,500 × 9.80665</td><td>14,710 N (3,307 lbf)</td></tr>
+</table>
+<p>Notice that the force needed to accelerate the car at 3 m/s² is less than a third of its weight. That's why you
+can't lift a car, but a few people can push one along a flat road (slowly, since friction also pushes back).</p>
+
+<h2>Common mistakes</h2>
+<ul>
+  <li><strong>Using pounds as force and mass interchangeably.</strong> In US units, "pound" can mean mass (lb) or force (lbf). A 1 lb mass weighs 1 lbf on Earth, but F = ma only works directly in newtons with kilograms.</li>
+  <li><strong>Forgetting other forces.</strong> F = ma uses the net force. Subtract friction, drag or anything pushing the other way first.</li>
+  <li><strong>Using grams.</strong> 500 g × 2 m/s² is 1 N, not 1,000 N. Convert grams to kilograms first.</li>
+  <li><strong>Calling weight mass.</strong> Bathroom scales show kilograms or pounds of mass, but they actually measure the force your weight puts on them.</li>
+</ul>

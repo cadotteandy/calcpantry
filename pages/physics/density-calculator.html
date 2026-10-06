@@ -1,0 +1,194 @@
+---
+{
+  "title": "Density Calculator: ρ = m / V, Solve for Density, Mass or Volume",
+  "description": "Calculate density from mass and volume, or find mass or volume from density. Units include kg/m³, g/cm³ and lb/ft³, with liters, mL, cm³, m³, ft³ and gallons.",
+  "h1": "Density Calculator",
+  "short": "Density Calculator",
+  "intro": "Find an object's density from its mass and volume, or use a known density to work out mass or volume. The result is compared with common materials.",
+  "updated": "October 2026",
+  "related": ["pressure-calculator", "force-calculator", "potential-energy-calculator", "kinetic-energy-calculator"],
+  "faq": [
+    {"q": "What is the formula for density?", "a": "Density = mass ÷ volume, written ρ = m ÷ V. Rearranged, mass = density × volume and volume = mass ÷ density. In SI units density is in kilograms per cubic meter (kg/m³); in the lab, grams per cubic centimeter (g/cm³) is more common."},
+    {"q": "How do I convert g/cm³ to kg/m³?", "a": "Multiply by 1,000. Water is about 1 g/cm³, which is 1,000 kg/m³. A cubic meter holds a million cubic centimeters, and a kilogram is 1,000 grams, so the factor works out to 1,000."},
+    {"q": "What is the density of water?", "a": "Pure water is densest at about 4 °C, where it's very close to 1,000 kg/m³ (1 g/cm³). At room temperature, 25 °C, it's about 997 kg/m³. Seawater is denser, around 1,025 kg/m³, because of the dissolved salt."},
+    {"q": "How do I find the volume of an irregular object?", "a": "Use water displacement. Fill a measuring container, note the level, submerge the object fully and read the new level. The rise is the object's volume; 1 mL equals 1 cm³. Then weigh the object and divide."},
+    {"q": "Will it float?", "a": "An object floats in water if its average density is less than the water's, about 1,000 kg/m³ (1 g/cm³). Ice at about 917 kg/m³ floats with roughly 90% of it under the surface. Steel ships float because their hollow shape makes their average density lower than water."},
+    {"q": "What is specific gravity?", "a": "Specific gravity is density compared with water, so it has no units. This calculator divides by 1,000 kg/m³. Aluminum, at 2,700 kg/m³, has a specific gravity of 2.7."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="solve">Solve for</label>
+        <select id="solve" name="solve">
+          <option value="rho" selected>Density (ρ)</option>
+          <option value="m">Mass (m)</option>
+          <option value="V">Volume (V)</option>
+        </select>
+      </div>
+      <div class="row2" data-show="rhoIn" hidden>
+        <div class="field">
+          <label for="rho">Density (ρ)</label>
+          <input id="rho" name="rho" type="number" min="0" step="any" value="1" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="rhoUnit">Unit</label>
+          <select id="rhoUnit" name="rhoUnit">
+            <option value="1">kg/m³</option>
+            <option value="1000" selected>g/cm³ (g/mL)</option>
+            <option value="16.018463373960138">lb/ft³</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="mIn">
+        <div class="field">
+          <label for="m">Mass (m)</label>
+          <input id="m" name="m" type="number" min="0" step="any" value="540" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="mUnit">Unit</label>
+          <select id="mUnit" name="mUnit">
+            <option value="1">kg</option>
+            <option value="0.001" selected>g</option>
+            <option value="0.45359237">lb</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="VIn">
+        <div class="field">
+          <label for="V">Volume (V)</label>
+          <input id="V" name="V" type="number" min="0" step="any" value="200" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="VUnit">Unit</label>
+          <select id="VUnit" name="VUnit">
+            <option value="cm3" selected>cm³</option>
+            <option value="mL">mL</option>
+            <option value="L">liters</option>
+            <option value="m3">m³</option>
+            <option value="ft3">ft³</option>
+            <option value="gal">US gallons</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="bigLabel">Density</span><b data-out="big">—</b></div>
+    <div class="result"><span>Density</span><b data-out="dens">—</b></div>
+    <div class="result"><span>Density (US)</span><b data-out="densUS">—</b></div>
+    <div class="result"><span>Specific gravity (vs. water)</span><b data-out="sg">—</b></div>
+    <div class="result"><span>Mass</span><b data-out="mass">—</b></div>
+    <div class="result"><span>Volume</span><b data-out="vol">—</b></div>
+    <div class="result"><span>Closest common material</span><b data-out="match">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const SUP = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+  const fmt = (x, s = 4) => {
+    if (!isFinite(x)) return "—";
+    if (x === 0) return "0";
+    const a = Math.abs(x);
+    if (a >= 1e9 || a < 1e-3) {
+      const [m, e] = x.toExponential(s - 1).split("e");
+      return parseFloat(m) + " × 10" + String(parseInt(e, 10)).replace(/./g, (c) => SUP[c]);
+    }
+    return Calc.num(x, Math.max(0, s - 1 - Math.floor(Math.log10(a))));
+  };
+  const LBFT3 = 16.018463373960138, LB = 0.45359237, GAL = 0.003785411784;
+  const RU = { "1": "kg/m³", "1000": "g/cm³", "16.018463373960138": "lb/ft³" }[v.rhoUnit];
+  const MU = { "1": "kg", "0.001": "g", "0.45359237": "lb" }[v.mUnit];
+  // Volume units in m³.
+  const VOL = { cm3: [1e-6, "cm³"], mL: [1e-6, "mL"], L: [0.001, "L"], m3: [1, "m³"], ft3: [0.028316846592, "ft³"], gal: [GAL, "gal"] };
+  const [vk, VUN] = VOL[v.VUnit];
+  const S = v.solve;
+  ["rho", "m", "V"].forEach((q) => out.show(q + "In", S !== q));
+
+  let rho = v.rho * parseFloat(v.rhoUnit), m = v.m * parseFloat(v.mUnit), V = v.V * vk;
+  if (S === "rho") rho = V > 0 ? m / V : NaN;
+  else if (S === "m") m = rho * V;
+  else V = rho > 0 ? m / rho : NaN;
+
+  out.set("bigLabel", { rho: "Density", m: "Mass", V: "Volume" }[S]);
+  out.set("big", {
+    rho: fmt(rho / parseFloat(v.rhoUnit)) + " " + RU,
+    m: fmt(m / parseFloat(v.mUnit)) + " " + MU,
+    V: fmt(V / vk) + " " + VUN,
+  }[S]);
+  out.set("dens", `${fmt(rho)} kg/m³ · ${fmt(rho / 1000)} g/cm³`);
+  out.set("densUS", fmt(rho / LBFT3) + " lb/ft³");
+  out.set("sg", fmt(rho / 1000));
+  out.set("mass", `${fmt(m)} kg · ${fmt(m / LB)} lb`);
+  out.set("vol", `${fmt(V * 1000)} L · ${fmt(V * 1e6)} cm³ · ${fmt(V / GAL)} gal`);
+
+  const MAT = [["air (20 °C, sea level)", 1.204], ["ethanol", 789], ["ice", 917], ["water (25 °C)", 997],
+    ["water (4 °C)", 1000], ["seawater", 1025], ["aluminum", 2700], ["iron", 7874], ["copper", 8960],
+    ["lead", 11340], ["gold", 19300]];
+  let best = null;
+  if (rho > 0) MAT.forEach(([n, d]) => { const e = Math.abs(rho - d) / d; if (!best || e < best[2]) best = [n, d, e]; });
+  out.set("match", best && best[2] <= 0.03 ? `${best[0]} (${Calc.num(best[1], 3)} kg/m³)` : "No close match");
+
+  if ((S === "rho" && !(V > 0)) || (S === "V" && !(rho > 0))) out.note("The value you divide by must be greater than zero.");
+  else if (rho > 0 && rho < 990) out.note("Less dense than water, so it would float in water.");
+  else if (rho > 1010) out.note("Denser than water, so it would sink in water.");
+  else if (rho > 0) out.note("About the same density as water.");
+}));
+</script>
+<!-- article -->
+<h2>What density means</h2>
+<p>Density is how much mass is packed into a given volume. A kilogram of feathers and a kilogram of lead weigh the
+same, but the lead takes up far less space because it's much denser. Density is a property of the material, not the
+object, so it's a good way to identify what something is made of.</p>
+<p>Two units are common. Scientists and engineers use kilograms per cubic meter (kg/m³); chemistry labs often use grams
+per cubic centimeter (g/cm³), which is the same as grams per milliliter. In the US, pounds per cubic foot (lb/ft³) shows
+up in construction and shipping.</p>
+
+<h2>The formula</h2>
+<div class="formula">ρ = m ÷ V<br>
+m = ρ × V<br>
+V = m ÷ ρ<br>
+1 g/cm³ = 1,000 kg/m³ = 62.43 lb/ft³</div>
+<p>Other conversions used: 1 L = 1,000 cm³ = 0.001 m³, 1 mL = 1 cm³, 1 ft³ = 0.0283168 m³, 1 US gallon = 3.785411784 L
+and 1 lb = 0.45359237 kg.</p>
+
+<h2>Example: identifying a metal block</h2>
+<p>A block has a mass of 540 g and a volume of 200 cm³ (the default values).</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>ρ = 540 g ÷ 200 cm³</td><td><strong>2.7 g/cm³</strong></td></tr>
+  <tr><td>In kg/m³: 2.7 × 1,000</td><td>2,700 kg/m³</td></tr>
+  <tr><td>In lb/ft³: 2,700 ÷ 16.018</td><td>168.6 lb/ft³</td></tr>
+  <tr><td>Specific gravity: 2,700 ÷ 1,000</td><td>2.7</td></tr>
+  <tr><td>Closest match</td><td>Aluminum</td></tr>
+</table>
+
+<h2>Densities of common materials</h2>
+<table>
+  <tr><th>Material</th><th>kg/m³</th><th>g/cm³</th></tr>
+  <tr><td>Air (20 °C, sea level)</td><td>1.204</td><td>0.001204</td></tr>
+  <tr><td>Ethanol (20 °C)</td><td>789</td><td>0.789</td></tr>
+  <tr><td>Ice (0 °C)</td><td>917</td><td>0.917</td></tr>
+  <tr><td>Water (25 °C)</td><td>997</td><td>0.997</td></tr>
+  <tr><td>Water (4 °C, its densest)</td><td>1,000</td><td>1.000</td></tr>
+  <tr><td>Seawater (typical)</td><td>about 1,025</td><td>about 1.025</td></tr>
+  <tr><td>Aluminum</td><td>2,700</td><td>2.70</td></tr>
+  <tr><td>Iron</td><td>7,874</td><td>7.874</td></tr>
+  <tr><td>Copper</td><td>8,960</td><td>8.96</td></tr>
+  <tr><td>Lead</td><td>11,340</td><td>11.34</td></tr>
+  <tr><td>Gold</td><td>19,300</td><td>19.3</td></tr>
+</table>
+<p>Values are for pure materials near room temperature unless noted. Alloys such as steel (about 7,850 kg/m³) and brass
+vary with their exact mix.</p>
+
+<h2>Tips and common mistakes</h2>
+<ul>
+  <li><strong>Mismatched units.</strong> Grams over liters gives g/L, which is the same number as kg/m³, not g/cm³.</li>
+  <li><strong>Hollow objects.</strong> The formula gives average density. A hollow aluminum can is far less dense overall than solid aluminum.</li>
+  <li><strong>Temperature matters for liquids and gases.</strong> Most substances expand when warmed, so their density drops. Air changes a lot with altitude too.</li>
+  <li><strong>Trapped air bubbles</strong> during water displacement make the volume look bigger and the density smaller. Tap the object to release them.</li>
+</ul>

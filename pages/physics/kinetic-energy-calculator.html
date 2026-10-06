@@ -1,0 +1,165 @@
+---
+{
+  "title": "Kinetic Energy Calculator: KE = ½mv²",
+  "description": "Calculate kinetic energy from mass and speed, or solve for mass or velocity. Results in joules, kilojoules, foot-pounds and kWh, with mass in kg or lb and speed in m/s, km/h or mph.",
+  "h1": "Kinetic Energy Calculator",
+  "short": "Kinetic Energy Calculator",
+  "intro": "Find the energy of a moving object, or work backward to the mass or speed. Enter values in metric or US units and see every step of the formula.",
+  "updated": "October 2026",
+  "related": ["potential-energy-calculator", "power-calculator", "force-calculator", "speed-distance-time-calculator"],
+  "faq": [
+    {"q": "What is the formula for kinetic energy?", "a": "KE = ½ × m × v², where m is the mass in kilograms and v is the speed in meters per second. The answer is in joules. A 2 kg ball moving at 3 m/s has ½ × 2 × 3² = 9 J of kinetic energy."},
+    {"q": "Why does doubling the speed quadruple the kinetic energy?", "a": "Because speed is squared in the formula. Going from 50 to 100 km/h multiplies v² by 4, so the car carries four times the energy, and needs roughly four times the distance to brake to a stop at the same deceleration."},
+    {"q": "What is a joule?", "a": "A joule is the SI unit of energy. It's the energy transferred when a force of 1 newton pushes something 1 meter. Lifting a small apple 1 meter takes about 1 joule. 1 kJ is 1,000 J, and 1 kWh is 3.6 million J."},
+    {"q": "How do I find velocity from kinetic energy?", "a": "Rearrange the formula: v = √(2 × KE ÷ m). For an object of 1,500 kg with 578,704 J of energy, v = √(2 × 578,704 ÷ 1,500) = 27.78 m/s, which is 100 km/h."},
+    {"q": "What is the difference between kinetic energy and momentum?", "a": "Both depend on mass and velocity, but momentum is m × v (a vector, with direction) and kinetic energy is ½mv² (a scalar). Momentum is always conserved in collisions; kinetic energy is often partly turned into heat, sound and bent metal."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="solve">Solve for</label>
+        <select id="solve" name="solve">
+          <option value="KE" selected>Kinetic energy (KE)</option>
+          <option value="m">Mass (m)</option>
+          <option value="v">Velocity (v)</option>
+        </select>
+      </div>
+      <div class="row2" data-show="KEIn" hidden>
+        <div class="field">
+          <label for="KE">Kinetic energy</label>
+          <input id="KE" name="KE" type="number" min="0" step="any" value="500" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="EUnit">Unit</label>
+          <select id="EUnit" name="EUnit">
+            <option value="1">J</option>
+            <option value="1000" selected>kJ</option>
+            <option value="1.3558179483314004">ft·lbf</option>
+            <option value="3600000">kWh</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="mIn">
+        <div class="field">
+          <label for="m">Mass (m)</label>
+          <input id="m" name="m" type="number" min="0" step="any" value="1500" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="mUnit">Unit</label>
+          <select id="mUnit" name="mUnit">
+            <option value="1">kg</option>
+            <option value="0.001">g</option>
+            <option value="0.45359237">lb</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="vIn">
+        <div class="field">
+          <label for="v">Velocity (v)</label>
+          <input id="v" name="v" type="number" step="any" value="100" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="vUnit">Unit</label>
+          <select id="vUnit" name="vUnit">
+            <option value="1">m/s</option>
+            <option value="0.2777777777777778" selected>km/h</option>
+            <option value="0.44704">mph</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="bigLabel">Kinetic energy</span><b data-out="big">—</b></div>
+    <div class="result"><span>Energy</span><b data-out="energy">—</b></div>
+    <div class="result"><span>Energy (US)</span><b data-out="energyUS">—</b></div>
+    <div class="result"><span>Energy in kWh</span><b data-out="kwh">—</b></div>
+    <div class="result"><span>Mass</span><b data-out="mass">—</b></div>
+    <div class="result"><span>Velocity</span><b data-out="vel">—</b></div>
+    <div class="result"><span>Momentum (m × v)</span><b data-out="mom">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const SUP = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+  const fmt = (x, s = 4) => {
+    if (!isFinite(x)) return "—";
+    if (x === 0) return "0";
+    const a = Math.abs(x);
+    if (a >= 1e9 || a < 1e-3) {
+      const [m, e] = x.toExponential(s - 1).split("e");
+      return parseFloat(m) + " × 10" + String(parseInt(e, 10)).replace(/./g, (c) => SUP[c]);
+    }
+    return Calc.num(x, Math.max(0, s - 1 - Math.floor(Math.log10(a))));
+  };
+  const FTLBF = 1.3558179483314004, LB = 0.45359237;
+  const EU = { "1": "J", "1000": "kJ", "1.3558179483314004": "ft·lbf", "3600000": "kWh" }[v.EUnit];
+  const MU = { "1": "kg", "0.001": "g", "0.45359237": "lb" }[v.mUnit];
+  const VU = { "1": "m/s", "0.2777777777777778": "km/h", "0.44704": "mph" }[v.vUnit];
+  const S = v.solve;
+  ["KE", "m", "v"].forEach((k) => out.show(k + "In", S !== k));
+
+  let E = v.KE * parseFloat(v.EUnit), m = v.m * parseFloat(v.mUnit), vel = Math.abs(v.v * parseFloat(v.vUnit));
+  if (S === "KE") E = 0.5 * m * vel * vel;
+  else if (S === "m") m = vel > 0 ? 2 * E / (vel * vel) : NaN;
+  else vel = m > 0 && E >= 0 ? Math.sqrt(2 * E / m) : NaN;
+
+  out.set("bigLabel", { KE: "Kinetic energy", m: "Mass", v: "Velocity" }[S]);
+  out.set("big", {
+    KE: fmt(E / parseFloat(v.EUnit)) + " " + EU,
+    m: fmt(m / parseFloat(v.mUnit)) + " " + MU,
+    v: fmt(vel / parseFloat(v.vUnit)) + " " + VU,
+  }[S]);
+  out.set("energy", `${fmt(E)} J · ${fmt(E / 1000)} kJ`);
+  out.set("energyUS", fmt(E / FTLBF) + " ft·lbf");
+  out.set("kwh", fmt(E / 3.6e6) + " kWh");
+  out.set("mass", `${fmt(m)} kg · ${fmt(m / LB)} lb`);
+  out.set("vel", `${fmt(vel)} m/s · ${fmt(vel * 3.6)} km/h · ${fmt(vel / 0.44704)} mph`);
+  out.set("mom", fmt(m * vel) + " kg·m/s");
+
+  if (S === "m" && !(vel > 0)) out.note("Velocity must be greater than zero when solving for mass.");
+  else if (S === "v" && !(m > 0)) out.note("Mass must be greater than zero when solving for velocity.");
+  else out.note("Uses the classical formula, accurate for everyday speeds (far below the speed of light).");
+}));
+</script>
+<!-- article -->
+<h2>What kinetic energy is</h2>
+<p>Kinetic energy is the energy an object has because it's moving. It's the work needed to get it up to speed from
+rest, and the work it can do (or the damage it can cause) when it's brought back to a stop. Brakes turn a car's
+kinetic energy into heat; a hammer turns it into driving a nail.</p>
+<p>The formula depends on mass and on the square of speed, so speed matters much more than mass. A car at 100 km/h
+carries four times the energy it has at 50 km/h.</p>
+
+<h2>The formula</h2>
+<div class="formula">KE = ½ × m × v²<br>
+m = 2 × KE ÷ v²<br>
+v = √(2 × KE ÷ m)</div>
+<p>Use kilograms and meters per second to get joules. Conversions: 1 km/h = 1 ÷ 3.6 m/s, 1 mph = 0.44704 m/s,
+1 lb = 0.45359237 kg, 1 ft·lbf = 1.355818 J, 1 kWh = 3,600,000 J.</p>
+
+<h2>Example: a 1,500 kg car at 100 km/h</h2>
+<p>How much kinetic energy does a 1,500 kg car carry at highway speed? These are the default values.</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Speed in m/s: 100 ÷ 3.6</td><td>27.78 m/s</td></tr>
+  <tr><td>Square it: 27.78²</td><td>771.6 m²/s²</td></tr>
+  <tr><td>KE = ½ × 1,500 × 771.6</td><td><strong>578,704 J (578.7 kJ)</strong></td></tr>
+  <tr><td>In foot-pounds: 578,704 ÷ 1.355818</td><td>426,830 ft·lbf</td></tr>
+  <tr><td>In kWh: 578,704 ÷ 3,600,000</td><td>0.1608 kWh</td></tr>
+  <tr><td>Momentum: 1,500 × 27.78</td><td>41,667 kg·m/s</td></tr>
+</table>
+<p>That's the same energy as dropping the car from about 39 meters, roughly a 13-story building, which is why
+highway-speed crashes are so destructive.</p>
+
+<h2>Common mistakes</h2>
+<ul>
+  <li><strong>Forgetting to square the speed.</strong> ½ × 1,500 × 27.78 gives momentum-like numbers, not energy.</li>
+  <li><strong>Using km/h or mph directly.</strong> Convert to m/s first or the answer will be off by a factor of 13 (km/h) or 5 (mph).</li>
+  <li><strong>Using grams.</strong> Mass must be in kilograms to get joules.</li>
+  <li><strong>Forgetting the ½.</strong> mv² without the half doubles the answer.</li>
+</ul>

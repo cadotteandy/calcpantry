@@ -1,0 +1,187 @@
+---
+{
+  "title": "Ohm's Law Calculator: Voltage, Current, Resistance & Power",
+  "description": "Enter any two of voltage, current, resistance and power to get the other two. Uses V = IR and P = VI, with unit prefixes like mA, kΩ and mW.",
+  "h1": "Ohm's Law Calculator",
+  "short": "Ohm's Law Calculator",
+  "intro": "Choose which two values you know, enter them with any unit prefix, and get the other two instantly. The formulas used are shown with the result.",
+  "updated": "October 2026",
+  "related": ["power-calculator", "electricity-cost-calculator", "force-calculator", "pressure-calculator"],
+  "faq": [
+    {"q": "What is Ohm's law?", "a": "Ohm's law says the voltage across a resistor equals the current through it times its resistance: V = I × R. Rearranged, I = V ÷ R and R = V ÷ I. It holds for ordinary resistors at a steady temperature; components like LEDs and diodes don't follow it."},
+    {"q": "How do I calculate electrical power?", "a": "P = V × I, voltage times current, gives power in watts. Combining it with Ohm's law gives two more forms: P = I² × R and P = V² ÷ R. Use whichever matches the values you know."},
+    {"q": "What current flows through a 240 Ω resistor on 12 V?", "a": "I = 12 ÷ 240 = 0.05 A, which is 50 mA. The resistor dissipates P = 12 × 0.05 = 0.6 W, so a common 1/4 W resistor would overheat; you'd want a 1 W part for a safe margin."},
+    {"q": "What do the prefixes mA, kΩ and MΩ mean?", "a": "They're metric multipliers. m (milli) is one thousandth, µ (micro) one millionth, k (kilo) one thousand and M (mega) one million. So 50 mA is 0.05 A, 4.7 kΩ is 4,700 Ω and 1 MΩ is 1,000,000 Ω."},
+    {"q": "How do I choose a resistor's power rating?", "a": "Calculate the power it will dissipate with P = I² × R or P = V² ÷ R, then pick a resistor rated for at least double that. Running a resistor near its limit makes it hot and shortens its life."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="known">I know</label>
+        <select id="known" name="known">
+          <option value="VI">Voltage and current</option>
+          <option value="VR" selected>Voltage and resistance</option>
+          <option value="VP">Voltage and power</option>
+          <option value="IR">Current and resistance</option>
+          <option value="IP">Current and power</option>
+          <option value="RP">Resistance and power</option>
+        </select>
+      </div>
+      <div class="row2" data-show="VIn">
+        <div class="field">
+          <label for="V">Voltage (V)</label>
+          <input id="V" name="V" type="number" min="0" step="any" value="12" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="VUnit">Unit</label>
+          <select id="VUnit" name="VUnit">
+            <option value="0.001">mV</option>
+            <option value="1" selected>V</option>
+            <option value="1000">kV</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="IIn" hidden>
+        <div class="field">
+          <label for="I">Current (I)</label>
+          <input id="I" name="I" type="number" min="0" step="any" value="50" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="IUnit">Unit</label>
+          <select id="IUnit" name="IUnit">
+            <option value="0.000001">µA</option>
+            <option value="0.001" selected>mA</option>
+            <option value="1">A</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="RIn">
+        <div class="field">
+          <label for="R">Resistance (R)</label>
+          <input id="R" name="R" type="number" min="0" step="any" value="240" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="RUnit">Unit</label>
+          <select id="RUnit" name="RUnit">
+            <option value="0.001">mΩ</option>
+            <option value="1" selected>Ω</option>
+            <option value="1000">kΩ</option>
+            <option value="1000000">MΩ</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="PIn" hidden>
+        <div class="field">
+          <label for="P">Power (P)</label>
+          <input id="P" name="P" type="number" min="0" step="any" value="600" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="PUnit">Unit</label>
+          <select id="PUnit" name="PUnit">
+            <option value="0.001" selected>mW</option>
+            <option value="1">W</option>
+            <option value="1000">kW</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="label1">Current</span><b data-out="big1">—</b></div>
+    <div class="result big"><span data-out="label2">Power</span><b data-out="big2">—</b></div>
+    <div class="result"><span>Voltage (V)</span><b data-out="vOut">—</b></div>
+    <div class="result"><span>Current (I)</span><b data-out="iOut">—</b></div>
+    <div class="result"><span>Resistance (R)</span><b data-out="rOut">—</b></div>
+    <div class="result"><span>Power (P)</span><b data-out="pOut">—</b></div>
+    <div class="result"><span>Formulas used</span><b data-out="used">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  // Format with an SI prefix: 0.05 A -> "50 mA".
+  const PRE = [[1e9, "G"], [1e6, "M"], [1e3, "k"], [1, ""], [1e-3, "m"], [1e-6, "µ"], [1e-9, "n"]];
+  const eng = (x, unit) => {
+    if (!isFinite(x)) return "—";
+    if (x === 0) return "0 " + unit;
+    const a = Math.abs(x);
+    const [p, sym] = PRE.find(([p]) => a >= p * 0.99995) || PRE[PRE.length - 1];
+    const y = x / p, d = Math.max(0, 3 - Math.floor(Math.log10(Math.abs(y))));
+    return Calc.num(y, d) + " " + sym + unit;
+  };
+  const K = v.known;
+  ["V", "I", "R", "P"].forEach((q) => out.show(q + "In", K.includes(q)));
+  let V = v.V * parseFloat(v.VUnit), I = v.I * parseFloat(v.IUnit);
+  let R = v.R * parseFloat(v.RUnit), P = v.P * parseFloat(v.PUnit);
+  const F = {
+    VI: () => { R = V / I; P = V * I; return "R = V ÷ I, P = V × I"; },
+    VR: () => { I = V / R; P = V * V / R; return "I = V ÷ R, P = V² ÷ R"; },
+    VP: () => { I = P / V; R = V * V / P; return "I = P ÷ V, R = V² ÷ P"; },
+    IR: () => { V = I * R; P = I * I * R; return "V = I × R, P = I² × R"; },
+    IP: () => { V = P / I; R = P / (I * I); return "V = P ÷ I, R = P ÷ I²"; },
+    RP: () => { I = Math.sqrt(P / R); V = Math.sqrt(P * R); return "I = √(P ÷ R), V = √(P × R)"; },
+  };
+  const ok = [...K].every((q) => ({ V, I, R, P })[q] > 0);
+  const used = F[K]();
+  const NAME = { V: "Voltage", I: "Current", R: "Resistance", P: "Power" };
+  const UNIT = { V: "V", I: "A", R: "Ω", P: "W" };
+  const VAL = { V, I, R, P };
+  const unknown = ["V", "I", "R", "P"].filter((q) => !K.includes(q));
+  unknown.forEach((q, i) => {
+    out.set("label" + (i + 1), NAME[q]);
+    out.set("big" + (i + 1), ok ? eng(VAL[q], UNIT[q]) : "—");
+  });
+  const show = (q) => (ok ? eng(VAL[q], UNIT[q]) : "—") + (K.includes(q) ? "" : " (calculated)");
+  out.set("vOut", show("V"));
+  out.set("iOut", show("I"));
+  out.set("rOut", show("R"));
+  out.set("pOut", show("P"));
+  out.set("used", used);
+  if (!ok) out.note("Enter both known values as numbers above zero.");
+  else out.note("Ohm's law applies to resistors at a steady temperature. LEDs, diodes and bulbs don't follow it exactly.");
+}));
+</script>
+<!-- article -->
+<h2>How Ohm's law works</h2>
+<p>Voltage is the electrical "push," current is the flow of charge, and resistance is how strongly a component resists
+that flow. Ohm's law ties the three together: for a given resistance, doubling the voltage doubles the current.</p>
+<p>Power, measured in watts, is how much energy the component uses or turns into heat each second. Because power depends
+on voltage and current, and Ohm's law links those to resistance, knowing any two of the four values lets you find the
+other two.</p>
+
+<h2>The formula</h2>
+<div class="formula">V = I × R &nbsp;&nbsp; I = V ÷ R &nbsp;&nbsp; R = V ÷ I<br>
+P = V × I &nbsp;&nbsp; P = I² × R &nbsp;&nbsp; P = V² ÷ R<br>
+I = √(P ÷ R) &nbsp;&nbsp; V = √(P × R)</div>
+<p>Work in base units (volts, amps, ohms, watts), then add prefixes back at the end. The calculator does both steps for you.</p>
+
+<h3>All twelve rearrangements</h3>
+<table>
+  <tr><th>To find</th><th>From V and I</th><th>From V and R</th><th>From I and R</th><th>From P and another</th></tr>
+  <tr><td>V</td><td>—</td><td>—</td><td>I × R</td><td>P ÷ I or √(P × R)</td></tr>
+  <tr><td>I</td><td>—</td><td>V ÷ R</td><td>—</td><td>P ÷ V or √(P ÷ R)</td></tr>
+  <tr><td>R</td><td>V ÷ I</td><td>—</td><td>—</td><td>V² ÷ P or P ÷ I²</td></tr>
+  <tr><td>P</td><td>V × I</td><td>V² ÷ R</td><td>I² × R</td><td>—</td></tr>
+</table>
+
+<h2>Example: a 240 Ω resistor on 12 V</h2>
+<p>You connect a 240 Ω resistor across a 12 V supply (the default values).</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Current: I = V ÷ R = 12 ÷ 240</td><td><strong>0.05 A = 50 mA</strong></td></tr>
+  <tr><td>Power: P = V² ÷ R = 144 ÷ 240</td><td><strong>0.6 W = 600 mW</strong></td></tr>
+  <tr><td>Check: P = V × I = 12 × 0.05</td><td>0.6 W</td></tr>
+</table>
+<p>A standard 1/4 W (250 mW) resistor would run far too hot here. Choose one rated 1 W or more.</p>
+
+<h2>Common mistakes</h2>
+<ul>
+  <li><strong>Forgetting prefixes.</strong> 12 V ÷ 240 kΩ is 50 µA, not 50 mA. Convert kΩ and mA to base units before dividing.</li>
+  <li><strong>Using Ohm's law on an LED.</strong> LEDs have a nearly fixed voltage drop. For a series resistor, use R = (supply voltage − LED voltage) ÷ current.</li>
+  <li><strong>Ignoring power ratings.</strong> The right resistance can still burn out if its wattage rating is too low.</li>
+  <li><strong>Mixing up AC and DC.</strong> For mains AC, use RMS voltage and current (like 120 V); the formulas then work for resistive loads such as heaters.</li>
+</ul>

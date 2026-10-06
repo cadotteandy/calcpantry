@@ -1,0 +1,180 @@
+---
+{
+  "title": "Potential Energy Calculator: PE = mgh",
+  "description": "Calculate gravitational potential energy from mass and height, or solve for mass or height. Joules, kJ and foot-pounds, kg or lb, meters or feet, on Earth, the Moon or Mars.",
+  "h1": "Potential Energy Calculator",
+  "short": "Potential Energy Calculator",
+  "intro": "Find the gravitational potential energy of a raised object, or solve for the mass or height. Switch gravity to the Moon or Mars to compare.",
+  "updated": "October 2026",
+  "related": ["kinetic-energy-calculator", "power-calculator", "force-calculator", "projectile-motion-calculator"],
+  "faq": [
+    {"q": "What is the formula for gravitational potential energy?", "a": "PE = m × g × h: mass in kilograms, times the gravitational acceleration in m/s², times the height in meters. On Earth, g is 9.80665 m/s² (standard gravity). The answer is in joules."},
+    {"q": "Height above what?", "a": "Above whatever level you choose as zero, usually the floor, the ground or the lowest point the object could fall to. Only changes in potential energy matter physically, so pick the reference that makes the problem easiest and stick with it."},
+    {"q": "How much energy does it take to climb stairs?", "a": "A 70 kg person climbing 10 meters (about three floors) gains 70 × 9.80665 × 10 = 6,865 J of potential energy, about 1.64 food calories. Your body burns several times more than that, because muscles are only around 20 to 25% efficient."},
+    {"q": "What is the gravity on the Moon and Mars?", "a": "Surface gravity is about 1.62 m/s² on the Moon (roughly one-sixth of Earth's) and about 3.71 m/s² on Mars (a bit over one-third). The same climb takes far less energy there."},
+    {"q": "How fast will an object be going when it hits the ground?", "a": "If all the potential energy turns into kinetic energy (no air resistance), mgh = ½mv², so v = √(2gh). The mass cancels out: from 10 meters on Earth, anything lands at about 14 m/s (50 km/h)."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="solve">Solve for</label>
+        <select id="solve" name="solve">
+          <option value="PE" selected>Potential energy (PE)</option>
+          <option value="m">Mass (m)</option>
+          <option value="h">Height (h)</option>
+        </select>
+      </div>
+      <div class="row2" data-show="PEIn" hidden>
+        <div class="field">
+          <label for="PE">Potential energy</label>
+          <input id="PE" name="PE" type="number" step="any" value="5" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="EUnit">Unit</label>
+          <select id="EUnit" name="EUnit">
+            <option value="1">J</option>
+            <option value="1000" selected>kJ</option>
+            <option value="1.3558179483314004">ft·lbf</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="mIn">
+        <div class="field">
+          <label for="m">Mass (m)</label>
+          <input id="m" name="m" type="number" min="0" step="any" value="70" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="mUnit">Unit</label>
+          <select id="mUnit" name="mUnit">
+            <option value="1">kg</option>
+            <option value="0.001">g</option>
+            <option value="0.45359237">lb</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="hIn">
+        <div class="field">
+          <label for="h">Height (h)</label>
+          <input id="h" name="h" type="number" step="any" value="10" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="hUnit">Unit</label>
+          <select id="hUnit" name="hUnit">
+            <option value="1">m</option>
+            <option value="0.01">cm</option>
+            <option value="0.3048">ft</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="planet">Gravity (g)</label>
+        <select id="planet" name="planet">
+          <option value="9.80665" selected>Earth, 9.80665 m/s² (standard)</option>
+          <option value="1.62">Moon, 1.62 m/s²</option>
+          <option value="3.71">Mars, 3.71 m/s²</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+      <div class="field" data-show="customG" hidden>
+        <label for="g">Custom gravity</label>
+        <div class="input"><input id="g" name="g" type="number" min="0" step="any" value="9.81" inputmode="decimal"><span class="unit">m/s²</span></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="bigLabel">Potential energy</span><b data-out="big">—</b></div>
+    <div class="result"><span>Energy</span><b data-out="energy">—</b></div>
+    <div class="result"><span>Energy (US)</span><b data-out="energyUS">—</b></div>
+    <div class="result"><span>Food calories (kcal)</span><b data-out="kcal">—</b></div>
+    <div class="result"><span>Mass</span><b data-out="mass">—</b></div>
+    <div class="result"><span>Height</span><b data-out="height">—</b></div>
+    <div class="result"><span>Speed if dropped (√2gh)</span><b data-out="drop">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const SUP = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+  const fmt = (x, s = 4) => {
+    if (!isFinite(x)) return "—";
+    if (x === 0) return "0";
+    const a = Math.abs(x);
+    if (a >= 1e9 || a < 1e-3) {
+      const [m, e] = x.toExponential(s - 1).split("e");
+      return parseFloat(m) + " × 10" + String(parseInt(e, 10)).replace(/./g, (c) => SUP[c]);
+    }
+    return Calc.num(x, Math.max(0, s - 1 - Math.floor(Math.log10(a))));
+  };
+  const FTLBF = 1.3558179483314004, LB = 0.45359237;
+  const EU = { "1": "J", "1000": "kJ", "1.3558179483314004": "ft·lbf" }[v.EUnit];
+  const MU = { "1": "kg", "0.001": "g", "0.45359237": "lb" }[v.mUnit];
+  const HU = { "1": "m", "0.01": "cm", "0.3048": "ft" }[v.hUnit];
+  const S = v.solve;
+  ["PE", "m", "h"].forEach((k) => out.show(k + "In", S !== k));
+  const custom = v.planet === "custom";
+  out.show("customG", custom);
+  const g = custom ? v.g : parseFloat(v.planet);
+
+  let E = v.PE * parseFloat(v.EUnit), m = v.m * parseFloat(v.mUnit), h = v.h * parseFloat(v.hUnit);
+  if (S === "PE") E = m * g * h;
+  else if (S === "m") m = g > 0 && h !== 0 ? E / (g * h) : NaN;
+  else h = g > 0 && m > 0 ? E / (m * g) : NaN;
+
+  out.set("bigLabel", { PE: "Potential energy", m: "Mass", h: "Height" }[S]);
+  out.set("big", {
+    PE: fmt(E / parseFloat(v.EUnit)) + " " + EU,
+    m: fmt(m / parseFloat(v.mUnit)) + " " + MU,
+    h: fmt(h / parseFloat(v.hUnit)) + " " + HU,
+  }[S]);
+  out.set("energy", `${fmt(E)} J · ${fmt(E / 1000)} kJ`);
+  out.set("energyUS", fmt(E / FTLBF) + " ft·lbf");
+  out.set("kcal", fmt(E / 4184) + " kcal");
+  out.set("mass", `${fmt(m)} kg · ${fmt(m / LB)} lb`);
+  out.set("height", `${fmt(h)} m · ${fmt(h / 0.3048)} ft`);
+  const vd = h >= 0 && g > 0 ? Math.sqrt(2 * g * h) : NaN;
+  out.set("drop", `${fmt(vd)} m/s (${fmt(vd * 3.6)} km/h)`);
+
+  if (!(g > 0)) out.note("Gravity must be greater than zero.");
+  else if (S === "m" && h === 0) out.note("Height can't be zero when solving for mass.");
+  else if (h < 0) out.note("A negative height means the object is below your zero level, so its potential energy is negative.");
+  else out.note(`Using g = ${Calc.num(g, 5)} m/s². Drop speed ignores air resistance.`);
+}));
+</script>
+<!-- article -->
+<h2>What gravitational potential energy is</h2>
+<p>Lifting something against gravity takes work, and that work is stored as potential energy. Let the object fall
+and the stored energy turns into motion (kinetic energy). Hydroelectric dams, pendulum clocks and roller coasters all
+run on this trade between height and speed.</p>
+<p>Near a planet's surface, gravity pulls with a nearly constant acceleration, g. On Earth this calculator uses
+standard gravity, g = 9.80665 m/s². The Moon (1.62 m/s²) and Mars (3.71 m/s²) are also built in.</p>
+
+<h2>The formula</h2>
+<div class="formula">PE = m × g × h<br>
+m = PE ÷ (g × h)<br>
+h = PE ÷ (m × g)<br>
+speed if dropped, v = √(2 × g × h)</div>
+<p>Use kilograms and meters to get joules. Conversions: 1 lb = 0.45359237 kg, 1 ft = 0.3048 m, 1 ft·lbf = 1.355818 J,
+1 food Calorie (kcal) = 4,184 J.</p>
+
+<h2>Example: climbing three floors</h2>
+<p>A 70 kg person climbs 10 meters of stairs on Earth (the default values).</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>PE = 70 × 9.80665 × 10</td><td><strong>6,865 J (6.865 kJ)</strong></td></tr>
+  <tr><td>In foot-pounds: 6,865 ÷ 1.355818</td><td>5,063 ft·lbf</td></tr>
+  <tr><td>In food Calories: 6,865 ÷ 4,184</td><td>1.641 kcal</td></tr>
+  <tr><td>Speed if dropped: √(2 × 9.80665 × 10)</td><td>14 m/s (50.42 km/h)</td></tr>
+</table>
+<p>On the Moon the same climb stores only 70 × 1.62 × 10 = 1,134 J.</p>
+
+<h2>Common mistakes</h2>
+<ul>
+  <li><strong>Using weight instead of mass.</strong> If you know the weight in newtons, PE is simply weight × height; don't multiply by g again.</li>
+  <li><strong>Mixing feet and meters.</strong> With heights in feet, convert to meters (× 0.3048) before using g = 9.80665 m/s².</li>
+  <li><strong>Measuring height along a slope.</strong> Only vertical height counts. A 100 m ramp that rises 5 m adds the same PE as a 5 m ladder.</li>
+  <li><strong>Expecting the food calories to match exercise.</strong> Your body uses several times this much energy, because muscles waste most of it as heat.</li>
+</ul>

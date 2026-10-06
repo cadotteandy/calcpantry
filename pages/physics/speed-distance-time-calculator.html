@@ -1,0 +1,179 @@
+---
+{
+  "title": "Speed Distance Time Calculator: Solve for Any One",
+  "description": "Find speed, distance or travel time from the other two. Works in km/h, mph, m/s and knots, kilometers, miles and meters, with hours, minutes and seconds.",
+  "h1": "Speed, Distance and Time Calculator",
+  "short": "Speed, Distance & Time",
+  "intro": "Choose what you want to find, then enter the other two values in whatever units you have. The answer is shown in every common unit, with the formula steps below.",
+  "updated": "October 2026",
+  "related": ["acceleration-calculator", "projectile-motion-calculator", "kinetic-energy-calculator", "power-calculator"],
+  "faq": [
+    {"q": "What is the formula for speed, distance and time?", "a": "Speed = distance ÷ time. Rearranged, distance = speed × time and time = distance ÷ speed. The only trick is keeping units consistent: miles with hours for mph, kilometers with hours for km/h, meters with seconds for m/s."},
+    {"q": "How long does it take to drive 150 miles at 65 mph?", "a": "150 ÷ 65 = 2.308 hours, which is 2 hours, 18 minutes and 28 seconds of driving. Real trips take longer because of stops, traffic and slower sections, so treat this as the moving time."},
+    {"q": "How do I convert decimal hours to hours and minutes?", "a": "Keep the whole number as hours, then multiply the decimal part by 60 to get minutes. For 2.308 hours: 0.308 × 60 = 18.5 minutes, so about 2 hours 18 minutes. Multiply any leftover decimal of a minute by 60 again for seconds."},
+    {"q": "How do I convert km/h to mph?", "a": "Divide km/h by 1.609344, or multiply by about 0.6214. 100 km/h is 62.14 mph. To go from mph to km/h, multiply by 1.609344, so 65 mph is 104.6 km/h."},
+    {"q": "What is a knot?", "a": "A knot is one nautical mile per hour. A nautical mile is exactly 1,852 meters, so 1 knot is 1.852 km/h, about 1.151 mph or 0.514 m/s. Knots are used for ships, aircraft and wind speed."},
+    {"q": "Is this average speed or top speed?", "a": "The formula gives average speed over the whole distance. If you drive 150 miles in 2.5 hours, your average is 60 mph even if you were sometimes going 75 and sometimes stopped."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="solve">Solve for</label>
+        <select id="solve" name="solve">
+          <option value="time" selected>Time</option>
+          <option value="speed">Speed</option>
+          <option value="distance">Distance</option>
+        </select>
+      </div>
+      <div class="row2" data-show="speedIn">
+        <div class="field">
+          <label for="speed">Speed</label>
+          <input id="speed" name="speed" type="number" min="0" step="any" value="65" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="speedUnit">Unit</label>
+          <select id="speedUnit" name="speedUnit">
+            <option value="0.2777777777777778">km/h</option>
+            <option value="0.44704" selected>mph</option>
+            <option value="1">m/s</option>
+            <option value="0.5144444444444445">knots</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="distIn">
+        <div class="field">
+          <label for="dist">Distance</label>
+          <input id="dist" name="dist" type="number" min="0" step="any" value="150" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="distUnit">Unit</label>
+          <select id="distUnit" name="distUnit">
+            <option value="1000">km</option>
+            <option value="1609.344" selected>miles</option>
+            <option value="1">meters</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" data-show="timeIn" hidden>
+        <label for="th">Time</label>
+        <div class="row2 trio">
+          <div class="input"><input id="th" name="th" type="number" min="0" step="any" value="2" inputmode="decimal" aria-label="Hours"><span class="unit">h</span></div>
+          <div class="input"><input id="tm" name="tm" type="number" min="0" step="any" value="30" inputmode="decimal" aria-label="Minutes"><span class="unit">min</span></div>
+          <div class="input"><input id="ts" name="ts" type="number" min="0" step="any" value="0" inputmode="decimal" aria-label="Seconds"><span class="unit">s</span></div>
+        </div>
+        <div class="hint">Use any mix, such as 0 h 90 min or 1.5 h.</div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="bigLabel">Time</span><b data-out="big">—</b></div>
+    <div class="result"><span>Time in hours</span><b data-out="hours">—</b></div>
+    <div class="result"><span>Time in minutes</span><b data-out="mins">—</b></div>
+    <div class="result"><span>Speed</span><b data-out="spd1">—</b></div>
+    <div class="result"><span>Speed (other units)</span><b data-out="spd2">—</b></div>
+    <div class="result"><span>Distance</span><b data-out="distOut">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const SUP = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+  const fmt = (x, s = 4) => {
+    if (!isFinite(x)) return "—";
+    if (x === 0) return "0";
+    const a = Math.abs(x);
+    if (a >= 1e9 || a < 1e-3) {
+      const [m, e] = x.toExponential(s - 1).split("e");
+      return parseFloat(m) + " × 10" + String(parseInt(e, 10)).replace(/./g, (c) => SUP[c]);
+    }
+    return Calc.num(x, Math.max(0, s - 1 - Math.floor(Math.log10(a))));
+  };
+  const hms = (sec) => {
+    if (!isFinite(sec)) return "—";
+    if (sec < 60) return fmt(sec) + " s";
+    const r = Math.round(sec), h = Math.floor(r / 3600), m = Math.floor(r % 3600 / 60), s = r % 60;
+    return h ? `${h} h ${m} min ${s} s` : `${m} min ${s} s`;
+  };
+  const SPEED_NAME = { "0.2777777777777778": "km/h", "0.44704": "mph", "1": "m/s", "0.5144444444444445": "knots" };
+  const DIST_NAME = { "1000": "km", "1609.344": "mi", "1": "m" };
+  const S = v.solve;
+  out.show("speedIn", S !== "speed");
+  out.show("distIn", S !== "distance");
+  out.show("timeIn", S !== "time");
+
+  // Work in SI: meters, seconds, m/s.
+  let spd = v.speed * parseFloat(v.speedUnit);
+  let d = v.dist * parseFloat(v.distUnit);
+  let t = v.th * 3600 + v.tm * 60 + v.ts;
+  if (S === "time") t = spd > 0 ? d / spd : NaN;
+  else if (S === "speed") spd = t > 0 ? d / t : NaN;
+  else d = spd * t;
+
+  out.set("bigLabel", { time: "Time", speed: "Average speed", distance: "Distance" }[S]);
+  if (S === "time") out.set("big", hms(t));
+  else if (S === "speed") out.set("big", fmt(spd / parseFloat(v.speedUnit)) + " " + SPEED_NAME[v.speedUnit]);
+  else out.set("big", fmt(d / parseFloat(v.distUnit)) + " " + DIST_NAME[v.distUnit]);
+
+  out.set("hours", fmt(t / 3600) + " h");
+  out.set("mins", fmt(t / 60) + " min");
+  out.set("spd1", `${fmt(spd * 3.6)} km/h · ${fmt(spd / 0.44704)} mph`);
+  out.set("spd2", `${fmt(spd)} m/s · ${fmt(spd / (1852 / 3600))} kn`);
+  out.set("distOut", `${fmt(d / 1000)} km · ${fmt(d / 1609.344)} mi`);
+
+  if ((S === "time" && !(spd > 0)) || (S === "speed" && !(t > 0))) out.note("Enter a value above zero to divide by.");
+  else out.note("This is average speed over the whole distance. Stops and slow sections are already averaged in.");
+}));
+</script>
+<style>
+.trio { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.trio .input input { padding-left: 8px; padding-right: 4px; }
+.trio .unit { padding: 10px 7px; font-size: 13px; }
+</style>
+<!-- article -->
+<h2>How speed, distance and time relate</h2>
+<p>Speed tells you how much distance you cover in each unit of time. Drive at 65 miles per hour for one hour
+and you cover 65 miles; keep going for two hours and you cover 130. That simple idea gives three versions of
+the same formula, one for each thing you might want to find.</p>
+<p>The calculator converts everything to meters and seconds behind the scenes, so you can mix units freely,
+such as a distance in kilometers with a speed in mph.</p>
+
+<h2>The formula</h2>
+<div class="formula">speed = distance ÷ time<br>
+distance = speed × time<br>
+time = distance ÷ speed</div>
+<p>A handy way to remember it is the triangle with distance on top and speed and time underneath: cover the one
+you want, and what's left shows whether to multiply or divide.</p>
+
+<h3>Unit conversions used</h3>
+<table>
+  <tr><th>Unit</th><th>In SI units</th></tr>
+  <tr><td>1 mile</td><td>1,609.344 m</td></tr>
+  <tr><td>1 km/h</td><td>1 ÷ 3.6 = 0.2778 m/s</td></tr>
+  <tr><td>1 mph</td><td>0.44704 m/s</td></tr>
+  <tr><td>1 knot</td><td>1,852 m per hour = 0.5144 m/s</td></tr>
+</table>
+
+<h2>Example: a 150-mile drive at 65 mph</h2>
+<p>How long will 150 miles take at a steady 65 mph? These are the calculator's default values.</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Time = distance ÷ speed = 150 ÷ 65</td><td>2.308 h</td></tr>
+  <tr><td>Whole hours</td><td>2 h</td></tr>
+  <tr><td>Minutes: 0.3077 × 60</td><td>18.46 min, so 18 min</td></tr>
+  <tr><td>Seconds: 0.46 × 60</td><td>28 s (rounded)</td></tr>
+  <tr><td>Answer</td><td><strong>2 h 18 min 28 s</strong></td></tr>
+  <tr><td>Same speed in km/h: 65 × 1.609344</td><td>104.6 km/h</td></tr>
+  <tr><td>Same distance in km: 150 × 1.609344</td><td>241.4 km</td></tr>
+</table>
+
+<h2>Common mistakes</h2>
+<ul>
+  <li><strong>Reading decimal hours as minutes.</strong> 2.5 hours is 2 hours 30 minutes, not 2 hours 50 minutes.</li>
+  <li><strong>Mixing units.</strong> Kilometers divided by mph gives nonsense. Convert first, or let the calculator do it.</li>
+  <li><strong>Averaging speeds directly.</strong> Driving 60 mph one way and 40 mph back does not average 50 mph. Over equal distances it's 48 mph, because you spend longer at the slower speed. Use total distance ÷ total time.</li>
+  <li><strong>Forgetting stops.</strong> The result is moving time. Add breaks, fuel and traffic separately.</li>
+</ul>

@@ -1,0 +1,177 @@
+---
+{
+  "title": "Pressure Calculator: P = F / A in Pa, kPa, psi, bar & atm",
+  "description": "Calculate pressure from force and area, or solve for force or area. Converts between pascals, kilopascals, psi, bar and atmospheres, with newtons, lbf, m², cm², mm², in² and ft².",
+  "h1": "Pressure Calculator (P = F/A)",
+  "short": "Pressure Calculator",
+  "intro": "Enter a force and the area it presses on to get the pressure, or solve backward for force or area. Every result is shown in Pa, kPa, psi, bar and atm.",
+  "updated": "October 2026",
+  "related": ["force-calculator", "density-calculator", "power-calculator", "ohms-law-calculator"],
+  "faq": [
+    {"q": "What is the formula for pressure?", "a": "Pressure is force divided by the area it acts on: P = F ÷ A. With force in newtons and area in square meters, the answer is in pascals (Pa). One pascal is one newton per square meter, a very small pressure."},
+    {"q": "How do I convert psi to kPa or bar?", "a": "1 psi is 6,894.757 Pa, or about 6.895 kPa. 1 bar is exactly 100,000 Pa (100 kPa), which is about 14.5 psi. So a tire at 32 psi is about 221 kPa or 2.21 bar."},
+    {"q": "What is 1 atmosphere in other units?", "a": "Standard atmospheric pressure is defined as exactly 101,325 Pa. That's 101.325 kPa, 1.01325 bar or about 14.70 psi. It's roughly the air pressure at sea level."},
+    {"q": "Why do sharp knives cut better?", "a": "A sharp edge has a tiny contact area, so the same push creates a much higher pressure. Halving the area doubles the pressure. The same idea explains why stiletto heels dent floors and why snowshoes keep you from sinking."},
+    {"q": "Is tire pressure absolute or gauge pressure?", "a": "Tire gauges read gauge pressure, the pressure above the surrounding air. Absolute pressure is gauge pressure plus atmospheric pressure, so a tire at 32 psi gauge is about 46.7 psi absolute at sea level. This calculator works with whatever force you enter; it doesn't add atmospheric pressure."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="solve">Solve for</label>
+        <select id="solve" name="solve">
+          <option value="P" selected>Pressure (P)</option>
+          <option value="F">Force (F)</option>
+          <option value="A">Area (A)</option>
+        </select>
+      </div>
+      <div class="row2" data-show="PIn" hidden>
+        <div class="field">
+          <label for="P">Pressure (P)</label>
+          <input id="P" name="P" type="number" min="0" step="any" value="100" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="PUnit">Unit</label>
+          <select id="PUnit" name="PUnit">
+            <option value="Pa">Pa</option>
+            <option value="kPa" selected>kPa</option>
+            <option value="psi">psi</option>
+            <option value="bar">bar</option>
+            <option value="atm">atm</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="FIn">
+        <div class="field">
+          <label for="F">Force (F)</label>
+          <input id="F" name="F" type="number" min="0" step="any" value="1000" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="FUnit">Unit</label>
+          <select id="FUnit" name="FUnit">
+            <option value="N" selected>N</option>
+            <option value="kN">kN</option>
+            <option value="lbf">lbf</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="AIn">
+        <div class="field">
+          <label for="A">Area (A)</label>
+          <input id="A" name="A" type="number" min="0" step="any" value="25" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="AUnit">Unit</label>
+          <select id="AUnit" name="AUnit">
+            <option value="m2">m²</option>
+            <option value="cm2" selected>cm²</option>
+            <option value="mm2">mm²</option>
+            <option value="in2">in²</option>
+            <option value="ft2">ft²</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="bigLabel">Pressure</span><b data-out="big">—</b></div>
+    <div class="result"><span>Pascals</span><b data-out="pa">—</b></div>
+    <div class="result"><span>Kilopascals</span><b data-out="kpa">—</b></div>
+    <div class="result"><span>psi</span><b data-out="psi">—</b></div>
+    <div class="result"><span>bar</span><b data-out="bar">—</b></div>
+    <div class="result"><span>Atmospheres</span><b data-out="atm">—</b></div>
+    <div class="result"><span>Force</span><b data-out="force">—</b></div>
+    <div class="result"><span>Area</span><b data-out="area">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const SUP = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+  const fmt = (x, s = 4) => {
+    if (!isFinite(x)) return "—";
+    if (x === 0) return "0";
+    const a = Math.abs(x);
+    if (a >= 1e9 || a < 1e-3) {
+      const [m, e] = x.toExponential(s - 1).split("e");
+      return parseFloat(m) + " × 10" + String(parseInt(e, 10)).replace(/./g, (c) => SUP[c]);
+    }
+    return Calc.num(x, Math.max(0, s - 1 - Math.floor(Math.log10(a))));
+  };
+  // Factors to SI: Pa, N, m².
+  const PK = { Pa: 1, kPa: 1000, psi: 6894.757, bar: 100000, atm: 101325 };
+  const FK = { N: 1, kN: 1000, lbf: 4.4482216152605 };
+  const AK = { m2: 1, cm2: 1e-4, mm2: 1e-6, in2: 0.00064516, ft2: 0.09290304 };
+  const AN = { m2: "m²", cm2: "cm²", mm2: "mm²", in2: "in²", ft2: "ft²" };
+  const S = v.solve;
+  ["P", "F", "A"].forEach((q) => out.show(q + "In", S !== q));
+
+  let P = v.P * PK[v.PUnit], F = v.F * FK[v.FUnit], A = v.A * AK[v.AUnit];
+  if (S === "P") P = A > 0 ? F / A : NaN;
+  else if (S === "F") F = P * A;
+  else A = P > 0 ? F / P : NaN;
+
+  out.set("bigLabel", { P: "Pressure", F: "Force", A: "Area" }[S]);
+  out.set("big", {
+    P: fmt(P / PK[v.PUnit]) + " " + v.PUnit,
+    F: fmt(F / FK[v.FUnit]) + " " + v.FUnit,
+    A: fmt(A / AK[v.AUnit]) + " " + AN[v.AUnit],
+  }[S]);
+  out.set("pa", fmt(P) + " Pa");
+  out.set("kpa", fmt(P / 1000) + " kPa");
+  out.set("psi", fmt(P / PK.psi) + " psi");
+  out.set("bar", fmt(P / PK.bar) + " bar");
+  out.set("atm", fmt(P / PK.atm) + " atm");
+  out.set("force", `${fmt(F)} N · ${fmt(F / FK.lbf)} lbf`);
+  out.set("area", `${fmt(A)} m² · ${fmt(A / AK.cm2)} cm² · ${fmt(A / AK.in2)} in²`);
+
+  if ((S === "P" && !(A > 0)) || (S === "A" && !(P > 0))) out.note("The value you divide by must be greater than zero.");
+  else out.note("1 atm = 101,325 Pa · 1 bar = 100,000 Pa · 1 psi = 6,894.757 Pa.");
+}));
+</script>
+<!-- article -->
+<h2>What pressure is</h2>
+<p>Pressure is how concentrated a force is. The same push spread over a large area makes a low pressure; squeezed onto a
+small area it makes a high one. That's why you can lie on a bed of many nails but not stand on one, and why snowshoes,
+tank treads and wide tires spread weight out.</p>
+<p>The SI unit is the pascal (Pa), one newton per square meter. Because a pascal is tiny, everyday pressures are usually
+given in kilopascals (kPa), bar, atmospheres (atm) or, in the US, pounds per square inch (psi).</p>
+
+<h2>The formula</h2>
+<div class="formula">P = F ÷ A<br>
+F = P × A<br>
+A = F ÷ P<br>
+1 atm = 101,325 Pa &nbsp;&nbsp; 1 bar = 100,000 Pa &nbsp;&nbsp; 1 psi = 6,894.757 Pa</div>
+<p>Convert areas carefully: 1 cm² = 0.0001 m², 1 mm² = 0.000001 m², 1 in² = 0.00064516 m² and 1 ft² = 0.09290304 m².
+Squaring the unit squares the conversion factor, which is the most common source of mistakes.</p>
+
+<h2>Example: 1,000 N on 25 cm²</h2>
+<p>A force of 1,000 N (roughly the weight of a 102 kg mass) presses on an area of 25 cm² (the default values).</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Area in m²: 25 × 0.0001</td><td>0.0025 m²</td></tr>
+  <tr><td>P = 1,000 ÷ 0.0025</td><td>400,000 Pa</td></tr>
+  <tr><td>In kPa: 400,000 ÷ 1,000</td><td><strong>400 kPa</strong></td></tr>
+  <tr><td>In psi: 400,000 ÷ 6,894.757</td><td>58.02 psi</td></tr>
+  <tr><td>In bar: 400,000 ÷ 100,000</td><td>4 bar</td></tr>
+  <tr><td>In atm: 400,000 ÷ 101,325</td><td>3.948 atm</td></tr>
+</table>
+
+<h2>Everyday pressures</h2>
+<table>
+  <tr><th>Situation</th><th>Approximate pressure</th></tr>
+  <tr><td>Sea-level air (standard atmosphere)</td><td>101.3 kPa, 14.7 psi</td></tr>
+  <tr><td>Car tire (gauge)</td><td>210–250 kPa, 30–36 psi</td></tr>
+  <tr><td>Road bike tire (gauge)</td><td>550–700 kPa, 80–100 psi</td></tr>
+</table>
+
+<h2>Common mistakes</h2>
+<ul>
+  <li><strong>Converting area like length.</strong> 1 cm = 0.01 m, but 1 cm² = 0.0001 m². Forgetting to square gives answers 100 times too small.</li>
+  <li><strong>Using mass instead of force.</strong> A 70 kg person presses with about 686 N (70 × 9.80665), not 70 N.</li>
+  <li><strong>Mixing gauge and absolute pressure.</strong> Tire and pump gauges read pressure above the air around them. Add 101.325 kPa (14.7 psi) for absolute pressure.</li>
+  <li><strong>Using the whole object's area.</strong> Only the contact area counts: the footprint of a tire, not its whole surface.</li>
+</ul>

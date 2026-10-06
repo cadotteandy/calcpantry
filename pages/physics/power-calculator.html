@@ -1,0 +1,235 @@
+---
+{
+  "title": "Power Calculator: P = W/t and P = F·v, Watts to Horsepower",
+  "description": "Calculate power from work and time or from force and speed, or solve for any value. Results in watts, kilowatts and horsepower (1 hp = 745.7 W).",
+  "h1": "Power Calculator",
+  "short": "Power Calculator",
+  "intro": "Find power from energy and time, or from a force and the speed it moves at. You can also solve backward for work, time, force or speed.",
+  "updated": "October 2026",
+  "related": ["kinetic-energy-calculator", "potential-energy-calculator", "force-calculator", "electricity-cost-calculator"],
+  "faq": [
+    {"q": "What is the formula for power?", "a": "Power is the rate of doing work: P = W ÷ t, energy in joules divided by time in seconds, giving watts. For something moving at a steady speed against a force, P = F × v, force in newtons times speed in meters per second."},
+    {"q": "How many watts is one horsepower?", "a": "One mechanical (imperial) horsepower is 745.7 watts, so 1 kW is about 1.341 hp. Metric horsepower (PS), used in some European car specs, is slightly smaller at about 735.5 W."},
+    {"q": "What is the difference between power and energy?", "a": "Energy is the total amount of work done, in joules or kilowatt-hours. Power is how fast it's done, in watts. A 100 W bulb left on for 10 hours uses 1 kWh of energy; a 1,000 W heater uses the same 1 kWh in just one hour."},
+    {"q": "Where does P = F × v come from?", "a": "Work is force times distance, and power is work per unit time. So P = F × d ÷ t, and distance divided by time is speed, giving P = F × v. It's handy for vehicles: the engine power needed at a steady speed equals the drag and rolling resistance times the speed."},
+    {"q": "How much power can a person produce?", "a": "A fit adult can sustain around 100 to 250 W on a bike for an hour, and trained cyclists more. Short sprints can reach well over 1,000 W for a few seconds, which is more than 1 horsepower."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="mode">Formula</label>
+        <select id="mode" name="mode">
+          <option value="work" selected>Work and time (P = W ÷ t)</option>
+          <option value="force">Force and speed (P = F × v)</option>
+        </select>
+      </div>
+      <div class="field" data-show="modeWork">
+        <label for="solveW">Solve for</label>
+        <select id="solveW" name="solveW">
+          <option value="P" selected>Power (P)</option>
+          <option value="W">Work or energy (W)</option>
+          <option value="t">Time (t)</option>
+        </select>
+      </div>
+      <div class="field" data-show="modeForce" hidden>
+        <label for="solveF">Solve for</label>
+        <select id="solveF" name="solveF">
+          <option value="P" selected>Power (P)</option>
+          <option value="F">Force (F)</option>
+          <option value="v">Speed (v)</option>
+        </select>
+      </div>
+      <div class="row2" data-show="PIn" hidden>
+        <div class="field">
+          <label for="P">Power (P)</label>
+          <input id="P" name="P" type="number" min="0" step="any" value="500" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="PUnit">Unit</label>
+          <select id="PUnit" name="PUnit">
+            <option value="1" selected>W</option>
+            <option value="1000">kW</option>
+            <option value="745.7">hp</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="WIn">
+        <div class="field">
+          <label for="E">Work or energy (W)</label>
+          <input id="E" name="E" type="number" min="0" step="any" value="30" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="EUnit">Unit</label>
+          <select id="EUnit" name="EUnit">
+            <option value="1">J</option>
+            <option value="1000" selected>kJ</option>
+            <option value="3600000">kWh</option>
+            <option value="1.3558179483314004">ft·lbf</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="tIn">
+        <div class="field">
+          <label for="t">Time (t)</label>
+          <input id="t" name="t" type="number" min="0" step="any" value="1" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="tUnit">Unit</label>
+          <select id="tUnit" name="tUnit">
+            <option value="1">seconds</option>
+            <option value="60" selected>minutes</option>
+            <option value="3600">hours</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="FIn" hidden>
+        <div class="field">
+          <label for="F">Force (F)</label>
+          <input id="F" name="F" type="number" min="0" step="any" value="500" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="FUnit">Unit</label>
+          <select id="FUnit" name="FUnit">
+            <option value="1">N</option>
+            <option value="1000">kN</option>
+            <option value="4.4482216152605">lbf</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="vIn" hidden>
+        <div class="field">
+          <label for="v">Speed (v)</label>
+          <input id="v" name="v" type="number" min="0" step="any" value="100" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="vUnit">Unit</label>
+          <select id="vUnit" name="vUnit">
+            <option value="1">m/s</option>
+            <option value="0.2777777777777778" selected>km/h</option>
+            <option value="0.44704">mph</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="bigLabel">Power</span><b data-out="big">—</b></div>
+    <div class="result"><span>Power</span><b data-out="power">—</b></div>
+    <div class="result"><span>Horsepower</span><b data-out="hp">—</b></div>
+    <div class="result" data-show="modeWork"><span>Work or energy</span><b data-out="energy">—</b></div>
+    <div class="result" data-show="modeWork"><span>Time</span><b data-out="time">—</b></div>
+    <div class="result" data-show="modeForce" hidden><span>Force</span><b data-out="force">—</b></div>
+    <div class="result" data-show="modeForce" hidden><span>Speed</span><b data-out="speed">—</b></div>
+    <div class="result"><span>Energy used in 1 hour</span><b data-out="perHour">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const SUP = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+  const fmt = (x, s = 4) => {
+    if (!isFinite(x)) return "—";
+    if (x === 0) return "0";
+    const a = Math.abs(x);
+    if (a >= 1e9 || a < 1e-3) {
+      const [m, e] = x.toExponential(s - 1).split("e");
+      return parseFloat(m) + " × 10" + String(parseInt(e, 10)).replace(/./g, (c) => SUP[c]);
+    }
+    return Calc.num(x, Math.max(0, s - 1 - Math.floor(Math.log10(a))));
+  };
+  const HP = 745.7, LBF = 4.4482216152605;
+  const PU = { "1": "W", "1000": "kW", "745.7": "hp" }[v.PUnit];
+  const EU = { "1": "J", "1000": "kJ", "3600000": "kWh", "1.3558179483314004": "ft·lbf" }[v.EUnit];
+  const TU = { "1": "s", "60": "min", "3600": "h" }[v.tUnit];
+  const FU = { "1": "N", "1000": "kN", "4.4482216152605": "lbf" }[v.FUnit];
+  const VU = { "1": "m/s", "0.2777777777777778": "km/h", "0.44704": "mph" }[v.vUnit];
+  const work = v.mode === "work";
+  const S = work ? v.solveW : v.solveF;
+  out.show("modeWork", work);
+  out.show("modeForce", !work);
+  out.show("PIn", S !== "P");
+  out.show("WIn", work && S !== "W");
+  out.show("tIn", work && S !== "t");
+  out.show("FIn", !work && S !== "F");
+  out.show("vIn", !work && S !== "v");
+
+  let P = v.P * parseFloat(v.PUnit), E = v.E * parseFloat(v.EUnit), t = v.t * parseFloat(v.tUnit);
+  let F = v.F * parseFloat(v.FUnit), vel = v.v * parseFloat(v.vUnit);
+  if (work) {
+    if (S === "P") P = t > 0 ? E / t : NaN;
+    else if (S === "W") E = P * t;
+    else t = P > 0 ? E / P : NaN;
+  } else {
+    if (S === "P") P = F * vel;
+    else if (S === "F") F = vel > 0 ? P / vel : NaN;
+    else vel = F > 0 ? P / F : NaN;
+  }
+
+  out.set("bigLabel", { P: "Power", W: "Work or energy", t: "Time", F: "Force", v: "Speed" }[S]);
+  out.set("big", {
+    P: fmt(P / parseFloat(v.PUnit)) + " " + PU,
+    W: fmt(E / parseFloat(v.EUnit)) + " " + EU,
+    t: fmt(t / parseFloat(v.tUnit)) + " " + TU,
+    F: fmt(F / parseFloat(v.FUnit)) + " " + FU,
+    v: fmt(vel / parseFloat(v.vUnit)) + " " + VU,
+  }[S]);
+  out.set("power", `${fmt(P)} W · ${fmt(P / 1000)} kW`);
+  out.set("hp", fmt(P / HP) + " hp");
+  out.set("energy", `${fmt(E)} J · ${fmt(E / 3.6e6)} kWh`);
+  out.set("time", `${fmt(t)} s · ${fmt(t / 60)} min`);
+  out.set("force", `${fmt(F)} N · ${fmt(F / LBF)} lbf`);
+  out.set("speed", `${fmt(vel)} m/s · ${fmt(vel * 3.6)} km/h · ${fmt(vel / 0.44704)} mph`);
+  out.set("perHour", fmt(P / 1000) + " kWh");
+
+  const bad = (S === "P" && work && !(t > 0)) || (S === "t" && !(P > 0)) || (S === "F" && !(vel > 0)) || (S === "v" && !(F > 0));
+  if (bad) out.note("The value you divide by must be greater than zero.");
+  else out.note("1 hp = 745.7 W (mechanical horsepower). Power is the average over the time given.");
+}));
+</script>
+<!-- article -->
+<h2>What power means</h2>
+<p>Power is how quickly energy is used or work is done. Lifting a box onto a shelf takes the same work whether you
+do it slowly or quickly, but doing it in half the time takes twice the power. The SI unit is the watt: one joule per
+second.</p>
+<p>There are two everyday ways to calculate it. If you know the total energy and the time, divide. If something is
+being pushed or pulled along at a steady speed, multiply the force by the speed.</p>
+
+<h2>The formula</h2>
+<div class="formula">P = W ÷ t &nbsp;&nbsp; W = P × t &nbsp;&nbsp; t = W ÷ P<br>
+P = F × v &nbsp;&nbsp; F = P ÷ v &nbsp;&nbsp; v = P ÷ F<br>
+1 hp = 745.7 W &nbsp;&nbsp; 1 kWh = 3,600,000 J</div>
+<p>Use joules, seconds, newtons and meters per second to get watts. 1 km/h = 1 ÷ 3.6 m/s, 1 mph = 0.44704 m/s and
+1 lbf = 4.448222 N.</p>
+
+<h2>Example: 30 kJ of work in one minute</h2>
+<p>An electric winch does 30 kJ of work in 1 minute (the default values).</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Convert: 30 kJ = 30,000 J, 1 min = 60 s</td><td></td></tr>
+  <tr><td>P = 30,000 ÷ 60</td><td><strong>500 W (0.5 kW)</strong></td></tr>
+  <tr><td>In horsepower: 500 ÷ 745.7</td><td>0.6705 hp</td></tr>
+  <tr><td>Energy if it ran for an hour: 0.5 kW × 1 h</td><td>0.5 kWh</td></tr>
+</table>
+
+<h3>Example: force and speed</h3>
+<p>A car needs about 500 N of force to overcome air drag and rolling resistance at a steady 100 km/h. Switch the
+formula to force and speed to see this one.</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Speed in m/s: 100 ÷ 3.6</td><td>27.78 m/s</td></tr>
+  <tr><td>P = 500 × 27.78</td><td><strong>13,889 W (13.89 kW)</strong></td></tr>
+  <tr><td>In horsepower: 13,889 ÷ 745.7</td><td>18.63 hp</td></tr>
+</table>
+<p>Real cars have much bigger engines than this because they need extra power to accelerate and climb hills.</p>
+
+<h2>Common mistakes</h2>
+<ul>
+  <li><strong>Confusing kW and kWh.</strong> kW is power (a rate); kWh is energy (an amount). A 2 kW heater uses 2 kWh each hour.</li>
+  <li><strong>Leaving time in minutes or hours.</strong> Joules per minute aren't watts. Convert time to seconds first.</li>
+  <li><strong>Mixing horsepower types.</strong> Mechanical hp (745.7 W) and metric PS (735.5 W) differ by about 1.4%.</li>
+  <li><strong>Using P = F × v for accelerating objects.</strong> It gives the power at that instant. If the speed is changing, the power changes too.</li>
+</ul>

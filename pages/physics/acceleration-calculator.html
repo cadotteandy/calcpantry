@@ -1,0 +1,173 @@
+---
+{
+  "title": "Acceleration Calculator: a = (v − u) / t, with Distance",
+  "description": "Calculate acceleration from initial speed, final speed and time, or solve for final velocity, initial velocity or time. Shows m/s², g-force and distance covered.",
+  "h1": "Acceleration Calculator",
+  "short": "Acceleration Calculator",
+  "intro": "Pick what you want to find and enter the other three values. You'll also see the result in g's and how far the object travels while it speeds up or slows down.",
+  "updated": "October 2026",
+  "related": ["speed-distance-time-calculator", "force-calculator", "kinetic-energy-calculator", "projectile-motion-calculator"],
+  "faq": [
+    {"q": "What is the formula for acceleration?", "a": "Acceleration is the change in velocity divided by the time it takes: a = (v − u) ÷ t, where u is the starting velocity, v the final velocity and t the time. In SI units the answer is in meters per second squared (m/s²)."},
+    {"q": "What does m/s² mean?", "a": "Meters per second, per second. An acceleration of 3 m/s² means the speed goes up by 3 m/s every second. After 1 second you're at 3 m/s, after 2 seconds 6 m/s, and so on."},
+    {"q": "What is the acceleration of a car going 0 to 60 mph in 8 seconds?", "a": "60 mph is 26.82 m/s, so the average acceleration is 26.82 ÷ 8 = 3.35 m/s², or about 0.34 g. A 0 to 100 km/h time of 8 seconds works out to 3.47 m/s²."},
+    {"q": "What does 1 g of acceleration mean?", "a": "1 g is the acceleration of a freely falling object near Earth's surface, standard gravity, defined as exactly 9.80665 m/s². Dividing any acceleration by 9.80665 gives it in g's. Most cars accelerate at well under 1 g; fast roller coasters and fighter jets reach several g."},
+    {"q": "Can acceleration be negative?", "a": "Yes. Negative acceleration (often called deceleration) means the velocity is decreasing in the direction you've called positive. Braking from 30 m/s to 0 in 5 seconds is an acceleration of −6 m/s²."},
+    {"q": "How do I find the distance traveled while accelerating?", "a": "Use s = ut + ½at², or the equivalent s = (u + v) ÷ 2 × t. Both assume the acceleration is constant. For 0 to 100 km/h in 8 seconds, the car covers about 111 meters."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="solve">Solve for</label>
+        <select id="solve" name="solve">
+          <option value="a" selected>Acceleration (a)</option>
+          <option value="v">Final velocity (v)</option>
+          <option value="u">Initial velocity (u)</option>
+          <option value="t">Time (t)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="velUnit">Velocity unit</label>
+        <select id="velUnit" name="velUnit">
+          <option value="1">m/s</option>
+          <option value="0.2777777777777778" selected>km/h</option>
+          <option value="0.44704">mph</option>
+        </select>
+      </div>
+      <div class="row2">
+        <div class="field" data-show="uIn">
+          <label for="u">Initial velocity (u)</label>
+          <input id="u" name="u" type="number" step="any" value="0" inputmode="decimal">
+        </div>
+        <div class="field" data-show="vIn">
+          <label for="v">Final velocity (v)</label>
+          <input id="v" name="v" type="number" step="any" value="100" inputmode="decimal">
+        </div>
+      </div>
+      <div class="field" data-show="tIn">
+        <label for="t">Time (t)</label>
+        <div class="input"><input id="t" name="t" type="number" min="0" step="any" value="8" inputmode="decimal"><span class="unit">seconds</span></div>
+      </div>
+      <div class="row2" data-show="aIn" hidden>
+        <div class="field">
+          <label for="a">Acceleration (a)</label>
+          <input id="a" name="a" type="number" step="any" value="3" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="aUnit">Unit</label>
+          <select id="aUnit" name="aUnit">
+            <option value="1">m/s²</option>
+            <option value="9.80665">g</option>
+            <option value="0.3048">ft/s²</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="bigLabel">Acceleration</span><b data-out="big">—</b></div>
+    <div class="result"><span>Acceleration</span><b data-out="acc">—</b></div>
+    <div class="result"><span>In g's</span><b data-out="gs">—</b></div>
+    <div class="result"><span>Initial velocity</span><b data-out="uOut">—</b></div>
+    <div class="result"><span>Final velocity</span><b data-out="vOut">—</b></div>
+    <div class="result"><span>Time</span><b data-out="tOut">—</b></div>
+    <div class="result"><span>Distance covered</span><b data-out="dist">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const SUP = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+  const fmt = (x, s = 4) => {
+    if (!isFinite(x)) return "—";
+    if (x === 0) return "0";
+    const a = Math.abs(x);
+    if (a >= 1e9 || a < 1e-3) {
+      const [m, e] = x.toExponential(s - 1).split("e");
+      return parseFloat(m) + " × 10" + String(parseInt(e, 10)).replace(/./g, (c) => SUP[c]);
+    }
+    return Calc.num(x, Math.max(0, s - 1 - Math.floor(Math.log10(a))));
+  };
+  const G = 9.80665;
+  const VU = { "1": "m/s", "0.2777777777777778": "km/h", "0.44704": "mph" }[v.velUnit];
+  const AU = { "1": "m/s²", "9.80665": "g", "0.3048": "ft/s²" }[v.aUnit];
+  const S = v.solve;
+  ["a", "v", "u", "t"].forEach((k) => out.show(k + "In", S !== k));
+
+  const k = parseFloat(v.velUnit);
+  let u = v.u * k, vf = v.v * k, t = v.t, a = v.a * parseFloat(v.aUnit);
+  if (S === "a") a = t > 0 ? (vf - u) / t : NaN;
+  else if (S === "v") vf = u + a * t;
+  else if (S === "u") u = vf - a * t;
+  else t = a !== 0 ? (vf - u) / a : NaN;
+  const s = u * t + 0.5 * a * t * t;
+
+  const vel = (x) => VU === "m/s" ? `${fmt(x)} m/s` : `${fmt(x / k)} ${VU} (${fmt(x)} m/s)`;
+  out.set("bigLabel", { a: "Acceleration", v: "Final velocity", u: "Initial velocity", t: "Time" }[S]);
+  out.set("big", {
+    a: fmt(a) + " m/s²",
+    v: fmt(vf / k) + " " + VU,
+    u: fmt(u / k) + " " + VU,
+    t: fmt(t) + " s",
+  }[S]);
+  out.set("acc", `${fmt(a)} m/s² · ${fmt(a / 0.3048)} ft/s²`);
+  out.set("gs", fmt(a / G) + " g");
+  out.set("uOut", vel(u));
+  out.set("vOut", vel(vf));
+  out.set("tOut", fmt(t) + " s");
+  out.set("dist", `${fmt(s)} m (${fmt(s / 0.3048)} ft)`);
+
+  if (S === "a" && !(t > 0)) out.note("Time must be greater than zero.");
+  else if (S === "t" && a === 0) out.note("With zero acceleration the velocity never changes, so there is no time to solve for.");
+  else if (t < 0) out.note("The time comes out negative: with this acceleration the object can't get from u to v. Check the sign of the acceleration.");
+  else if (a < 0) out.note("Negative acceleration means the object is slowing down (decelerating). Assumes constant acceleration.");
+  else out.note("Assumes constant acceleration. g = 9.80665 m/s² (standard gravity).");
+}));
+</script>
+<!-- article -->
+<h2>What acceleration means</h2>
+<p>Acceleration is how quickly velocity changes. If a car's speed climbs from 0 to 27.8 m/s (100 km/h) over 8
+seconds, its speed goes up by an average of 3.47 m/s every second. Slowing down is acceleration too, just with a
+negative sign.</p>
+<p>The calculator uses the standard symbols from physics class: <em>u</em> for initial velocity, <em>v</em> for final
+velocity, <em>t</em> for time, <em>a</em> for acceleration and <em>s</em> for distance (displacement).</p>
+
+<h2>The formula</h2>
+<div class="formula">a = (v − u) ÷ t<br>
+v = u + a·t<br>
+u = v − a·t<br>
+t = (v − u) ÷ a<br>
+s = u·t + ½·a·t²<br>
+acceleration in g = a ÷ 9.80665</div>
+<p>All five come from the same idea and assume the acceleration stays constant. Velocities are converted to m/s
+first: divide km/h by 3.6, or multiply mph by 0.44704. Standard gravity, g, is 9.80665 m/s².</p>
+
+<h2>Example: 0 to 100 km/h in 8 seconds</h2>
+<p>A car accelerates from a standstill to 100 km/h in 8 seconds (the default values).</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Final velocity in m/s: 100 ÷ 3.6</td><td>27.78 m/s</td></tr>
+  <tr><td>a = (27.78 − 0) ÷ 8</td><td><strong>3.472 m/s²</strong></td></tr>
+  <tr><td>In g's: 3.472 ÷ 9.80665</td><td>0.3541 g</td></tr>
+  <tr><td>Distance: 0 × 8 + ½ × 3.472 × 8²</td><td>111.1 m (364.5 ft)</td></tr>
+</table>
+
+<h2>Typical accelerations</h2>
+<table>
+  <tr><th>Situation</th><th>Approximate acceleration</th></tr>
+  <tr><td>Family car, 0–100 km/h in 10 s</td><td>2.8 m/s² (0.28 g)</td></tr>
+  <tr><td>Free fall near Earth (no air resistance)</td><td>9.81 m/s² (1 g)</td></tr>
+  <tr><td>Hard braking on dry pavement</td><td>about 7–9 m/s² (0.7–0.9 g)</td></tr>
+</table>
+
+<h2>Common mistakes</h2>
+<ul>
+  <li><strong>Not converting km/h or mph.</strong> 100 ÷ 8 = 12.5 is not the acceleration in m/s²; convert 100 km/h to 27.78 m/s first.</li>
+  <li><strong>Mixing up u and v.</strong> Final minus initial. Swapping them flips the sign.</li>
+  <li><strong>Using average speed as final speed.</strong> A car that ends at 100 km/h averaged only 50 km/h along the way if it accelerated evenly from rest.</li>
+  <li><strong>Assuming constant acceleration when it isn't.</strong> Real cars pull hardest in low gears, so these formulas give an average.</li>
+</ul>
