@@ -1,0 +1,176 @@
+---
+{
+  "title": "pH Calculator: pH, pOH, [H+] and [OH−] (Strong & Weak Acids)",
+  "description": "Convert between pH, pOH, hydrogen ion and hydroxide ion concentration at 25 °C. Also finds the pH of strong acids, strong bases and weak acids from concentration and Ka.",
+  "h1": "pH Calculator",
+  "short": "pH Calculator",
+  "intro": "Start from [H⁺], pH, [OH⁻], pOH, or the concentration of a strong acid, strong base or weak acid. Get all four values and whether the solution is acidic or basic.",
+  "updated": "October 2026",
+  "related": ["molarity-calculator", "dilution-calculator", "mole-calculator", "molar-mass-calculator"],
+  "faq": [
+    {"q": "How do you calculate pH from [H+]?", "a": "pH is the negative base-10 logarithm of the hydrogen ion concentration in mol/L: pH = −log[H⁺]. For [H⁺] = 2.5 × 10⁻⁴ M, pH = −log(0.00025) = 3.60."},
+    {"q": "How do you get [H+] from pH?", "a": "Reverse the log: [H⁺] = 10^(−pH). A pH of 7.40 means [H⁺] = 10^(−7.40) = 3.98 × 10⁻⁸ M. On most calculators, press 10^x (often shift + log) and enter the negative pH."},
+    {"q": "Why do pH and pOH add up to 14?", "a": "Water always contains a little H⁺ and OH⁻, and their product is the ion-product constant Kw. At 25 °C, Kw = 1.0 × 10⁻¹⁴, so taking −log of both sides gives pH + pOH = 14.00. Kw grows with temperature, so at 37 °C neutral water has a pH of about 6.8, not 7."},
+    {"q": "How do I find the pH of a strong acid?", "a": "Strong acids like HCl, HNO3 and HBr ionize completely, so [H⁺] equals the acid concentration. 0.01 M HCl has [H⁺] = 0.01 M and pH 2.00. For a strong base like NaOH, [OH⁻] equals the base concentration; find pOH first, then pH = 14 − pOH."},
+    {"q": "How is a weak acid different?", "a": "A weak acid such as acetic acid only partly ionizes, so you need its acid dissociation constant Ka. Solving Ka = x² ÷ (C − x) for x gives [H⁺]. For 0.10 M acetic acid (Ka = 1.8 × 10⁻⁵), [H⁺] is about 1.3 × 10⁻³ M and pH is about 2.88, much higher than a strong acid at the same concentration."},
+    {"q": "How many decimal places should pH have?", "a": "The number of decimal places in a pH should equal the number of significant figures in the concentration. [H⁺] = 2.5 × 10⁻⁴ M has two significant figures, so report pH = 3.60. This calculator shows two decimal places."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="mode">I know</label>
+        <select id="mode" name="mode">
+          <option value="h" selected>Hydrogen ion concentration [H⁺]</option>
+          <option value="ph">pH</option>
+          <option value="oh">Hydroxide ion concentration [OH⁻]</option>
+          <option value="poh">pOH</option>
+          <option value="sa">Strong acid concentration (HCl, HNO₃…)</option>
+          <option value="sb">Strong base concentration (NaOH, KOH…)</option>
+          <option value="wa">Weak acid concentration and Ka</option>
+        </select>
+      </div>
+      <div class="field" data-show="needConc">
+        <label for="conc" data-show="lblH">[H⁺]</label>
+        <label for="conc" data-show="lblOH" hidden>[OH⁻]</label>
+        <label for="conc" data-show="lblAcid" hidden>Acid concentration</label>
+        <label for="conc" data-show="lblBase" hidden>Base concentration</label>
+        <div class="input"><input id="conc" name="conc" type="number" min="0" step="any" value="2.5e-4" inputmode="decimal"><span class="unit">mol/L</span></div>
+        <div class="hint">Use e-notation for small numbers: 2.5e-4 means 2.5 × 10⁻⁴.</div>
+      </div>
+      <div class="field" data-show="needP" hidden>
+        <label for="p" data-show="lblPH">pH</label>
+        <label for="p" data-show="lblPOH" hidden>pOH</label>
+        <input id="p" name="p" type="number" step="any" value="7.4" inputmode="decimal">
+      </div>
+      <div class="field" data-show="needN" hidden>
+        <label for="n">Ions released per formula unit</label>
+        <select id="n" name="n">
+          <option value="1" selected>1 (HCl, HNO₃, NaOH, KOH)</option>
+          <option value="2">2 (H₂SO₄*, Ca(OH)₂, Ba(OH)₂)</option>
+          <option value="3">3</option>
+        </select>
+        <div class="hint">*Treating both H₂SO₄ protons as fully released is a common classroom approximation; the second one is only partly ionized.</div>
+      </div>
+      <div class="field" data-show="needKa" hidden>
+        <label for="ka">Acid dissociation constant, Ka</label>
+        <input id="ka" name="ka" type="number" min="0" step="any" value="1.8e-5" inputmode="decimal">
+        <div class="hint">Acetic acid 1.8e-5, hydrofluoric acid 6.8e-4, carbonic acid (first step) 4.3e-7.</div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>pH</span><b data-out="ph">—</b></div>
+    <div class="result"><span>pOH</span><b data-out="poh">—</b></div>
+    <div class="result"><span>[H⁺]</span><b data-out="h">—</b></div>
+    <div class="result"><span>[OH⁻]</span><b data-out="oh">—</b></div>
+    <div class="result"><span>Solution is</span><b data-out="kind">—</b></div>
+    <div class="result" data-show="needKa" hidden><span>Percent ionized</span><b data-out="ion">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const SUP = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+  const fmt = (x, s = 3) => {
+    if (!isFinite(x)) return "—";
+    if (x === 0) return "0";
+    const a = Math.abs(x);
+    if (a >= 1e6 || a < 1e-3) {
+      const [m, e] = x.toExponential(s - 1).split("e");
+      return `${m.includes(".") ? m.replace(/\.?0+$/, "") : m} × 10${String(+e).replace(/./g, (c) => SUP[c])}`;
+    }
+    return Calc.num(x, Math.max(0, s - 1 - Math.floor(Math.log10(a))));
+  };
+  const KW = 1e-14, PKW = 14;   // at 25 °C
+  const m = v.mode;
+  out.show("needConc", ["h", "oh", "sa", "sb", "wa"].includes(m));
+  out.show("lblH", m === "h");
+  out.show("lblOH", m === "oh");
+  out.show("lblAcid", m === "sa" || m === "wa");
+  out.show("lblBase", m === "sb");
+  out.show("needP", m === "ph" || m === "poh");
+  out.show("lblPH", m === "ph");
+  out.show("lblPOH", m === "poh");
+  out.show("needN", m === "sa" || m === "sb");
+  out.show("needKa", m === "wa");
+
+  const n = parseInt(v.n, 10);
+  let pH = NaN, x = NaN;
+  if (m === "h") pH = -Math.log10(v.conc);
+  else if (m === "oh") pH = PKW + Math.log10(v.conc);
+  else if (m === "ph") pH = v.p;
+  else if (m === "poh") pH = PKW - v.p;
+  else if (m === "sa") pH = -Math.log10(v.conc * n);
+  else if (m === "sb") pH = PKW + Math.log10(v.conc * n);
+  else if (m === "wa" && v.ka > 0 && v.conc > 0) {
+    // x = (−Ka + √(Ka² + 4·Ka·C)) / 2, written in a form that avoids round-off for tiny Ka
+    x = 2 * v.ka * v.conc / (v.ka + Math.sqrt(v.ka * v.ka + 4 * v.ka * v.conc));
+    pH = -Math.log10(x);
+  }
+
+  const bad = !isFinite(pH) || (m !== "ph" && m !== "poh" && !(v.conc > 0));
+  const H = Math.pow(10, -pH), OH = KW / H;
+  out.set("ph", bad ? "—" : pH.toFixed(2));
+  out.set("poh", bad ? "—" : (PKW - pH).toFixed(2));
+  out.set("h", bad ? "—" : fmt(H) + " M");
+  out.set("oh", bad ? "—" : fmt(OH) + " M");
+  out.set("kind", bad ? "—" : pH < 6.995 ? "Acidic" : pH > 7.005 ? "Basic" : "Neutral");
+  out.set("ion", bad || m !== "wa" ? "—" : Calc.num(x / v.conc * 100, 2) + "%");
+
+  if (bad) out.note(m === "wa" ? "Enter a concentration and a Ka greater than 0." : "Enter a concentration greater than 0.");
+  else if ((m === "sa" || m === "sb") && v.conc * n < 1e-6) out.note("At concentrations below about 10⁻⁶ M, the H⁺ and OH⁻ from water itself matter, so this simple answer is off. A very dilute acid can never be basic.");
+  else if (pH < 0 || pH > 14) out.note("pH outside 0–14 is possible for very concentrated acids and bases, but the simple formulas become less accurate there.");
+  else if (m === "wa") out.note(`Weak acid: x = [H⁺] = ${fmt(x)} M from Ka = x² ÷ (C − x). Assumes 25 °C (Kw = 1.0 × 10⁻¹⁴).`);
+  else out.note("Assumes 25 °C, where Kw = 1.0 × 10⁻¹⁴ and pH + pOH = 14.00.");
+}));
+</script>
+<!-- article -->
+<h2>What pH tells you</h2>
+<p>pH is a compact way to write the hydrogen ion concentration, [H⁺], of a water solution. Because [H⁺] can range
+from about 1 M down to 10⁻¹⁴ M, chemists use a logarithmic scale: pH is the negative base-10 log of [H⁺]. Lower pH
+means more acidic. Each step of 1 pH unit is a tenfold change in [H⁺], so pH 3 is ten times more acidic than pH 4.</p>
+<p>pOH does the same for hydroxide ions, [OH⁻]. In water at 25 °C the two are tied together, so knowing any one of
+pH, pOH, [H⁺] or [OH⁻] gives you the other three.</p>
+
+<h2>The formula</h2>
+<div class="formula">pH = −log[H⁺] &nbsp;&nbsp; [H⁺] = 10<sup>−pH</sup><br>
+pOH = −log[OH⁻] &nbsp;&nbsp; [OH⁻] = 10<sup>−pOH</sup><br>
+[H⁺] × [OH⁻] = Kw = 1.0 × 10⁻¹⁴ &nbsp;&nbsp; pH + pOH = 14.00 (at 25 °C)<br>
+Strong acid: [H⁺] = n × C &nbsp;&nbsp; Strong base: [OH⁻] = n × C<br>
+Weak acid: [H⁺] = x = (−Ka + √(Ka² + 4·Ka·C)) ÷ 2</div>
+<p>The weak acid formula comes from solving Ka = x² ÷ (C − x) with the quadratic formula. Many textbooks use the
+shortcut x ≈ √(Ka·C), which is fine when less than 5% of the acid ionizes.</p>
+
+<h2>Example: [H⁺] = 2.5 × 10⁻⁴ M</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>pH = −log(2.5 × 10⁻⁴)</td><td><strong>3.60</strong></td></tr>
+  <tr><td>pOH = 14.00 − 3.60</td><td>10.40</td></tr>
+  <tr><td>[OH⁻] = 1.0 × 10⁻¹⁴ ÷ 2.5 × 10⁻⁴</td><td>4 × 10⁻¹¹ M</td></tr>
+  <tr><td>pH below 7</td><td>Acidic</td></tr>
+</table>
+
+<h2>pH of everyday substances</h2>
+<table>
+  <tr><th>Substance</th><th>Approximate pH</th></tr>
+  <tr><td>Stomach acid</td><td>1.5–3.5</td></tr>
+  <tr><td>Lemon juice</td><td>about 2</td></tr>
+  <tr><td>Black coffee</td><td>about 5</td></tr>
+  <tr><td>Pure water at 25 °C</td><td>7.00</td></tr>
+  <tr><td>Human blood</td><td>7.35–7.45</td></tr>
+  <tr><td>Baking soda solution</td><td>about 8.3</td></tr>
+  <tr><td>Household ammonia</td><td>about 11–12</td></tr>
+</table>
+
+<h2>Common mistakes</h2>
+<ul>
+  <li><strong>Dropping the minus sign.</strong> log(2.5 × 10⁻⁴) is −3.60, so pH = +3.60.</li>
+  <li><strong>Using the strong acid shortcut for a weak acid.</strong> 0.10 M acetic acid has a pH near 2.9, not 1.0.</li>
+  <li><strong>Forgetting the second step for bases.</strong> From [OH⁻] you get pOH first; pH = 14 − pOH.</li>
+  <li><strong>Assuming 14 at every temperature.</strong> pH + pOH = 14.00 only at 25 °C. This calculator uses that value.</li>
+  <li><strong>Ignoring stoichiometry.</strong> 0.010 M Ca(OH)<sub>2</sub> gives 0.020 M OH⁻, so choose 2 ions per formula unit.</li>
+</ul>

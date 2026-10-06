@@ -1,0 +1,183 @@
+---
+{
+  "title": "Dilution Calculator (C1V1 = C2V2): Stock & Solvent Volumes",
+  "description": "Solve C1V1 = C2V2 for any value and see exactly how much stock solution and water to mix. Supports M, mM, µM and percent, in liters, milliliters or microliters.",
+  "h1": "Dilution Calculator (C1V1 = C2V2)",
+  "short": "Dilution Calculator",
+  "intro": "Pick the value you need, enter the other three, and get the amount of stock solution and solvent to mix. Units can be different for each field.",
+  "updated": "October 2026",
+  "related": ["molarity-calculator", "mole-calculator", "ph-calculator", "molar-mass-calculator"],
+  "faq": [
+    {"q": "What does C1V1 = C2V2 mean?", "a": "C1 and V1 are the concentration and volume of the stock solution you take. C2 and V2 are the concentration and volume of the diluted solution you make. Adding solvent doesn't change the amount of solute, so concentration × volume is the same before and after."},
+    {"q": "How do I make 500 mL of 0.1 M from a 1 M stock?", "a": "V1 = C2 × V2 ÷ C1 = 0.1 × 500 ÷ 1 = 50 mL. Measure 50 mL of the 1 M stock and add 450 mL of water to reach 500 mL total."},
+    {"q": "Is V2 the volume of water I add?", "a": "No. V2 is the final total volume after mixing. The water to add is V2 − V1. In the example above you add 450 mL of water, not 500 mL."},
+    {"q": "Can I use percent concentrations?", "a": "Yes, as long as both concentrations use percent. The equation works for any concentration unit that is an amount per volume. You can't mix percent with molarity, because converting between them needs the molar mass and, for some percent types, the density."},
+    {"q": "What is a dilution factor?", "a": "The dilution factor is C1 ÷ C2, or equivalently V2 ÷ V1. Diluting 1 M to 0.1 M is a 10× dilution, sometimes written 1:10, meaning 1 part stock in 10 parts total."},
+    {"q": "Why should I add acid to water and not water to acid?", "a": "Diluting concentrated acids, especially sulfuric acid, releases a lot of heat. Pouring acid slowly into water lets the larger volume of water absorb the heat. Adding water to concentrated acid can boil locally and spatter. Wear goggles and gloves."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="solve">Solve for</label>
+        <select id="solve" name="solve">
+          <option value="V1" selected>V1: volume of stock needed</option>
+          <option value="C2">C2: final concentration</option>
+          <option value="V2">V2: final volume</option>
+          <option value="C1">C1: stock concentration</option>
+        </select>
+      </div>
+      <div class="row2" data-show="inC1">
+        <div class="field">
+          <label for="C1">C1 (stock concentration)</label>
+          <input id="C1" name="C1" type="number" min="0" step="any" value="1" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="c1u">Unit</label>
+          <select id="c1u" name="c1u">
+            <option value="1" selected>M</option>
+            <option value="0.001">mM</option>
+            <option value="0.000001">µM</option>
+            <option value="pct">%</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="inV1" hidden>
+        <div class="field">
+          <label for="V1">V1 (stock volume)</label>
+          <input id="V1" name="V1" type="number" min="0" step="any" value="50" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="v1u">Unit</label>
+          <select id="v1u" name="v1u">
+            <option value="1">L</option>
+            <option value="0.001" selected>mL</option>
+            <option value="0.000001">µL</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="inC2">
+        <div class="field">
+          <label for="C2">C2 (final concentration)</label>
+          <input id="C2" name="C2" type="number" min="0" step="any" value="0.1" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="c2u">Unit</label>
+          <select id="c2u" name="c2u">
+            <option value="1" selected>M</option>
+            <option value="0.001">mM</option>
+            <option value="0.000001">µM</option>
+            <option value="pct">%</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="inV2">
+        <div class="field">
+          <label for="V2">V2 (final volume)</label>
+          <input id="V2" name="V2" type="number" min="0" step="any" value="500" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="v2u">Unit</label>
+          <select id="v2u" name="v2u">
+            <option value="1">L</option>
+            <option value="0.001" selected>mL</option>
+            <option value="0.000001">µL</option>
+          </select>
+        </div>
+      </div>
+      <div class="hint">The unit menus also set the units of the answer.</div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="mainLabel">Stock volume (V1)</span><b data-out="main">—</b></div>
+    <div class="result"><span>Stock solution to measure</span><b data-out="stock">—</b></div>
+    <div class="result"><span>Solvent (water) to add</span><b data-out="solvent">—</b></div>
+    <div class="result"><span>Final volume</span><b data-out="final">—</b></div>
+    <div class="result"><span>Dilution factor</span><b data-out="factor">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const SUP = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+  const fmt = (x, s = 4) => {
+    if (!isFinite(x)) return "—";
+    if (x === 0) return "0";
+    const a = Math.abs(x);
+    if (a >= 1e6 || a < 1e-3) {
+      const [m, e] = x.toExponential(s - 1).split("e");
+      return `${m.includes(".") ? m.replace(/\.?0+$/, "") : m} × 10${String(+e).replace(/./g, (c) => SUP[c])}`;
+    }
+    return Calc.num(x, Math.max(0, s - 1 - Math.floor(Math.log10(a))));
+  };
+  const s = v.solve;
+  ["C1", "V1", "C2", "V2"].forEach((k) => out.show("in" + k, s !== k));
+  const CU = { "1": "M", "0.001": "mM", "0.000001": "µM", pct: "%" };
+  const VU = { "1": "L", "0.001": "mL", "0.000001": "µL" };
+  const cf = (u) => (u === "pct" ? 1 : parseFloat(u));
+  const showC = (x, u) => (isFinite(x) && x > 0 ? fmt(x / cf(u)) + " " + CU[u] : "—");
+  const showV = (x, u) => (isFinite(x) && x >= 0 ? fmt(x / parseFloat(u)) + " " + VU[u] : "—");
+
+  let C1 = v.C1 * cf(v.c1u), C2 = v.C2 * cf(v.c2u);       // M (or %)
+  let V1 = v.V1 * parseFloat(v.v1u), V2 = v.V2 * parseFloat(v.v2u); // L
+  if (s === "V1") V1 = C2 * V2 / C1;
+  else if (s === "V2") V2 = C1 * V1 / C2;
+  else if (s === "C1") C1 = C2 * V2 / V1;
+  else C2 = C1 * V1 / V2;
+
+  const label = { V1: "Stock volume (V1)", V2: "Final volume (V2)", C1: "Stock concentration (C1)", C2: "Final concentration (C2)" }[s];
+  const main = { V1: showV(V1, v.v1u), V2: showV(V2, v.v2u), C1: showC(C1, v.c1u), C2: showC(C2, v.c2u) }[s];
+  const mixed = (v.c1u === "pct") !== (v.c2u === "pct");
+  const ok = !mixed && [C1, C2, V1, V2].every((x) => isFinite(x) && x > 0);
+
+  out.set("mainLabel", label);
+  out.set("main", ok ? main : "—");
+  out.set("stock", ok ? showV(V1, v.v1u) : "—");
+  out.set("solvent", ok && V2 >= V1 ? showV(V2 - V1, v.v2u) : "—");
+  out.set("final", ok ? showV(V2, v.v2u) : "—");
+  out.set("factor", ok ? fmt(C1 / C2) + "×" : "—");
+
+  if (mixed) out.note("Both concentrations must be in percent, or both in molar units (M, mM, µM). Converting between them needs the molar mass.");
+  else if (!ok) out.note("Enter values greater than 0 for the three known fields.");
+  else if (C2 > C1 * (1 + 1e-12)) out.note("The final concentration can't be higher than the stock. Dilution only lowers concentration.");
+  else out.note(`Measure ${showV(V1, v.v1u)} of stock, then add solvent until the total volume is ${showV(V2, v.v2u)}.`);
+}));
+</script>
+<!-- article -->
+<h2>How dilution works</h2>
+<p>When you dilute a solution, you add solvent but the amount of solute stays the same. The number of moles
+of solute equals concentration times volume, so the product C × V is the same before and after. That gives the
+dilution equation, C<sub>1</sub>V<sub>1</sub> = C<sub>2</sub>V<sub>2</sub>.</p>
+<p>The equation works with any concentration unit as long as both sides match, and any volume unit as long as both
+sides match. This calculator converts units for you, so you can mix mM with M or mL with L.</p>
+
+<h2>The formula</h2>
+<div class="formula">C₁ × V₁ = C₂ × V₂<br>
+V₁ = C₂V₂ ÷ C₁ &nbsp; V₂ = C₁V₁ ÷ C₂<br>
+C₁ = C₂V₂ ÷ V₁ &nbsp; C₂ = C₁V₁ ÷ V₂<br>
+solvent to add = V₂ − V₁ &nbsp; dilution factor = C₁ ÷ C₂</div>
+
+<h2>Example: 500 mL of 0.1 M from a 1 M stock</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>V₁ = C₂V₂ ÷ C₁ = 0.1 M × 500 mL ÷ 1 M</td><td><strong>50 mL</strong></td></tr>
+  <tr><td>Solvent: 500 mL − 50 mL</td><td>450 mL</td></tr>
+  <tr><td>Dilution factor: 1 M ÷ 0.1 M</td><td>10×</td></tr>
+</table>
+<p>Measure 50 mL of the stock into a 500 mL volumetric flask, then fill to the line with water.</p>
+
+<h2>Serial dilutions</h2>
+<p>For very large dilution factors, such as 1,000× or more, it's more accurate to dilute in steps. Three 10×
+dilutions in a row give 1,000× overall, and each step uses volumes big enough to measure precisely. Use this
+calculator on each step, with the C<sub>2</sub> of one step becoming the C<sub>1</sub> of the next.</p>
+
+<h2>Common mistakes</h2>
+<ul>
+  <li><strong>Adding V₂ of water.</strong> V₂ is the final total volume. Add V₂ − V₁ of solvent, or fill to the mark.</li>
+  <li><strong>Mismatched units.</strong> If C₁ is in M and C₂ in mM, convert first. 0.1 M is 100 mM.</li>
+  <li><strong>C₂ larger than C₁.</strong> You can't concentrate a solution by adding solvent. Check which number is the stock.</li>
+  <li><strong>Using it for reactions.</strong> C₁V₁ = C₂V₂ is only for dilutions. For a titration or reaction, use mole ratios from the balanced equation.</li>
+</ul>

@@ -1,0 +1,152 @@
+---
+{
+  "title": "Percent Yield Calculator with Theoretical Yield",
+  "description": "Calculate percent yield from actual and theoretical yield, or work out the theoretical yield first from the limiting reactant's mass, molar masses and the mole ratio in the balanced equation.",
+  "h1": "Percent Yield Calculator",
+  "short": "Percent Yield Calculator",
+  "intro": "Enter your actual yield and the theoretical yield, or let the calculator find the theoretical yield from the limiting reactant and the balanced equation.",
+  "updated": "October 2026",
+  "related": ["molar-mass-calculator", "mole-calculator", "molarity-calculator", "ideal-gas-law-calculator"],
+  "faq": [
+    {"q": "What is the percent yield formula?", "a": "Percent yield = actual yield ÷ theoretical yield × 100. Both yields must be in the same units, usually grams. If you made 28.0 g of product and the theoretical yield was 33.79 g, the percent yield is 28.0 ÷ 33.79 × 100 = 82.86%."},
+    {"q": "How do I find the theoretical yield?", "a": "Convert the mass of the limiting reactant to moles (divide by its molar mass), multiply by the mole ratio of product to reactant from the balanced equation, then convert to grams of product (multiply by the product's molar mass)."},
+    {"q": "What is the limiting reactant?", "a": "The limiting reactant is the one that runs out first and so sets the maximum amount of product. To find it, work out how much product each reactant could make on its own. The one that makes less product is limiting. Use that reactant's mass in this calculator."},
+    {"q": "Can percent yield be over 100%?", "a": "Not for a truly pure, dry product. A result above 100% usually means the product is still wet with solvent, contains impurities or unreacted starting material, or there was a weighing or calculation error."},
+    {"q": "Why is percent yield usually less than 100%?", "a": "Real reactions lose product along the way. Some is left behind on glassware or filter paper, side reactions make other products, reversible reactions don't go to completion, and purification steps such as recrystallization sacrifice some product for purity."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="mode">Theoretical yield</label>
+        <select id="mode" name="mode">
+          <option value="calc" selected>Calculate it from the limiting reactant</option>
+          <option value="known">I already know it</option>
+        </select>
+      </div>
+      <div class="field" data-show="known" hidden>
+        <label for="theo">Theoretical yield</label>
+        <div class="input"><input id="theo" name="theo" type="number" min="0" step="any" value="40" inputmode="decimal"><span class="unit">g</span></div>
+      </div>
+      <div data-show="calc">
+        <div class="fields">
+          <div class="row2">
+            <div class="field">
+              <label for="rMass">Limiting reactant mass</label>
+              <div class="input"><input id="rMass" name="rMass" type="number" min="0" step="any" value="6" inputmode="decimal"><span class="unit">g</span></div>
+            </div>
+            <div class="field">
+              <label for="rMM">Its molar mass</label>
+              <div class="input"><input id="rMM" name="rMM" type="number" min="0" step="any" value="2.016" inputmode="decimal"><span class="unit">g/mol</span></div>
+            </div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="rCoef">Reactant coefficient</label>
+              <input id="rCoef" name="rCoef" type="number" min="0" step="any" value="3" inputmode="decimal">
+            </div>
+            <div class="field">
+              <label for="pCoef">Product coefficient</label>
+              <input id="pCoef" name="pCoef" type="number" min="0" step="any" value="2" inputmode="decimal">
+            </div>
+          </div>
+          <div class="hint">Coefficients come from the balanced equation. Default: N₂ + 3H₂ → 2NH₃, with H₂ limiting.</div>
+          <div class="field">
+            <label for="pMM">Product molar mass</label>
+            <div class="input"><input id="pMM" name="pMM" type="number" min="0" step="any" value="17.031" inputmode="decimal"><span class="unit">g/mol</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="actual">Actual yield (what you collected)</label>
+        <div class="input"><input id="actual" name="actual" type="number" min="0" step="any" value="28" inputmode="decimal"><span class="unit">g</span></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Percent yield</span><b data-out="pct">—</b></div>
+    <div class="result"><span>Theoretical yield</span><b data-out="theo">—</b></div>
+    <div class="result"><span>Actual yield</span><b data-out="actual">—</b></div>
+    <div class="result"><span>Product lost</span><b data-out="lost">—</b></div>
+    <div class="result" data-show="calc"><span>Moles of reactant</span><b data-out="rMol">—</b></div>
+    <div class="result" data-show="calc"><span>Moles of product (max)</span><b data-out="pMol">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const fmt = (x, s = 4) => {
+    if (!isFinite(x)) return "—";
+    if (x === 0) return "0";
+    return Calc.num(x, Math.max(0, s - 1 - Math.floor(Math.log10(Math.abs(x)))));
+  };
+  const calc = v.mode === "calc";
+  out.show("calc", calc);
+  out.show("known", !calc);
+
+  let theo, rMol = NaN, pMol = NaN;
+  if (calc) {
+    rMol = v.rMass / v.rMM;
+    pMol = rMol * v.pCoef / v.rCoef;
+    theo = pMol * v.pMM;
+  } else theo = v.theo;
+
+  const ok = isFinite(theo) && theo > 0;
+  const pct = v.actual / theo * 100;
+  out.set("pct", ok ? Calc.num(pct, 2) + "%" : "—");
+  out.set("theo", ok ? fmt(theo) + " g" : "—");
+  out.set("actual", fmt(v.actual) + " g");
+  out.set("lost", ok ? (theo >= v.actual ? fmt(theo - v.actual) + " g" : "None (over 100%)") : "—");
+  out.set("rMol", isFinite(rMol) ? fmt(rMol) + " mol" : "—");
+  out.set("pMol", isFinite(pMol) ? fmt(pMol) + " mol" : "—");
+
+  if (!ok) out.note(calc ? "Enter the reactant mass, both molar masses and both coefficients (all greater than 0)." : "Enter a theoretical yield greater than 0.");
+  else if (pct > 100) out.note("Over 100% usually means the product is still wet or impure, or a measurement is off. Dry it to constant mass and reweigh.");
+  else if (calc) out.note(`Steps: ${fmt(v.rMass)} g ÷ ${Calc.num(v.rMM, 4)} g/mol = ${fmt(rMol)} mol × ${fmt(v.pCoef)}/${fmt(v.rCoef)} = ${fmt(pMol)} mol × ${Calc.num(v.pMM, 4)} g/mol = ${fmt(theo)} g theoretical.`);
+  else out.note(`Steps: ${fmt(v.actual)} g ÷ ${fmt(theo)} g × 100 = ${Calc.num(pct, 2)}%.`);
+}));
+</script>
+<!-- article -->
+<h2>What percent yield means</h2>
+<p>The theoretical yield is the most product a reaction could possibly make, based on the balanced equation and the
+amount of limiting reactant. The actual yield is what you really collect and weigh at the end. Percent yield
+compares the two, telling you how efficient your reaction and your technique were.</p>
+<p>Most percent yield problems have two parts: a stoichiometry calculation to find the theoretical yield, then a
+simple division. This calculator can do both.</p>
+
+<h2>The formula</h2>
+<div class="formula">percent yield = actual yield ÷ theoretical yield × 100<br>
+moles of reactant = mass of reactant ÷ molar mass of reactant<br>
+moles of product = moles of reactant × (product coefficient ÷ reactant coefficient)<br>
+theoretical yield = moles of product × molar mass of product</div>
+
+<h2>Example: making ammonia</h2>
+<p>In the reaction N<sub>2</sub> + 3H<sub>2</sub> → 2NH<sub>3</sub>, 6.00 g of hydrogen (2.016 g/mol) is the limiting
+reactant. You collect 28.0 g of ammonia (17.031 g/mol). What is the percent yield?</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Moles of H₂: 6.00 g ÷ 2.016 g/mol</td><td>2.976 mol</td></tr>
+  <tr><td>Moles of NH₃: 2.976 mol × 2 ÷ 3</td><td>1.984 mol</td></tr>
+  <tr><td>Theoretical yield: 1.984 mol × 17.031 g/mol</td><td>33.79 g</td></tr>
+  <tr><td>Percent yield: 28.0 g ÷ 33.79 g × 100</td><td><strong>82.86%</strong></td></tr>
+  <tr><td>Product lost: 33.79 g − 28.0 g</td><td>5.792 g</td></tr>
+</table>
+<p>The calculator carries full precision between steps, so its answers may differ slightly in the last digit from a
+hand calculation that rounds at each step.</p>
+
+<h2>Finding the limiting reactant</h2>
+<p>If a problem gives you masses of two reactants, run the theoretical yield calculation once for each. Whichever
+reactant gives the smaller amount of product is the limiting reactant, and that smaller amount is the theoretical
+yield. The other reactant is in excess.</p>
+
+<h2>Common mistakes</h2>
+<ul>
+  <li><strong>Skipping the mole ratio.</strong> You can't go straight from grams of reactant to grams of product. Always pass through moles and the coefficients.</li>
+  <li><strong>Flipping the ratio.</strong> Multiply by product coefficient ÷ reactant coefficient, so the reactant's units cancel.</li>
+  <li><strong>Using the excess reactant.</strong> The theoretical yield is set by the limiting reactant only.</li>
+  <li><strong>An unbalanced equation.</strong> Balance the equation first, or the coefficients will be wrong.</li>
+  <li><strong>Weighing a wet product.</strong> Leftover water or solvent inflates the actual yield, sometimes above 100%.</li>
+</ul>

@@ -1,0 +1,215 @@
+---
+{
+  "title": "Half-Life Calculator: Remaining Amount, Time & Decay Constant",
+  "description": "Solve N = N₀ × (1/2)^(t / t½) for the amount remaining, elapsed time, half-life or starting amount. Includes the decay constant and presets for carbon-14, iodine-131, uranium-238 and radon-222.",
+  "h1": "Half-Life Calculator",
+  "short": "Half-Life Calculator",
+  "intro": "Find how much of a radioactive isotope is left after a given time, how long decay takes, or the half-life itself. Pick an isotope preset or enter your own half-life.",
+  "updated": "October 2026",
+  "related": ["ideal-gas-law-calculator", "mole-calculator", "ph-calculator", "molar-mass-calculator"],
+  "faq": [
+    {"q": "What is a half-life?", "a": "A half-life is the time it takes for half of a sample of a radioactive isotope to decay. After one half-life, 50% remains; after two, 25%; after three, 12.5%. The half-life is the same no matter how much material you start with."},
+    {"q": "How do I calculate the amount remaining?", "a": "Use N = N₀ × (1/2)^(t / t½). Divide the elapsed time by the half-life to get the number of half-lives, raise 1/2 to that power, and multiply by the starting amount. For 100 g of carbon-14 after 10,000 years: 10,000 ÷ 5,730 = 1.745 half-lives, and 100 × 0.5^1.745 = 29.83 g."},
+    {"q": "How do I solve for time?", "a": "Rearrange with logarithms: t = t½ × log(N/N₀) ÷ log(1/2), which is the same as t½ × log₂(N₀/N). For example, going from 100 g to 25 g is log₂(4) = 2 half-lives."},
+    {"q": "What is the decay constant?", "a": "The decay constant λ is the fraction of nuclei that decay per unit time. It is related to half-life by λ = ln 2 ÷ t½ ≈ 0.6931 ÷ t½. Using it, the decay law can also be written N = N₀ × e^(−λt), which gives exactly the same results."},
+    {"q": "Does a radioactive sample ever completely disappear?", "a": "Mathematically, the amount keeps halving and never reaches zero. In practice, after about 10 half-lives less than 0.1% remains, and eventually so few atoms are left that the formula only describes the probability that any are still there."},
+    {"q": "Can I use this for drug half-lives?", "a": "Yes. Many drugs are cleared from the body at a rate that follows the same first-order decay, so the same formula applies. Real dosing is more complicated, so follow medical guidance rather than this calculator for actual doses."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="solve">Solve for</label>
+        <select id="solve" name="solve">
+          <option value="N" selected>Amount remaining (N)</option>
+          <option value="t">Elapsed time (t)</option>
+          <option value="h">Half-life (t½)</option>
+          <option value="N0">Initial amount (N₀)</option>
+        </select>
+      </div>
+      <div class="field" data-show="needHalf">
+        <label for="iso">Isotope</label>
+        <select id="iso" name="iso">
+          <option value="c14" selected>Carbon-14 (5,730 years)</option>
+          <option value="i131">Iodine-131 (8.02 days)</option>
+          <option value="rn222">Radon-222 (3.82 days)</option>
+          <option value="u238">Uranium-238 (4.468 billion years)</option>
+          <option value="custom">Custom half-life</option>
+        </select>
+      </div>
+      <div class="row2" data-show="halfInput" hidden>
+        <div class="field">
+          <label for="half">Half-life (t½)</label>
+          <input id="half" name="half" type="number" min="0" step="any" value="5730" inputmode="decimal" data-show="inHalf">
+          <div class="hint" data-show="outHalf" hidden>Calculated, in the unit at right</div>
+        </div>
+        <div class="field">
+          <label for="hu">Unit</label>
+          <select id="hu" name="hu">
+            <option value="s">seconds</option>
+            <option value="min">minutes</option>
+            <option value="h">hours</option>
+            <option value="d">days</option>
+            <option value="yr" selected>years</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field" data-show="needN0">
+          <label for="N0">Initial amount (N₀)</label>
+          <input id="N0" name="N0" type="number" min="0" step="any" value="100" inputmode="decimal">
+        </div>
+        <div class="field" data-show="needN" hidden>
+          <label for="N">Amount remaining (N)</label>
+          <input id="N" name="N" type="number" min="0" step="any" value="25" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="au">Amount unit</label>
+          <select id="au" name="au">
+            <option value="g" selected>g</option>
+            <option value="mg">mg</option>
+            <option value="µg">µg</option>
+            <option value="%">%</option>
+            <option value="atoms">atoms</option>
+            <option value="Bq">Bq (activity)</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="needT">
+        <div class="field">
+          <label for="t">Elapsed time (t)</label>
+          <input id="t" name="t" type="number" min="0" step="any" value="10000" inputmode="decimal" data-show="inT">
+          <div class="hint" data-show="outT" hidden>Calculated, in the unit at right</div>
+        </div>
+        <div class="field">
+          <label for="tu">Unit</label>
+          <select id="tu" name="tu">
+            <option value="s">seconds</option>
+            <option value="min">minutes</option>
+            <option value="h">hours</option>
+            <option value="d">days</option>
+            <option value="yr" selected>years</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="mainLabel">Amount remaining</span><b data-out="main">—</b></div>
+    <div class="result"><span>Number of half-lives</span><b data-out="halves">—</b></div>
+    <div class="result"><span>Fraction remaining</span><b data-out="frac">—</b></div>
+    <div class="result"><span>Amount decayed</span><b data-out="decayed">—</b></div>
+    <div class="result"><span>Half-life used</span><b data-out="halfUsed">—</b></div>
+    <div class="result"><span>Decay constant (λ)</span><b data-out="lambda">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const SUP = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+  const fmt = (x, s = 4) => {
+    if (!isFinite(x)) return "—";
+    if (x === 0) return "0";
+    const a = Math.abs(x);
+    if (a >= 1e6 || a < 1e-3) {
+      const [m, e] = x.toExponential(s - 1).split("e");
+      return `${m.includes(".") ? m.replace(/\.?0+$/, "") : m} × 10${String(+e).replace(/./g, (c) => SUP[c])}`;
+    }
+    return Calc.num(x, Math.max(0, s - 1 - Math.floor(Math.log10(a))));
+  };
+  const SEC = { s: 1, min: 60, h: 3600, d: 86400, yr: 31557600 };   // year = 365.25 days
+  const NAME = { s: "seconds", min: "minutes", h: "hours", d: "days", yr: "years" };
+  const ONE = { s: "second", min: "minute", h: "hour", d: "day", yr: "year" };
+  const PRESET = { c14: [5730, "yr"], i131: [8.02, "d"], rn222: [3.82, "d"], u238: [4.468e9, "yr"] };
+  const s = v.solve;
+  const custom = v.iso === "custom";
+  out.show("needHalf", s !== "h");
+  out.show("halfInput", s === "h" || custom);
+  out.show("needN0", s !== "N0");
+  out.show("needN", s !== "N");
+  out.show("inHalf", s !== "h");
+  out.show("outHalf", s === "h");
+  out.show("inT", s !== "t");
+  out.show("outT", s === "t");
+
+  // Half-life value and unit, from the preset or the custom fields.
+  let half, hu;
+  if (s !== "h" && !custom) [half, hu] = PRESET[v.iso];
+  else { half = v.half; hu = v.hu; }
+  let hSec = half * SEC[hu];
+  let N0 = v.N0, N = v.N, tSec = v.t * SEC[v.tu];
+
+  let err = "";
+  if (s === "N") N = N0 * Math.pow(0.5, tSec / hSec);
+  else if (s === "N0") N0 = N / Math.pow(0.5, tSec / hSec);
+  else if (!(N > 0 && N0 > 0)) err = "Enter amounts greater than 0.";
+  else if (N >= N0) err = "The amount remaining must be less than the initial amount.";
+  else if (s === "t") tSec = hSec * Math.log2(N0 / N);
+  else { hSec = tSec * Math.LN2 / Math.log(N0 / N); half = hSec / SEC[hu]; }
+
+  const ok = !err && [N0, N, tSec, hSec].every((x) => isFinite(x)) && N0 > 0 && hSec > 0 && tSec >= 0;
+  const au = v.au === "%" ? "%" : " " + v.au;
+  const halves = tSec / hSec;
+
+  out.set("mainLabel", { N: "Amount remaining", N0: "Initial amount", t: "Elapsed time", h: "Half-life" }[s]);
+  out.set("main", !ok ? "—" : {
+    N: fmt(N) + au, N0: fmt(N0) + au,
+    t: fmt(tSec / SEC[v.tu]) + " " + NAME[v.tu],
+    h: fmt(half) + " " + NAME[hu],
+  }[s]);
+  out.set("halves", ok ? fmt(halves) : "—");
+  out.set("frac", ok ? Calc.num(N / N0 * 100, 2) + "%" : "—");
+  out.set("decayed", ok ? fmt(N0 - N) + au : "—");
+  out.set("halfUsed", ok ? fmt(half) + " " + NAME[hu] : "—");
+  out.set("lambda", ok ? `${fmt(Math.LN2 / half)} per ${ONE[hu]}` : "—");
+
+  if (err) out.note(err);
+  else if (!ok) out.note("Enter values greater than 0.");
+  else out.note(`Steps: t ÷ t½ = ${fmt(halves)} half-lives, and (1/2)^${fmt(halves)} = ${fmt(N / N0)}, so N = ${fmt(N0)} × ${fmt(N / N0)} = ${fmt(N)}${au}.` + (hu === "yr" || v.tu === "yr" ? " A year is taken as 365.25 days." : ""));
+}));
+</script>
+<!-- article -->
+<h2>How radioactive half-life works</h2>
+<p>Radioactive decay is random for any single atom, but a large sample decays at a very predictable rate. In each
+half-life, half of the remaining radioactive nuclei decay. That means the amount drops by the same fraction every
+half-life, not by the same amount, which is called exponential decay.</p>
+<p>The amount can be measured in grams, number of atoms, percent of the original, or activity (decays per second,
+in becquerels). Activity is proportional to the number of radioactive atoms, so it follows the same curve.</p>
+
+<h2>The formula</h2>
+<div class="formula">N = N₀ × (1/2)<sup>t / t½</sup><br>
+t = t½ × log(N ÷ N₀) ÷ log(1/2)<br>
+t½ = t × ln 2 ÷ ln(N₀ ÷ N)<br>
+N₀ = N ÷ (1/2)<sup>t / t½</sup><br>
+λ = ln 2 ÷ t½ &nbsp;&nbsp; N = N₀ × e<sup>−λt</sup></div>
+
+<h2>Example: 100 g of carbon-14 after 10,000 years</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Number of half-lives: 10,000 ÷ 5,730</td><td>1.745</td></tr>
+  <tr><td>Fraction remaining: (1/2)<sup>1.745</sup></td><td>0.2983 (29.83%)</td></tr>
+  <tr><td>Amount remaining: 100 g × 0.2983</td><td><strong>29.83 g</strong></td></tr>
+  <tr><td>Amount decayed: 100 g − 29.83 g</td><td>70.17 g</td></tr>
+  <tr><td>Decay constant: 0.6931 ÷ 5,730 years</td><td>1.21 × 10⁻⁴ per year</td></tr>
+</table>
+
+<h2>Half-lives of common isotopes</h2>
+<table>
+  <tr><th>Isotope</th><th>Half-life</th><th>Where you meet it</th></tr>
+  <tr><td>Radon-222</td><td>3.82 days</td><td>Radioactive gas from uranium in rocks and soil; tested for in basements</td></tr>
+  <tr><td>Iodine-131</td><td>8.02 days</td><td>Thyroid treatment and imaging in nuclear medicine</td></tr>
+  <tr><td>Carbon-14</td><td>5,730 years</td><td>Radiocarbon dating of once-living material up to about 50,000 years old</td></tr>
+  <tr><td>Uranium-238</td><td>4.468 billion years</td><td>Dating the oldest rocks; about the age of the Earth</td></tr>
+</table>
+
+<h2>Tips and common mistakes</h2>
+<ul>
+  <li><strong>Match the time units.</strong> t and t½ must be in the same units before dividing. The calculator converts them for you.</li>
+  <li><strong>Don't subtract half each time.</strong> After two half-lives, 25% is left, not 0%. Each half-life halves what remains.</li>
+  <li><strong>Non-whole half-lives are fine.</strong> 1.745 half-lives is a perfectly valid exponent; use your calculator's x<sup>y</sup> key.</li>
+  <li><strong>Check the direction.</strong> The remaining amount is always less than the initial amount for decay.</li>
+  <li><strong>Quick check:</strong> after about 10 half-lives, roughly 0.1% (1/1,024) of the original remains.</li>
+</ul>

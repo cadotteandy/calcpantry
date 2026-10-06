@@ -1,0 +1,220 @@
+---
+{
+  "title": "Molar Mass Calculator: Grams per Mole from Any Formula",
+  "description": "Type a chemical formula like H2O, Ca(OH)2, Fe2(SO4)3 or CuSO4·5H2O and get the molar mass in g/mol plus an element-by-element breakdown with mass percent.",
+  "h1": "Molar Mass Calculator",
+  "short": "Molar Mass Calculator",
+  "intro": "Type any chemical formula, including parentheses, brackets and hydrates. See the molar mass in g/mol and how much each element contributes, step by step.",
+  "updated": "October 2026",
+  "related": ["mole-calculator", "molarity-calculator", "percent-yield-calculator", "dilution-calculator"],
+  "faq": [
+    {"q": "What is molar mass?", "a": "Molar mass is the mass of one mole of a substance, in grams per mole (g/mol). One mole is 6.022 × 10²³ particles. Numerically, the molar mass in g/mol equals the formula mass in atomic mass units, so water is about 18.015 u per molecule and 18.015 g per mole."},
+    {"q": "How do I calculate molar mass by hand?", "a": "Count the atoms of each element in the formula, multiply each count by that element's atomic weight from the periodic table, and add the results. For water, H2O: 2 × 1.008 + 1 × 15.999 = 18.015 g/mol."},
+    {"q": "How do parentheses work in a chemical formula?", "a": "A subscript after a parenthesis multiplies everything inside it. In Ca(OH)2 the 2 applies to both O and H, giving 1 Ca, 2 O and 2 H. Brackets work the same way and can be nested, as in K4[Fe(CN)6]."},
+    {"q": "How do I enter a hydrate like CuSO4·5H2O?", "a": "Use a raised dot, an asterisk or a period between the parts: CuSO4·5H2O, CuSO4*5H2O and CuSO4.5H2O all work. The number in front of H2O multiplies the whole water molecule, so five waters add 10 H and 5 O. Decimal coefficients such as CaSO4·0.5H2O are allowed too."},
+    {"q": "Why does my textbook give a slightly different answer?", "a": "Periodic tables round atomic weights differently. This calculator uses IUPAC's abridged standard atomic weights, such as Cl = 35.45 and S = 32.06. A table that uses Cl = 35.453 or S = 32.065 will give an answer that differs in the second or third decimal place. Use the values your class uses on tests."},
+    {"q": "Why are some atomic weights whole numbers?", "a": "Elements such as technetium, promethium, radon and everything past uranium have no stable isotopes, so there is no natural average to report. By convention the mass number of the longest-lived isotope is used instead, often shown in brackets like [98] for technetium."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="formula">Chemical formula</label>
+        <input id="formula" name="formula" type="text" value="CuSO4·5H2O" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <div class="hint">Examples: H2O, C6H12O6, Ca(OH)2, Fe2(SO4)3, K4[Fe(CN)6], CuSO4*5H2O. Capitalization matters: Co is cobalt, CO is carbon monoxide.</div>
+      </div>
+      <div class="field">
+        <label for="dp">Decimal places</label>
+        <select id="dp" name="dp">
+          <option value="2">2</option>
+          <option value="3" selected>3</option>
+          <option value="4">4</option>
+        </select>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Molar mass</span><b data-out="mm">—</b></div>
+    <div class="result"><span>Mass of one formula unit</span><b data-out="amu">—</b></div>
+    <div class="result"><span>Total atoms per formula</span><b data-out="atoms">—</b></div>
+    <div class="result"><span>Different elements</span><b data-out="elements">—</b></div>
+    <div class="mm-breakdown" data-out="breakdown"></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<style>
+.mm-breakdown { margin-top: 12px; overflow-x: auto; }
+.mm-breakdown table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.mm-breakdown th, .mm-breakdown td { padding: 6px 6px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+.mm-breakdown th { color: var(--muted); font-weight: 600; font-size: 12.5px; }
+.mm-breakdown th:first-child, .mm-breakdown td:first-child { text-align: left; }
+.mm-breakdown tr:last-child td { border-bottom: 0; font-weight: 700; }
+</style>
+<script>
+// IUPAC abridged / conventional standard atomic weights (g/mol). Elements with no stable
+// isotopes use the mass number of their longest-lived isotope.
+const AW = {
+  H: 1.008, He: 4.0026, Li: 6.94, Be: 9.0122, B: 10.81, C: 12.011, N: 14.007, O: 15.999, F: 18.998, Ne: 20.180,
+  Na: 22.990, Mg: 24.305, Al: 26.982, Si: 28.085, P: 30.974, S: 32.06, Cl: 35.45, Ar: 39.95, K: 39.098, Ca: 40.078,
+  Sc: 44.956, Ti: 47.867, V: 50.942, Cr: 51.996, Mn: 54.938, Fe: 55.845, Co: 58.933, Ni: 58.693, Cu: 63.546, Zn: 65.38,
+  Ga: 69.723, Ge: 72.630, As: 74.922, Se: 78.971, Br: 79.904, Kr: 83.798, Rb: 85.468, Sr: 87.62, Y: 88.906, Zr: 91.224,
+  Nb: 92.906, Mo: 95.95, Tc: 98, Ru: 101.07, Rh: 102.91, Pd: 106.42, Ag: 107.87, Cd: 112.41, In: 114.82, Sn: 118.71,
+  Sb: 121.76, Te: 127.60, I: 126.90, Xe: 131.29, Cs: 132.91, Ba: 137.33, La: 138.91, Ce: 140.12, Pr: 140.91, Nd: 144.24,
+  Pm: 145, Sm: 150.36, Eu: 151.96, Gd: 157.25, Tb: 158.93, Dy: 162.50, Ho: 164.93, Er: 167.26, Tm: 168.93, Yb: 173.05,
+  Lu: 174.97, Hf: 178.49, Ta: 180.95, W: 183.84, Re: 186.21, Os: 190.23, Ir: 192.22, Pt: 195.08, Au: 196.97, Hg: 200.59,
+  Tl: 204.38, Pb: 207.2, Bi: 208.98, Po: 209, At: 210, Rn: 222, Fr: 223, Ra: 226, Ac: 227, Th: 232.04,
+  Pa: 231.04, U: 238.03, Np: 237, Pu: 244, Am: 243, Cm: 247, Bk: 247, Cf: 251, Es: 252, Fm: 257,
+  Md: 258, No: 259, Lr: 266, Rf: 267, Db: 268, Sg: 269, Bh: 270, Hs: 269, Mt: 278, Ds: 281,
+  Rg: 282, Cn: 285, Nh: 286, Fl: 289, Mc: 290, Lv: 293, Ts: 294, Og: 294,
+};
+// Returns a Map of element -> atom count, or throws an Error with a friendly message.
+// Handles nested () and [], subscripts (also Unicode ₂), and hydrates joined by · • * or .
+function parseFormula(raw) {
+  const s = raw.replace(/\s+/g, "").replace(/[₀-₉]/g, (c) => String(c.charCodeAt(0) - 0x2080));
+  if (!s) throw new Error("Enter a chemical formula, like H2O or Ca(OH)2.");
+  const SEP = "·•*.";
+  let i = 0;
+  const sub = () => {
+    const j = i;
+    while (i < s.length && s[i] >= "0" && s[i] <= "9") i++;
+    if (i === j) return 1;
+    const n = parseInt(s.slice(j, i), 10);
+    if (n < 1) throw new Error("Subscripts must be 1 or more.");
+    return n;
+  };
+  const add = (into, from, k) => { for (const [el, n] of from) into.set(el, (into.get(el) || 0) + n * k); };
+  function group(close) {
+    const m = new Map();
+    while (i < s.length) {
+      const c = s[i];
+      if (c >= "A" && c <= "Z") {
+        let sym = c; i++;
+        if (i < s.length && s[i] >= "a" && s[i] <= "z") sym += s[i++];
+        if (!Object.prototype.hasOwnProperty.call(AW, sym))
+          throw new Error(`"${sym}" isn't an element symbol. Symbols are case-sensitive: Co is cobalt, CO is carbon + oxygen.`);
+        add(m, [[sym, 1]], sub());
+      } else if (c === "(" || c === "[") {
+        i++;
+        const inner = group(c === "(" ? ")" : "]");
+        if (!inner.size) throw new Error("Empty brackets in the formula.");
+        add(m, inner, sub());
+      } else if (c === ")" || c === "]") {
+        if (!close) throw new Error(`There's a "${c}" with no matching opening bracket.`);
+        if (c !== close) throw new Error(`Mismatched brackets: expected "${close}" but found "${c}".`);
+        i++;
+        return m;
+      } else if (SEP.includes(c)) {
+        if (close) throw new Error(`Missing a closing "${close}" before the hydrate dot.`);
+        return m;
+      } else if (c >= "a" && c <= "z") {
+        throw new Error(`Element symbols start with a capital letter ("${c}" found). Try ${c.toUpperCase()} instead.`);
+      } else {
+        throw new Error(`Unexpected character "${c}" in the formula.`);
+      }
+    }
+    if (close) throw new Error(`Missing a closing "${close}".`);
+    return m;
+  }
+  const total = new Map();
+  while (true) {
+    const lead = /^\d+(?:\.\d+)?/.exec(s.slice(i));
+    let k = 1;
+    if (lead) { k = parseFloat(lead[0]); i += lead[0].length; }
+    if (!(k > 0)) throw new Error("A leading coefficient must be greater than 0.");
+    const part = group(null);
+    if (!part.size) throw new Error("Part of the formula is empty. Check the hydrate dot.");
+    add(total, part, k);
+    if (i >= s.length) break;
+    i++; // skip the hydrate separator
+  }
+  return total;
+}
+
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const box = document.querySelector('[data-out="breakdown"]');
+  const dp = parseInt(v.dp, 10);
+  box.replaceChildren();
+  let counts;
+  try { counts = parseFormula(v.formula); }
+  catch (e) {
+    ["mm", "amu", "atoms", "elements"].forEach((k) => out.set(k, "—"));
+    out.note(e.message);
+    return;
+  }
+  let total = 0, atoms = 0;
+  const rows = [];
+  for (const [el, n] of counts) { const m = AW[el] * n; rows.push([el, n, m]); total += m; atoms += n; }
+
+  out.set("mm", Calc.num(total, dp) + " g/mol");
+  out.set("amu", Calc.num(total, dp) + " u");
+  out.set("atoms", Calc.num(atoms, 2));
+  out.set("elements", String(rows.length));
+
+  const table = document.createElement("table");
+  const tr = (cells, tag) => {
+    const r = document.createElement("tr");
+    cells.forEach((c) => { const cell = document.createElement(tag); cell.textContent = c; r.appendChild(cell); });
+    table.appendChild(r);
+  };
+  tr(["Element", "Atoms", "× Weight", "g/mol", "Mass %"], "th");
+  rows.forEach(([el, n, m]) => tr([el, Calc.num(n, 2), Calc.num(AW[el], 4), Calc.num(m, dp), Calc.num(m / total * 100, 2) + "%"], "td"));
+  tr(["Total", Calc.num(atoms, 2), "", Calc.num(total, dp), "100%"], "td");
+  box.appendChild(table);
+
+  const synthetic = rows.filter(([el]) => ["Tc", "Pm"].includes(el) || AW[el] >= 209 && !["Th", "Pa", "U"].includes(el));
+  if (synthetic.length) out.note(`${synthetic.map((r) => r[0]).join(", ")} ${synthetic.length > 1 ? "have" : "has"} no stable isotopes, so the mass number of the longest-lived isotope is used.`);
+  else out.note("Atomic weights are IUPAC abridged standard values. Your textbook may round a few of them differently.");
+}));
+</script>
+<!-- article -->
+<h2>What molar mass means</h2>
+<p>Molar mass is the mass of one mole of a substance, measured in grams per mole (g/mol). A mole is a counting
+unit, like a dozen, except it means 6.022 × 10²³ particles. Molar mass is the bridge between what you can weigh on
+a balance (grams) and what reactions actually count (moles of atoms and molecules), so you will use it in almost
+every stoichiometry problem.</p>
+<p>Each element's atomic weight on the periodic table is its molar mass in g/mol. Carbon is 12.011 g/mol, so a mole
+of carbon atoms weighs about 12 grams. For a compound, you add up the atomic weights of every atom in the formula.</p>
+
+<h2>The formula</h2>
+<div class="formula">molar mass = Σ (number of atoms of element × atomic weight of element)<br>
+mass % of an element = (atoms × atomic weight) ÷ molar mass × 100</div>
+<p>To count atoms, read each subscript as applying to the symbol just before it. A subscript after parentheses or
+brackets multiplies everything inside. In a hydrate, the number in front of H<sub>2</sub>O multiplies the entire
+water molecule.</p>
+
+<h2>Example: copper(II) sulfate pentahydrate, CuSO<sub>4</sub>·5H<sub>2</sub>O</h2>
+<p>First count atoms. CuSO<sub>4</sub> gives 1 Cu, 1 S and 4 O. Five waters add 5 × 2 = 10 H and 5 × 1 = 5 O, so the
+total is 1 Cu, 1 S, 9 O and 10 H.</p>
+<table>
+  <tr><th>Element</th><th>Atoms × atomic weight</th><th>g/mol</th><th>Mass %</th></tr>
+  <tr><td>Cu</td><td>1 × 63.546</td><td>63.546</td><td>25.45%</td></tr>
+  <tr><td>S</td><td>1 × 32.06</td><td>32.06</td><td>12.84%</td></tr>
+  <tr><td>O</td><td>9 × 15.999</td><td>143.991</td><td>57.67%</td></tr>
+  <tr><td>H</td><td>10 × 1.008</td><td>10.08</td><td>4.04%</td></tr>
+  <tr><td><strong>Total</strong></td><td>21 atoms</td><td><strong>249.677</strong></td><td>100%</td></tr>
+</table>
+<p>So one mole of the blue crystals weighs 249.677 g, and about 36% of that mass (5 × 18.015 = 90.075 g) is water.</p>
+
+<h2>Molar masses of common compounds</h2>
+<table>
+  <tr><th>Compound</th><th>Formula</th><th>Molar mass (g/mol)</th></tr>
+  <tr><td>Water</td><td>H2O</td><td>18.015</td></tr>
+  <tr><td>Carbon dioxide</td><td>CO2</td><td>44.009</td></tr>
+  <tr><td>Sodium chloride</td><td>NaCl</td><td>58.44</td></tr>
+  <tr><td>Calcium hydroxide</td><td>Ca(OH)2</td><td>74.092</td></tr>
+  <tr><td>Sulfuric acid</td><td>H2SO4</td><td>98.072</td></tr>
+  <tr><td>Glucose</td><td>C6H12O6</td><td>180.156</td></tr>
+  <tr><td>Iron(III) sulfate</td><td>Fe2(SO4)3</td><td>399.858</td></tr>
+</table>
+
+<h2>Common mistakes</h2>
+<ul>
+  <li><strong>Forgetting to distribute a subscript.</strong> In Ca(OH)<sub>2</sub> there are 2 hydrogens, not 1. In Fe<sub>2</sub>(SO<sub>4</sub>)<sub>3</sub> there are 12 oxygens.</li>
+  <li><strong>Wrong capitalization.</strong> CO (carbon monoxide, 28.010 g/mol) and Co (cobalt, 58.933 g/mol) are very different. Every element symbol starts with a capital letter.</li>
+  <li><strong>Leaving out the water in a hydrate.</strong> If the label says CuSO<sub>4</sub>·5H<sub>2</sub>O, weigh using 249.68 g/mol, not 159.60 g/mol for the anhydrous salt.</li>
+  <li><strong>Using atomic number instead of atomic weight.</strong> Oxygen's atomic number is 8, but its atomic weight is 15.999.</li>
+  <li><strong>Rounding too early.</strong> Keep at least the decimals your periodic table gives until the final answer.</li>
+</ul>

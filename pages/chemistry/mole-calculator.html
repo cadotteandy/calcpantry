@@ -1,0 +1,255 @@
+---
+{
+  "title": "Mole Calculator: Grams to Moles to Particles",
+  "description": "Convert grams to moles, moles to grams, and moles to molecules or atoms with Avogadro's number. Type a chemical formula or enter the molar mass, and see every step.",
+  "h1": "Mole Calculator (Grams ↔ Moles ↔ Particles)",
+  "short": "Mole Calculator",
+  "intro": "Enter a mass, a number of moles or a number of particles, plus the substance's formula or molar mass. Get the other two amounts with the steps shown.",
+  "updated": "October 2026",
+  "related": ["molar-mass-calculator", "molarity-calculator", "percent-yield-calculator", "ideal-gas-law-calculator"],
+  "faq": [
+    {"q": "How do I convert grams to moles?", "a": "Divide the mass in grams by the molar mass in g/mol. For 25 g of water (18.015 g/mol): 25 ÷ 18.015 = 1.388 mol. The grams cancel, leaving moles."},
+    {"q": "How do I convert moles to grams?", "a": "Multiply the number of moles by the molar mass. For 0.5 mol of NaCl (58.44 g/mol): 0.5 × 58.44 = 29.22 g."},
+    {"q": "What is Avogadro's number?", "a": "Avogadro's number is exactly 6.02214076 × 10²³ particles per mole. Since 2019 this value has been fixed by definition in the SI. Most classes round it to 6.022 × 10²³."},
+    {"q": "How do I find the number of atoms rather than molecules?", "a": "First find the number of molecules (moles × Avogadro's number), then multiply by the number of atoms in one molecule. One water molecule, H2O, has 3 atoms, so 1 mole of water contains about 1.807 × 10²⁴ atoms. This calculator shows the total atom count when you enter a formula."},
+    {"q": "What counts as a particle?", "a": "It depends on the substance. For molecular compounds like water or glucose, a particle is a molecule. For ionic compounds like NaCl, it is a formula unit. For an element like iron or helium, it is an atom. The math is the same in every case."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="mode">I have</label>
+        <select id="mode" name="mode">
+          <option value="mass" selected>A mass (grams)</option>
+          <option value="mol">A number of moles</option>
+          <option value="part">A number of particles</option>
+        </select>
+      </div>
+      <div class="row2" data-show="inMass">
+        <div class="field">
+          <label for="mass">Mass</label>
+          <input id="mass" name="mass" type="number" min="0" step="any" value="25" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="massUnit">Unit</label>
+          <select id="massUnit" name="massUnit">
+            <option value="1" selected>g</option>
+            <option value="0.001">mg</option>
+            <option value="1000">kg</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" data-show="inMol" hidden>
+        <label for="mol">Moles</label>
+        <div class="input"><input id="mol" name="mol" type="number" min="0" step="any" value="0.5" inputmode="decimal"><span class="unit">mol</span></div>
+      </div>
+      <div class="field" data-show="inPart" hidden>
+        <label for="part">Number of particles</label>
+        <input id="part" name="part" type="number" min="0" step="any" value="3.011e23" inputmode="decimal">
+        <div class="hint">Use e-notation for big numbers: 3.011e23 means 3.011 × 10²³.</div>
+      </div>
+      <div class="field">
+        <label for="mmSource">Molar mass from</label>
+        <select id="mmSource" name="mmSource">
+          <option value="formula" selected>A chemical formula</option>
+          <option value="manual">A value I enter</option>
+        </select>
+      </div>
+      <div class="field" data-show="byFormula">
+        <label for="formula">Chemical formula</label>
+        <input id="formula" name="formula" type="text" value="H2O" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <div class="hint">For example NaCl, C6H12O6, Ca(OH)2 or CuSO4·5H2O.</div>
+      </div>
+      <div class="field" data-show="byManual" hidden>
+        <label for="mm">Molar mass</label>
+        <div class="input"><input id="mm" name="mm" type="number" min="0" step="any" value="18.015" inputmode="decimal"><span class="unit">g/mol</span></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="mainLabel">Moles</span><b data-out="main">—</b></div>
+    <div class="result"><span>Mass</span><b data-out="grams">—</b></div>
+    <div class="result"><span>Moles</span><b data-out="moles">—</b></div>
+    <div class="result"><span>Particles (molecules or formula units)</span><b data-out="particles">—</b></div>
+    <div class="result" data-show="byFormula"><span>Total atoms</span><b data-out="atoms">—</b></div>
+    <div class="result"><span>Molar mass used</span><b data-out="mmUsed">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+// IUPAC abridged / conventional standard atomic weights (g/mol). Elements with no stable
+// isotopes use the mass number of their longest-lived isotope.
+const AW = {
+  H: 1.008, He: 4.0026, Li: 6.94, Be: 9.0122, B: 10.81, C: 12.011, N: 14.007, O: 15.999, F: 18.998, Ne: 20.180,
+  Na: 22.990, Mg: 24.305, Al: 26.982, Si: 28.085, P: 30.974, S: 32.06, Cl: 35.45, Ar: 39.95, K: 39.098, Ca: 40.078,
+  Sc: 44.956, Ti: 47.867, V: 50.942, Cr: 51.996, Mn: 54.938, Fe: 55.845, Co: 58.933, Ni: 58.693, Cu: 63.546, Zn: 65.38,
+  Ga: 69.723, Ge: 72.630, As: 74.922, Se: 78.971, Br: 79.904, Kr: 83.798, Rb: 85.468, Sr: 87.62, Y: 88.906, Zr: 91.224,
+  Nb: 92.906, Mo: 95.95, Tc: 98, Ru: 101.07, Rh: 102.91, Pd: 106.42, Ag: 107.87, Cd: 112.41, In: 114.82, Sn: 118.71,
+  Sb: 121.76, Te: 127.60, I: 126.90, Xe: 131.29, Cs: 132.91, Ba: 137.33, La: 138.91, Ce: 140.12, Pr: 140.91, Nd: 144.24,
+  Pm: 145, Sm: 150.36, Eu: 151.96, Gd: 157.25, Tb: 158.93, Dy: 162.50, Ho: 164.93, Er: 167.26, Tm: 168.93, Yb: 173.05,
+  Lu: 174.97, Hf: 178.49, Ta: 180.95, W: 183.84, Re: 186.21, Os: 190.23, Ir: 192.22, Pt: 195.08, Au: 196.97, Hg: 200.59,
+  Tl: 204.38, Pb: 207.2, Bi: 208.98, Po: 209, At: 210, Rn: 222, Fr: 223, Ra: 226, Ac: 227, Th: 232.04,
+  Pa: 231.04, U: 238.03, Np: 237, Pu: 244, Am: 243, Cm: 247, Bk: 247, Cf: 251, Es: 252, Fm: 257,
+  Md: 258, No: 259, Lr: 266, Rf: 267, Db: 268, Sg: 269, Bh: 270, Hs: 269, Mt: 278, Ds: 281,
+  Rg: 282, Cn: 285, Nh: 286, Fl: 289, Mc: 290, Lv: 293, Ts: 294, Og: 294,
+};
+// Returns a Map of element -> atom count, or throws an Error with a friendly message.
+// Handles nested () and [], subscripts (also Unicode ₂), and hydrates joined by · • * or .
+function parseFormula(raw) {
+  const s = raw.replace(/\s+/g, "").replace(/[₀-₉]/g, (c) => String(c.charCodeAt(0) - 0x2080));
+  if (!s) throw new Error("Enter a chemical formula, like H2O or Ca(OH)2.");
+  const SEP = "·•*.";
+  let i = 0;
+  const sub = () => {
+    const j = i;
+    while (i < s.length && s[i] >= "0" && s[i] <= "9") i++;
+    if (i === j) return 1;
+    const n = parseInt(s.slice(j, i), 10);
+    if (n < 1) throw new Error("Subscripts must be 1 or more.");
+    return n;
+  };
+  const add = (into, from, k) => { for (const [el, n] of from) into.set(el, (into.get(el) || 0) + n * k); };
+  function group(close) {
+    const m = new Map();
+    while (i < s.length) {
+      const c = s[i];
+      if (c >= "A" && c <= "Z") {
+        let sym = c; i++;
+        if (i < s.length && s[i] >= "a" && s[i] <= "z") sym += s[i++];
+        if (!Object.prototype.hasOwnProperty.call(AW, sym))
+          throw new Error(`"${sym}" isn't an element symbol. Symbols are case-sensitive: Co is cobalt, CO is carbon + oxygen.`);
+        add(m, [[sym, 1]], sub());
+      } else if (c === "(" || c === "[") {
+        i++;
+        const inner = group(c === "(" ? ")" : "]");
+        if (!inner.size) throw new Error("Empty brackets in the formula.");
+        add(m, inner, sub());
+      } else if (c === ")" || c === "]") {
+        if (!close) throw new Error(`There's a "${c}" with no matching opening bracket.`);
+        if (c !== close) throw new Error(`Mismatched brackets: expected "${close}" but found "${c}".`);
+        i++;
+        return m;
+      } else if (SEP.includes(c)) {
+        if (close) throw new Error(`Missing a closing "${close}" before the hydrate dot.`);
+        return m;
+      } else if (c >= "a" && c <= "z") {
+        throw new Error(`Element symbols start with a capital letter ("${c}" found). Try ${c.toUpperCase()} instead.`);
+      } else {
+        throw new Error(`Unexpected character "${c}" in the formula.`);
+      }
+    }
+    if (close) throw new Error(`Missing a closing "${close}".`);
+    return m;
+  }
+  const total = new Map();
+  while (true) {
+    const lead = /^\d+(?:\.\d+)?/.exec(s.slice(i));
+    let k = 1;
+    if (lead) { k = parseFloat(lead[0]); i += lead[0].length; }
+    if (!(k > 0)) throw new Error("A leading coefficient must be greater than 0.");
+    const part = group(null);
+    if (!part.size) throw new Error("Part of the formula is empty. Check the hydrate dot.");
+    add(total, part, k);
+    if (i >= s.length) break;
+    i++; // skip the hydrate separator
+  }
+  return total;
+}
+
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const NA = 6.02214076e23;
+  const SUP = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+  const fmt = (x, s = 4) => {
+    if (!isFinite(x)) return "—";
+    if (x === 0) return "0";
+    const a = Math.abs(x);
+    if (a >= 1e6 || a < 1e-3) {
+      const [m, e] = x.toExponential(s - 1).split("e");
+      return `${m.includes(".") ? m.replace(/\.?0+$/, "") : m} × 10${String(+e).replace(/./g, (c) => SUP[c])}`;
+    }
+    return Calc.num(x, Math.max(0, s - 1 - Math.floor(Math.log10(a))));
+  };
+  const wu = (x, u) => (isFinite(x) ? fmt(x) + u : "—");
+  const byFormula = v.mmSource === "formula";
+  out.show("inMass", v.mode === "mass");
+  out.show("inMol", v.mode === "mol");
+  out.show("inPart", v.mode === "part");
+  out.show("byFormula", byFormula);
+  out.show("byManual", !byFormula);
+
+  let mm = NaN, atomsPer = NaN, err = "";
+  if (byFormula) {
+    try {
+      const counts = parseFormula(v.formula);
+      mm = 0; atomsPer = 0;
+      for (const [el, n] of counts) { mm += AW[el] * n; atomsPer += n; }
+    } catch (e) { err = e.message; }
+  } else if (v.mm > 0) mm = v.mm;
+  else err = "Enter a molar mass greater than 0.";
+
+  let mol;
+  if (v.mode === "mass") mol = v.mass * parseFloat(v.massUnit) / mm;
+  else if (v.mode === "mol") mol = v.mol;
+  else mol = v.part / NA;
+
+  const grams = mol * mm;
+  out.set("mainLabel", v.mode === "mol" ? "Mass" : "Moles");
+  out.set("main", v.mode === "mol" ? wu(grams, " g") : wu(mol, " mol"));
+  out.set("grams", wu(grams, " g"));
+  out.set("moles", wu(mol, " mol"));
+  out.set("particles", fmt(mol * NA));
+  out.set("atoms", fmt(mol * NA * atomsPer));
+  out.set("mmUsed", isFinite(mm) ? Calc.num(mm, 3) + " g/mol" : "—");
+
+  if (err) out.note(err + (v.mode === "mass" ? "" : " Moles and particles don't need a molar mass, but grams do."));
+  else if (v.mode === "mass") out.note(`Steps: ${Calc.num(v.mass * parseFloat(v.massUnit), 4)} g ÷ ${Calc.num(mm, 3)} g/mol = ${fmt(mol)} mol, then × 6.022 × 10²³ = ${fmt(mol * NA)} particles.`);
+  else if (v.mode === "mol") out.note(`Steps: ${fmt(mol)} mol × ${Calc.num(mm, 3)} g/mol = ${fmt(grams)} g, and ${fmt(mol)} mol × 6.022 × 10²³ = ${fmt(mol * NA)} particles.`);
+  else out.note(`Steps: ${fmt(v.part)} ÷ 6.022 × 10²³ = ${fmt(mol)} mol, then × ${Calc.num(mm, 3)} g/mol = ${fmt(grams)} g.`);
+}));
+</script>
+<!-- article -->
+<h2>How grams, moles and particles connect</h2>
+<p>Chemists count atoms and molecules in moles because real samples contain unimaginably many of them. One mole is
+6.02214076 × 10²³ particles, a number called Avogadro's number (N<sub>A</sub>). Molar mass tells you how many grams
+one mole weighs, so it converts between the mass you weigh out and the number of moles. Avogadro's number converts
+between moles and individual particles.</p>
+<p>A handy way to picture it is a line with moles in the middle: grams on one side, particles on the other. You
+always pass through moles to go from grams to particles.</p>
+
+<h2>The formula</h2>
+<div class="formula">moles = mass (g) ÷ molar mass (g/mol)<br>
+mass (g) = moles × molar mass<br>
+particles = moles × 6.02214076 × 10²³<br>
+atoms = particles × atoms per formula</div>
+
+<h2>Example: 25 g of water</h2>
+<p>Water, H<sub>2</sub>O, has a molar mass of 2 × 1.008 + 15.999 = 18.015 g/mol and 3 atoms per molecule.</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Moles: 25 g ÷ 18.015 g/mol</td><td><strong>1.388 mol</strong></td></tr>
+  <tr><td>Molecules: 1.388 mol × 6.022 × 10²³</td><td>8.357 × 10²³</td></tr>
+  <tr><td>Atoms: 8.357 × 10²³ × 3</td><td>2.507 × 10²⁴</td></tr>
+</table>
+<p>The calculator keeps full precision between steps and rounds only the displayed answers to four significant
+figures, so your hand calculation may differ in the last digit if you round along the way.</p>
+
+<h2>Quick reference</h2>
+<table>
+  <tr><th>Substance</th><th>Molar mass</th><th>1 mole weighs</th><th>1 gram is</th></tr>
+  <tr><td>Water, H2O</td><td>18.015 g/mol</td><td>18.015 g</td><td>0.05551 mol</td></tr>
+  <tr><td>Sodium chloride, NaCl</td><td>58.44 g/mol</td><td>58.44 g</td><td>0.01711 mol</td></tr>
+  <tr><td>Carbon dioxide, CO2</td><td>44.009 g/mol</td><td>44.009 g</td><td>0.02272 mol</td></tr>
+  <tr><td>Glucose, C6H12O6</td><td>180.156 g/mol</td><td>180.156 g</td><td>0.005551 mol</td></tr>
+</table>
+
+<h2>Tips and common mistakes</h2>
+<ul>
+  <li><strong>Check your units cancel.</strong> g ÷ (g/mol) = mol. If the units don't cancel, you multiplied when you should have divided.</li>
+  <li><strong>Convert mg and kg first.</strong> Molar mass is in grams per mole, so 250 mg must become 0.250 g before dividing.</li>
+  <li><strong>Molecules are not atoms.</strong> One mole of O<sub>2</sub> has 6.022 × 10²³ molecules but twice as many oxygen atoms.</li>
+  <li><strong>Typing big numbers.</strong> Enter 6.022 × 10²³ as 6.022e23 in the particles box.</li>
+  <li><strong>Significant figures.</strong> Round your final answer to match the least precise measurement, usually the mass you weighed.</li>
+</ul>

@@ -1,0 +1,168 @@
+---
+{
+  "title": "Molarity Calculator: Molarity, Moles, Volume & Grams Needed",
+  "description": "Calculate molarity (M = mol/L), or solve for moles, solution volume, or the grams of solute needed to make a solution. Works in liters or milliliters, with steps shown.",
+  "h1": "Molarity Calculator",
+  "short": "Molarity Calculator",
+  "intro": "Find a solution's molarity, or work backward to the moles, volume or grams of solute you need. Choose what to solve for and fill in the rest.",
+  "updated": "October 2026",
+  "related": ["dilution-calculator", "mole-calculator", "molar-mass-calculator", "ph-calculator"],
+  "faq": [
+    {"q": "What is molarity?", "a": "Molarity (M) is the number of moles of solute per liter of solution. A 1 M sodium chloride solution has 1 mole of NaCl, 58.44 g, dissolved in enough water to make 1 liter of solution in total."},
+    {"q": "How do I calculate molarity from grams?", "a": "Convert grams to moles by dividing by the molar mass, convert the volume to liters, then divide moles by liters. For 5.844 g NaCl in 250 mL: 5.844 ÷ 58.44 = 0.1 mol, 250 mL = 0.250 L, and 0.1 ÷ 0.250 = 0.4 M."},
+    {"q": "How many grams do I need to make a solution?", "a": "Multiply molarity × volume in liters × molar mass. To make 500 mL of 0.2 M NaCl: 0.2 × 0.500 × 58.44 = 5.844 g. Choose 'Mass of solute needed' above to do this automatically."},
+    {"q": "Is the volume the water or the whole solution?", "a": "The whole solution. Molarity uses the final volume after the solute dissolves. In the lab, dissolve the solute in less water than you need, then top up to the mark in a volumetric flask."},
+    {"q": "What is the difference between molarity and molality?", "a": "Molarity is moles per liter of solution; molality (m) is moles per kilogram of solvent. Molarity changes slightly with temperature because liquids expand, while molality does not. For dilute water solutions near room temperature the two numbers are close."},
+    {"q": "What does mM mean?", "a": "mM is millimolar, one thousandth of a mole per liter. 0.4 M is the same as 400 mM. Biology protocols often use mM and µM."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="solve">Solve for</label>
+        <select id="solve" name="solve">
+          <option value="M" selected>Molarity (M)</option>
+          <option value="mol">Moles of solute</option>
+          <option value="mass">Mass of solute needed (g)</option>
+          <option value="V">Volume of solution</option>
+        </select>
+      </div>
+      <div class="field" data-show="needM" hidden>
+        <label for="M">Molarity</label>
+        <div class="input"><input id="M" name="M" type="number" min="0" step="any" value="0.5" inputmode="decimal"><span class="unit">mol/L (M)</span></div>
+      </div>
+      <div class="row2" data-show="needAmt">
+        <div class="field">
+          <label for="amt">Amount of solute</label>
+          <input id="amt" name="amt" type="number" min="0" step="any" value="5.844" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="amtUnit">Unit</label>
+          <select id="amtUnit" name="amtUnit">
+            <option value="g" selected>g</option>
+            <option value="mg">mg</option>
+            <option value="mol">mol</option>
+            <option value="mmol">mmol</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" data-show="needV">
+        <div class="field">
+          <label for="V">Volume of solution</label>
+          <input id="V" name="V" type="number" min="0" step="any" value="250" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="vUnit">Unit</label>
+          <select id="vUnit" name="vUnit">
+            <option value="0.001" selected>mL</option>
+            <option value="1">L</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="mm">Molar mass of solute</label>
+        <div class="input"><input id="mm" name="mm" type="number" min="0" step="any" value="58.44" inputmode="decimal"><span class="unit">g/mol</span></div>
+        <div class="hint">58.44 is sodium chloride (NaCl). Use the molar mass calculator for other compounds.</div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="mainLabel">Molarity</span><b data-out="main">—</b></div>
+    <div class="result"><span>Molarity</span><b data-out="molarity">—</b></div>
+    <div class="result"><span>Moles of solute</span><b data-out="moles">—</b></div>
+    <div class="result"><span>Mass of solute</span><b data-out="mass">—</b></div>
+    <div class="result"><span>Volume of solution</span><b data-out="vol">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const SUP = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+  const fmt = (x, s = 4) => {
+    if (!isFinite(x)) return "—";
+    if (x === 0) return "0";
+    const a = Math.abs(x);
+    if (a >= 1e6 || a < 1e-3) {
+      const [m, e] = x.toExponential(s - 1).split("e");
+      return `${m.includes(".") ? m.replace(/\.?0+$/, "") : m} × 10${String(+e).replace(/./g, (c) => SUP[c])}`;
+    }
+    return Calc.num(x, Math.max(0, s - 1 - Math.floor(Math.log10(a))));
+  };
+  const wu = (x, u) => (isFinite(x) && x >= 0 ? fmt(x) + u : "—");
+  const s = v.solve;
+  out.show("needM", s !== "M");
+  out.show("needAmt", s === "M" || s === "V");
+  out.show("needV", s !== "V");
+
+  const vf = parseFloat(v.vUnit);              // liters per chosen unit
+  const vName = vf === 1 ? "L" : "mL";
+  const mm = v.mm > 0 ? v.mm : NaN;
+  const amtMol = { g: v.amt / mm, mg: v.amt / 1000 / mm, mol: v.amt, mmol: v.amt / 1000 }[v.amtUnit];
+  let M, mol, L;
+  if (s === "M") { mol = amtMol; L = v.V * vf; M = mol / L; }
+  else if (s === "V") { mol = amtMol; M = v.M; L = mol / M; }
+  else { M = v.M; L = v.V * vf; mol = M * L; }
+  const g = mol * mm;
+
+  const label = { M: "Molarity", mol: "Moles of solute", mass: "Mass of solute needed", V: "Volume of solution" }[s];
+  const vol = (x) => (isFinite(x) && x > 0 ? fmt(x / vf) + " " + vName + (vf === 1 ? ` (${fmt(x * 1000)} mL)` : ` (${fmt(x)} L)`) : "—");
+  out.set("mainLabel", label);
+  out.set("main", { M: wu(M, " M"), mol: wu(mol, " mol"), mass: wu(g, " g"), V: vol(L) }[s]);
+  out.set("molarity", isFinite(M) && M >= 0 ? `${fmt(M)} M (${fmt(M * 1000)} mM)` : "—");
+  out.set("moles", wu(mol, " mol"));
+  out.set("mass", wu(g, " g"));
+  out.set("vol", vol(L));
+
+  const needsMM = s === "mass" || ((s === "M" || s === "V") && (v.amtUnit === "g" || v.amtUnit === "mg"));
+  if (needsMM && !(v.mm > 0)) out.note("Enter the molar mass of the solute to convert between grams and moles.");
+  else if ((s !== "V" && !(v.V > 0)) || (s !== "M" && !(v.M > 0))) out.note("Enter values greater than 0.");
+  else if (s === "M") out.note(`Steps: ${fmt(mol)} mol ÷ ${fmt(L)} L = ${fmt(M)} M.`);
+  else if (s === "V") out.note(`Steps: ${fmt(mol)} mol ÷ ${fmt(M)} M = ${fmt(L)} L.`);
+  else if (s === "mol") out.note(`Steps: ${fmt(M)} M × ${fmt(L)} L = ${fmt(mol)} mol` + (isFinite(g) ? `, which weighs ${fmt(mol)} × ${fmt(mm)} = ${fmt(g)} g.` : "."));
+  else out.note(`Steps: ${fmt(M)} M × ${fmt(L)} L × ${fmt(mm)} g/mol = ${fmt(g)} g. Weigh ${fmt(g)} g of solute, dissolve it in less than ${fmt(L / vf)} ${vName} of water, then add water up to ${fmt(L / vf)} ${vName} total.`);
+}));
+</script>
+<!-- article -->
+<h2>What molarity measures</h2>
+<p>Molarity is the most common way to express concentration in chemistry. It tells you how many moles of solute
+are dissolved in each liter of solution, written as M or mol/L. A 0.4 M solution contains 0.4 moles of solute in
+every liter, or 0.1 moles in every 250 mL.</p>
+<p>Because molarity links moles to volume, it lets you measure out a precise number of moles just by measuring
+volume with a pipette or graduated cylinder. That's why it shows up in titrations, dilutions and reaction
+stoichiometry.</p>
+
+<h2>The formula</h2>
+<div class="formula">M = moles of solute ÷ liters of solution<br>
+moles = M × L<br>
+L = moles ÷ M<br>
+grams needed = M × L × molar mass</div>
+<p>If you start with grams, convert to moles first: moles = grams ÷ molar mass. Always convert milliliters to
+liters by dividing by 1,000.</p>
+
+<h2>Example: 5.844 g of NaCl in 250 mL</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Moles: 5.844 g ÷ 58.44 g/mol</td><td>0.1 mol</td></tr>
+  <tr><td>Volume: 250 mL ÷ 1,000</td><td>0.25 L</td></tr>
+  <tr><td>Molarity: 0.1 mol ÷ 0.25 L</td><td><strong>0.4 M</strong> (400 mM)</td></tr>
+</table>
+<p>Working backward, to make 250 mL of a 0.4 M NaCl solution you would need 0.4 × 0.25 × 58.44 = 5.844 g.</p>
+
+<h2>How to make a solution in the lab</h2>
+<ol>
+  <li>Calculate the grams needed with the "Mass of solute needed" option.</li>
+  <li>Weigh the solute and transfer it to a volumetric flask of the right size.</li>
+  <li>Add distilled water to about two-thirds full and swirl until fully dissolved.</li>
+  <li>Add water until the bottom of the meniscus sits on the line, then cap and invert to mix.</li>
+</ol>
+
+<h2>Common mistakes</h2>
+<ul>
+  <li><strong>Forgetting to convert mL to L.</strong> 250 mL is 0.250 L. Dividing by 250 instead gives an answer 1,000 times too small.</li>
+  <li><strong>Using grams instead of moles.</strong> Molarity is moles per liter, never grams per liter.</li>
+  <li><strong>Adding solute to the full volume of water.</strong> The solute takes up space, so the final volume ends up a little too big.</li>
+  <li><strong>Ignoring hydrates.</strong> If your bottle says CuSO<sub>4</sub>·5H<sub>2</sub>O, use its molar mass of 249.68 g/mol, not 159.60 g/mol.</li>
+</ul>

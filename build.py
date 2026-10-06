@@ -27,7 +27,7 @@ DIST = ROOT / "dist"
 
 SITE = {
     "name": "CalcPantry",
-    "tagline": "Free calculators for sellers, home projects, pets, hobbies, money and gaming",
+    "tagline": "Free calculators for sellers, home projects, pets, hobbies, money, gaming, tech, cooking, music and science",
     "url": "https://calcpantry.com",
     "adsense_client": "ca-pub-6857897091548503",  # loads Google's ad script (Auto ads) on every page
     "adsense_slot": "",                   # ad unit ID from AdSense; the fixed ad spaces stay empty until set
@@ -48,6 +48,16 @@ CATEGORIES = {
               "blurb": "Take-home pay from side gigs, freelance rates and lease-versus-buy decisions."},
     "gaming": {"name": "Video Game Calculators", "short": "Gaming", "icon": "🎮",
                "blurb": "Minecraft coordinates and stacks, mouse sensitivity conversion, gacha pity odds, FPS, K/D and more."},
+    "computer": {"name": "Computer & Tech Calculators", "short": "Tech", "icon": "💻",
+                 "blurb": "Download times, power supply sizing, screen PPI, storage units, RAID, subnets, video bitrates and battery life."},
+    "kitchen": {"name": "Kitchen & Cooking Calculators", "short": "Kitchen", "icon": "🍳",
+                "blurb": "Scale recipes, convert cups, grams and oven temperatures, size a turkey and swap pan sizes."},
+    "music": {"name": "Music Calculators", "short": "Music", "icon": "🎵",
+              "blurb": "BPM to delay times, tap tempo, note frequencies, capo and transposing, song length, speaker impedance and streaming payouts."},
+    "physics": {"name": "Physics Calculators", "short": "Physics", "icon": "🧲",
+                "blurb": "Speed, acceleration, force, energy, power, projectile motion, Ohm's law and more, with the formulas shown step by step."},
+    "chemistry": {"name": "Chemistry Calculators", "short": "Chemistry", "icon": "⚗️",
+                  "blurb": "Molar mass, moles, molarity, dilution, pH, ideal gas law, percent yield and half-life, with worked examples."},
 }
 
 # Serve from a sub-folder (e.g. SITE_BASE=/calcpantry for username.github.io/calcpantry/).
