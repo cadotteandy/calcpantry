@@ -1,0 +1,104 @@
+---
+{
+  "title": "Game Cost per Hour Calculator: Is This Game Worth the Price?",
+  "description": "Divide a game's price (plus DLC, season passes and subscriptions) by the hours you play to get cost per hour, and compare it with movies, streaming and other entertainment.",
+  "h1": "Game Cost per Hour Calculator",
+  "short": "Game Cost per Hour",
+  "intro": "Enter what you paid, including DLC and subscriptions, and how much you've played or expect to play. See the cost per hour and how it stacks up against other ways to spend your free time.",
+  "updated": "October 2026",
+  "related": ["level-grind-time-calculator", "gacha-pity-calculator", "fps-frame-time-calculator", "kd-ratio-calculator"],
+  "faq": [
+    {"q": "How do you calculate a game's cost per hour?", "a": "Add up everything you spent on the game (the base price, DLC, season passes, in-game purchases and any share of a subscription) and divide by the hours you played. A $70 game played for 100 hours costs $0.70 an hour."},
+    {"q": "What is a good cost per hour for a game?", "a": "Many players treat $1 an hour as a fair benchmark, since a movie ticket works out to roughly $5 to $8 an hour. Anything under $1 is great value; long RPGs and multiplayer games often get well under $0.25 an hour."},
+    {"q": "How do I find how many hours I've played?", "a": "Steam shows hours on each game in your library. PlayStation shows play time in your profile's game list, and Xbox and Nintendo Switch track it in their profile or the parental controls app. For planning, sites like HowLongToBeat list typical completion times."},
+    {"q": "How should I count Game Pass or PlayStation Plus?", "a": "Count only the months you used for this game. If you paid for three months and played mostly this one game, add three months of the subscription; if you spread time across several games, add a fraction."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="price">Game price</label>
+          <div class="input"><span class="unit pre">$</span><input id="price" name="price" type="number" min="0" step="0.01" value="69.99" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="extras">DLC and in-game purchases</label>
+          <div class="input"><span class="unit pre">$</span><input id="extras" name="extras" type="number" min="0" step="0.01" value="30" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="sub">Subscription per month</label>
+          <div class="input"><span class="unit pre">$</span><input id="sub" name="sub" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div>
+        </div>
+        <div class="field">
+          <label for="months">Months counted</label>
+          <input id="months" name="months" type="number" min="0" step="1" value="0" inputmode="numeric">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="hours">Hours played (or expected)</label>
+          <input id="hours" name="hours" type="number" min="0" step="1" value="120" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="resale">Resale value (if you sell it)</label>
+          <div class="input"><span class="unit pre">$</span><input id="resale" name="resale" type="number" min="0" step="0.01" value="0" inputmode="decimal"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Cost per hour</span><b data-out="cph">—</b></div>
+    <div class="result"><span>Total spent</span><b data-out="total">—</b></div>
+    <div class="result"><span>Hours to reach $1/hour</span><b data-out="toOne">—</b></div>
+    <div class="result"><span>Movie ticket (≈ $12 for 2 h)</span><b data-out="movie">—</b></div>
+    <div class="result"><span>Verdict</span><b data-out="verdict">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const total = Math.max(0, v.price + v.extras + v.sub * v.months - v.resale);
+  const cph = v.hours > 0 ? total / v.hours : NaN;
+  out.set("cph", Calc.money(cph));
+  out.set("total", Calc.money(total));
+  out.set("toOne", total <= v.hours ? "Already there ✓" : `${Calc.num(Math.ceil(total), 0)} hours (${Calc.num(Math.ceil(total - v.hours), 0)} to go)`);
+  out.set("movie", Calc.money(6) + " per hour");
+  let verdict = "—";
+  if (isFinite(cph)) verdict = cph <= 0.25 ? "Outstanding value" : cph <= 1 ? "Great value" : cph <= 3 ? "Fair, cheaper than a movie" : cph <= 6 ? "About movie-ticket price" : "Pricey for the time";
+  out.set("verdict", verdict, isFinite(cph) ? (cph <= 1 ? "pos" : cph > 6 ? "neg" : "") : "");
+  out.note("Comparisons are rough guides: a $12 movie ticket for a 2-hour film is about $6 per hour.");
+}));
+</script>
+<!-- article -->
+<h2>Why cost per hour?</h2>
+<p>A $70 game and a $20 game are hard to compare by price alone. Cost per hour puts them on equal footing: a $70
+RPG you play for 150 hours is cheaper per hour than a $20 game you finish in an afternoon. It's also a handy way to
+decide whether DLC or a season pass is worth it for a game you already play a lot.</p>
+
+<h2>The formula</h2>
+<div class="formula">total = price + DLC + (subscription × months) − resale<br>
+cost per hour = total ÷ hours played</div>
+
+<h2>Example</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Game $69.99 + DLC $30</td><td>$99.99</td></tr>
+  <tr><td>Played 120 hours</td><td>$99.99 ÷ 120</td></tr>
+  <tr><td>Cost per hour</td><td><strong>$0.83</strong></td></tr>
+</table>
+
+<h2>How entertainment compares (rough per-hour costs)</h2>
+<table>
+  <tr><th>Activity</th><th>Approximate cost per hour</th></tr>
+  <tr><td>Movie in a theater</td><td>$5–$8</td></tr>
+  <tr><td>Bowling or mini golf</td><td>$10–$20</td></tr>
+  <tr><td>Streaming service, 20 hours a month</td><td>$0.50–$1</td></tr>
+  <tr><td>Paperback book</td><td>$1–$3</td></tr>
+  <tr><td>Long RPG or multiplayer game played for 200+ hours</td><td>under $0.35</td></tr>
+</table>
+<p>These are ballpark figures to give context, not exact prices.</p>

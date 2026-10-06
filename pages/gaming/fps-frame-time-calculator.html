@@ -1,0 +1,118 @@
+---
+{
+  "title": "FPS to Frame Time Calculator: Frames per Second to Milliseconds",
+  "description": "Convert FPS to frame time in milliseconds and back, compare against your monitor's refresh rate, and see how many milliseconds an FPS upgrade really saves.",
+  "h1": "FPS to Frame Time Calculator",
+  "short": "FPS ↔ Frame Time",
+  "intro": "Enter a frame rate or a frame time. See the other, how it lines up with your monitor's refresh rate, and how much faster each frame arrives compared with another FPS.",
+  "updated": "October 2026",
+  "related": ["mouse-sensitivity-converter", "kd-ratio-calculator", "game-cost-per-hour-calculator", "level-grind-time-calculator"],
+  "faq": [
+    {"q": "How do you convert FPS to milliseconds?", "a": "Divide 1,000 by the frame rate. 60 FPS is 16.7 ms per frame, 144 FPS is 6.9 ms and 240 FPS is 4.2 ms. To go the other way, divide 1,000 by the frame time in milliseconds."},
+    {"q": "Why is frame time better than FPS for comparing performance?", "a": "Frame time is linear and FPS isn't. Going from 30 to 60 FPS saves 16.7 ms per frame, but going from 144 to 240 FPS saves only 2.8 ms. Frame time shows how much each upgrade actually changes what you feel."},
+    {"q": "Should my FPS be higher than my refresh rate?", "a": "Frames above your refresh rate still lower input latency a little, because the frame you see is newer, but they aren't displayed as extra frames and can cause tearing without a sync technology. With G-Sync or FreeSync, many players cap FPS a few frames below the refresh rate for smooth, tear-free motion."},
+    {"q": "What is 1% low FPS?", "a": "1% lows are the frame rate of your slowest 1% of frames. A game averaging 120 FPS with 1% lows of 40 will feel stuttery, because those slow frames take 25 ms each. Stable frame times matter as much as the average."},
+    {"q": "What frame time do I need for a 144 Hz monitor?", "a": "A 144 Hz monitor refreshes every 6.94 ms. To show a new frame on every refresh, your PC needs to render each frame in 6.94 ms or less, which is 144 FPS or more."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="mode">I know the</label>
+        <select id="mode" name="mode">
+          <option value="fps">Frame rate (FPS)</option>
+          <option value="ms">Frame time (ms)</option>
+        </select>
+      </div>
+      <div class="field" data-show="fps">
+        <label for="fps">Frames per second</label>
+        <input id="fps" name="fps" type="number" min="1" step="1" value="144" inputmode="decimal">
+      </div>
+      <div class="field" data-show="ms" hidden>
+        <label for="ms">Frame time (milliseconds)</label>
+        <input id="ms" name="ms" type="number" min="0.1" step="0.1" value="6.9" inputmode="decimal">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="hz">Monitor refresh rate</label>
+          <select id="hz" name="hz">
+            <option value="60">60 Hz</option>
+            <option value="75">75 Hz</option>
+            <option value="120">120 Hz</option>
+            <option value="144" selected>144 Hz</option>
+            <option value="165">165 Hz</option>
+            <option value="240">240 Hz</option>
+            <option value="360">360 Hz</option>
+            <option value="480">480 Hz</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="cmp">Compare with FPS</label>
+          <input id="cmp" name="cmp" type="number" min="1" step="1" value="60" inputmode="decimal">
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="bigLabel">Frame time</span><b data-out="big">—</b></div>
+    <div class="result"><span>Refresh interval</span><b data-out="refresh">—</b></div>
+    <div class="result"><span>Frames per refresh</span><b data-out="perRefresh">—</b></div>
+    <div class="result"><span data-out="cmpLabel">Compared with 60 FPS</span><b data-out="cmpOut">—</b></div>
+    <div class="result"><span>Suggested cap (VRR)</span><b data-out="cap">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const byFps = v.mode === "fps";
+  out.show("fps", byFps);
+  out.show("ms", !byFps);
+  const fps = byFps ? v.fps : (v.ms > 0 ? 1000 / v.ms : NaN);
+  const ms = 1000 / fps;
+  const hz = parseInt(v.hz, 10), refresh = 1000 / hz;
+  out.set("bigLabel", byFps ? "Frame time" : "Frame rate");
+  out.set("big", byFps ? Calc.num(ms, 2) + " ms" : Calc.num(fps, 1) + " FPS");
+  out.set("refresh", `${Calc.num(refresh, 2)} ms (${hz} Hz)`);
+  out.set("perRefresh", Calc.num(fps / hz, 2));
+  const cms = 1000 / v.cmp;
+  out.set("cmpLabel", `Compared with ${Calc.num(v.cmp, 0)} FPS (${Calc.num(cms, 2)} ms)`);
+  const diff = cms - ms;
+  out.set("cmpOut", `${diff >= 0 ? Calc.num(diff, 2) + " ms faster" : Calc.num(-diff, 2) + " ms slower"} per frame`, Calc.tone(diff));
+  // A common rule of thumb: cap ~3 FPS under refresh with G-Sync/FreeSync.
+  out.set("cap", `${hz - 3} FPS`);
+  if (fps < hz) out.note(`Below ${hz} FPS your monitor shows some frames twice. Variable refresh (G-Sync/FreeSync) keeps that smooth.`);
+  else out.note("At or above the refresh rate: every refresh gets a new frame. Extra frames still trim input latency slightly.");
+}));
+</script>
+<!-- article -->
+<h2>How FPS and frame time relate</h2>
+<p>Frames per second counts how many images your PC or console finishes each second. Frame time is the same thing
+upside down: how long each one takes. Because they're reciprocals, equal FPS gains get smaller and smaller in real
+time as frame rates climb.</p>
+
+<h2>The formula</h2>
+<div class="formula">frame time (ms) = 1000 ÷ FPS<br>
+FPS = 1000 ÷ frame time (ms)<br>
+refresh interval (ms) = 1000 ÷ refresh rate (Hz)</div>
+
+<h2>Common frame rates</h2>
+<table>
+  <tr><th>FPS / Hz</th><th>Frame time</th><th>Saved vs. the row above</th></tr>
+  <tr><td>30</td><td>33.3 ms</td><td>—</td></tr>
+  <tr><td>60</td><td>16.7 ms</td><td>16.7 ms</td></tr>
+  <tr><td>120</td><td>8.3 ms</td><td>8.3 ms</td></tr>
+  <tr><td>144</td><td>6.9 ms</td><td>1.4 ms</td></tr>
+  <tr><td>240</td><td>4.2 ms</td><td>2.8 ms</td></tr>
+  <tr><td>360</td><td>2.8 ms</td><td>1.4 ms</td></tr>
+  <tr><td>480</td><td>2.1 ms</td><td>0.7 ms</td></tr>
+</table>
+
+<h2>Getting smoother frames</h2>
+<ul>
+  <li><strong>Cap your frame rate.</strong> A cap just under your refresh rate, with G-Sync or FreeSync on, gives steady frame times and avoids tearing.</li>
+  <li><strong>Watch the 1% lows.</strong> Stutter comes from the slowest frames. Lowering CPU-heavy settings (view distance, crowds, shadows) often helps more than lowering resolution.</li>
+  <li><strong>Don't chase the last few ms.</strong> Past about 240 FPS, each upgrade saves under 2 ms per frame. A good monitor and a stable connection may matter more.</li>
+</ul>

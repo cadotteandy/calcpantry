@@ -1,0 +1,117 @@
+---
+{
+  "title": "K/D Ratio Calculator: KD, KDA and Kills Needed to Raise Your KD",
+  "description": "Work out your K/D and KDA ratio from kills, deaths and assists, and how many kills in a row you need to reach a target K/D. Works for any shooter.",
+  "h1": "K/D Ratio Calculator",
+  "short": "K/D Ratio Calculator",
+  "intro": "Enter your kills, deaths and assists to get your K/D and KDA. Add a target K/D to see how many kills you'd need, with no deaths, to get there.",
+  "updated": "October 2026",
+  "related": ["mouse-sensitivity-converter", "fps-frame-time-calculator", "level-grind-time-calculator", "gacha-pity-calculator"],
+  "faq": [
+    {"q": "How is K/D ratio calculated?", "a": "Divide total kills by total deaths. 450 kills and 300 deaths is a K/D of 1.5. If you have zero deaths, games usually show your kills as the K/D."},
+    {"q": "What is KDA and how is it different?", "a": "KDA adds assists: (kills + assists) ÷ deaths. It's common in MOBAs like League of Legends and in hero shooters, where helping a teammate get a kill matters. Some stat sites count assists at half weight instead; this calculator lets you choose either."},
+    {"q": "What is a good K/D ratio?", "a": "1.0 means you get one kill per death, which is about average by definition across a game's players. 1.5 to 2.0 is strong in most battle royales and arena shooters, and above 3.0 is exceptional. In objective modes, K/D matters less than winning."},
+    {"q": "How many kills do I need to raise my K/D?", "a": "Kills needed = target K/D × deaths − current kills, assuming no more deaths. In practice you'll die too, so you need to play above your target K/D in each match to pull the overall number up."},
+    {"q": "Why does my K/D barely move anymore?", "a": "The more games you've played, the more each new match is averaged into a large total. After thousands of deaths, even a great game shifts lifetime K/D by a hundredth or two. Track recent or seasonal K/D to see improvement."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="kills">Kills</label>
+          <input id="kills" name="kills" type="number" min="0" step="1" value="450" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="deaths">Deaths</label>
+          <input id="deaths" name="deaths" type="number" min="0" step="1" value="300" inputmode="numeric">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="assists">Assists</label>
+          <input id="assists" name="assists" type="number" min="0" step="1" value="120" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="aw">Assist weight in KDA</label>
+          <select id="aw" name="aw">
+            <option value="1">Full (kills + assists)</option>
+            <option value="0.5">Half (kills + assists ÷ 2)</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="target">Target K/D</label>
+          <input id="target" name="target" type="number" min="0" step="0.1" value="2" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="matchKd">K/D you play at per match</label>
+          <input id="matchKd" name="matchKd" type="number" min="0" step="0.1" value="" placeholder="optional" inputmode="decimal">
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>K/D ratio</span><b data-out="kd">—</b></div>
+    <div class="result"><span>KDA ratio</span><b data-out="kda">—</b></div>
+    <div class="result"><span>Kills per death %</span><b data-out="share">—</b></div>
+    <div class="result"><span>Kills in a row to reach target</span><b data-out="need">—</b></div>
+    <div class="result"><span data-out="paceLabel">At your match K/D</span><b data-out="pace">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const k = Math.max(0, v.kills), d = Math.max(0, v.deaths), a = Math.max(0, v.assists);
+  const kd = d > 0 ? k / d : k;
+  const kda = d > 0 ? (k + a * parseFloat(v.aw)) / d : k + a * parseFloat(v.aw);
+  out.set("kd", Calc.num(kd, 2), kd >= 1 ? "pos" : "neg");
+  out.set("kda", Calc.num(kda, 2));
+  out.set("share", k + d > 0 ? Calc.pct(k / (k + d), 1) + " of fights won" : "—");
+  if (v.target > 0 && d > 0) {
+    const need = Math.ceil(v.target * d - k);
+    out.set("need", need <= 0 ? "Already there ✓" : `${Calc.num(need, 0)} kills with no deaths`);
+  } else out.set("need", d === 0 ? "No deaths yet" : "—");
+  out.set("paceLabel", "Deaths until you hit target at your match K/D");
+  if (v.matchKd > 0 && v.target > 0 && d > 0) {
+    if (v.matchKd <= v.target) out.set("pace", `Never: play above ${Calc.num(v.target, 2)} per match`);
+    else {
+      // (k + m·x) / (d + x) = t  →  x = (t·d − k) / (m − t)
+      const x = Math.max(0, Math.ceil((v.target * d - k) / (v.matchKd - v.target)));
+      out.set("pace", x === 0 ? "Already there ✓" : `${Calc.num(x, 0)} more deaths (≈ ${Calc.num(x * v.matchKd, 0)} kills)`);
+    }
+  } else out.set("pace", "Enter your match K/D");
+  out.note("K/D = kills ÷ deaths. KDA = (kills + assists) ÷ deaths.");
+}));
+</script>
+<!-- article -->
+<h2>How K/D and KDA work</h2>
+<p>K/D (kill/death ratio) is the simplest skill stat in shooters: how many opponents you take down for every time
+you go down. KDA adds assists, which credits players who deal damage or set up kills for teammates. MOBAs and
+hero shooters favour KDA; battle royales and arena shooters usually show K/D.</p>
+
+<h2>The formulas</h2>
+<div class="formula">K/D = kills ÷ deaths<br>
+KDA = (kills + assists) ÷ deaths<br>
+kills needed (no deaths) = target × deaths − kills<br>
+deaths until target at match K/D m = (target × deaths − kills) ÷ (m − target)</div>
+
+<h2>Example</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>K/D: 450 ÷ 300</td><td><strong>1.50</strong></td></tr>
+  <tr><td>KDA: (450 + 120) ÷ 300</td><td>1.90</td></tr>
+  <tr><td>Kills needed for 2.0: 2 × 300 − 450</td><td>150 kills with no deaths</td></tr>
+  <tr><td>At a 2.5 match K/D: (600 − 450) ÷ (2.5 − 2)</td><td>300 more deaths, about 750 kills</td></tr>
+</table>
+
+<h2>Raising your K/D</h2>
+<ul>
+  <li><strong>Trade smarter, not more.</strong> Most deaths come from peeking the same angle twice or rotating in the open. Fewer bad deaths raises K/D faster than more kills.</li>
+  <li><strong>Watch recent stats.</strong> Lifetime K/D is slow to move; a weekly or seasonal number shows whether practice is paying off.</li>
+  <li><strong>Get your settings right.</strong> A consistent sensitivity and a high, stable frame rate both help aim.</li>
+</ul>

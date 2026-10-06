@@ -27,7 +27,7 @@ DIST = ROOT / "dist"
 
 SITE = {
     "name": "CalcPantry",
-    "tagline": "Free calculators for sellers, home projects, pets, hobbies and money",
+    "tagline": "Free calculators for sellers, home projects, pets, hobbies, money and gaming",
     "url": "https://calcpantry.com",
     "adsense_client": "ca-pub-6857897091548503",  # loads Google's ad script (Auto ads) on every page
     "adsense_slot": "",                   # ad unit ID from AdSense; the fixed ad spaces stay empty until set
@@ -46,6 +46,8 @@ CATEGORIES = {
                 "blurb": "3D printing costs, fabric yardage, lumber board feet and coffee brew ratios."},
     "money": {"name": "Money & Side Hustle Calculators", "short": "Money", "icon": "💵",
               "blurb": "Take-home pay from side gigs, freelance rates and lease-versus-buy decisions."},
+    "gaming": {"name": "Video Game Calculators", "short": "Gaming", "icon": "🎮",
+               "blurb": "Minecraft coordinates and stacks, mouse sensitivity conversion, gacha pity odds, FPS, K/D and more."},
 }
 
 # Serve from a sub-folder (e.g. SITE_BASE=/calcpantry for username.github.io/calcpantry/).

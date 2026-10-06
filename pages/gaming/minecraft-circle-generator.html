@@ -1,0 +1,155 @@
+---
+{
+  "title": "Minecraft Circle Generator: Block Circles & Ovals",
+  "description": "Draw a pixel-perfect circle or oval in Minecraft blocks. Pick the width and height, thin or thick outline or filled, and get a block-by-block grid plus the block count.",
+  "h1": "Minecraft Circle Generator",
+  "short": "Circle & Oval Generator",
+  "intro": "Choose a diameter (or a width and height for an oval). The grid shows exactly which blocks to place, row by row, with the total number of blocks you'll need.",
+  "updated": "October 2026",
+  "related": ["minecraft-stack-calculator", "minecraft-nether-portal-calculator", "level-grind-time-calculator", "game-cost-per-hour-calculator"],
+  "faq": [
+    {"q": "How do you make a circle in Minecraft?", "a": "Minecraft has no curves, so a circle is built from straight runs of blocks that step inward. Pick a diameter, then copy the pattern from a block grid like the one above, row by row. Start from the center line and work out to each edge so the two halves stay symmetric."},
+    {"q": "Should my circle have an odd or even diameter?", "a": "Odd diameters have a single center block, which makes it easy to line up towers, domes and doors. Even diameters have a 2 × 2 center and are a block wider than the odd size below them. Both work; odd is easier to build accurately."},
+    {"q": "What is the difference between thin and thick outlines?", "a": "A thin outline only connects blocks at their corners on the diagonals, which looks clean from above but leaves gaps you can walk or see through. A thick outline adds blocks so every block touches the next one along a side, making a solid wall."},
+    {"q": "How do I build a sphere or dome?", "a": "A sphere is a stack of circles whose diameters shrink as you move away from the middle layer. For a dome, build the widest circle at the base and reduce the diameter for each layer up. The diameter for a layer at height h above the center of a sphere with radius r is 2 × √(r² − h²)."},
+    {"q": "How many blocks are in a circle?", "a": "The count is shown under the grid. For a filled circle it's close to π × r²; for an outline it's roughly the circumference, about π × diameter, plus the extra corner blocks if you choose a thick outline."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="shape">Shape</label>
+        <select id="shape" name="shape">
+          <option value="circle">Circle</option>
+          <option value="oval">Oval (ellipse)</option>
+        </select>
+      </div>
+      <div class="field" data-show="circle">
+        <label for="d">Diameter (blocks)</label>
+        <input id="d" name="d" type="number" min="3" max="128" step="1" value="21" inputmode="numeric">
+      </div>
+      <div class="row2" data-show="oval" hidden>
+        <div class="field">
+          <label for="w">Width (blocks)</label>
+          <input id="w" name="w" type="number" min="3" max="128" step="1" value="31" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="h">Height (blocks)</label>
+          <input id="h" name="h" type="number" min="3" max="128" step="1" value="19" inputmode="numeric">
+        </div>
+      </div>
+      <div class="field">
+        <label for="style">Style</label>
+        <select id="style" name="style">
+          <option value="thick">Thick outline (solid wall)</option>
+          <option value="thin">Thin outline</option>
+          <option value="filled">Filled</option>
+        </select>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Blocks needed</span><b data-out="count">—</b></div>
+    <div class="result"><span>Size</span><b data-out="size">—</b></div>
+    <div class="result"><span>Stacks of 64</span><b data-out="stacks">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<div class="circle-wrap"><canvas id="grid" aria-label="Block grid for the circle"></canvas></div>
+<style>
+.circle-wrap { margin-top: 16px; overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; }
+.circle-wrap canvas { display: block; margin: 0 auto; max-width: 100%; height: auto; image-rendering: pixelated; }
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const oval = v.shape === "oval";
+  out.show("circle", !oval);
+  out.show("oval", oval);
+  const clamp = (n) => Math.min(128, Math.max(3, Math.round(n) || 3));
+  const W = clamp(oval ? v.w : v.d), H = clamp(oval ? v.h : v.d);
+  const a = W / 2, b = H / 2;
+  // A block is inside if its center lies inside the ellipse.
+  const inside = (x, y) => {
+    if (x < 0 || y < 0 || x >= W || y >= H) return false;
+    const dx = (x + 0.5 - a) / a, dy = (y + 0.5 - b) / b;
+    return dx * dx + dy * dy <= 1;
+  };
+  const cells = [];
+  let count = 0;
+  for (let y = 0; y < H; y++) {
+    const row = [];
+    for (let x = 0; x < W; x++) {
+      let on = false;
+      if (inside(x, y)) {
+        if (v.style === "filled") on = true;
+        else {
+          // Edge blocks: an outside neighbour along a side (thick) or a side + corner check (thin).
+          const sideOut = !inside(x - 1, y) || !inside(x + 1, y) || !inside(x, y - 1) || !inside(x, y + 1);
+          if (v.style === "thick") on = sideOut || !inside(x - 1, y - 1) || !inside(x + 1, y - 1) || !inside(x - 1, y + 1) || !inside(x + 1, y + 1);
+          else on = sideOut;
+        }
+      }
+      row.push(on);
+      if (on) count++;
+    }
+    cells.push(row);
+  }
+  out.set("count", Calc.num(count, 0));
+  out.set("size", `${W} × ${H}`);
+  const st = Math.floor(count / 64), word = st === 1 ? "stack" : "stacks";
+  out.set("stacks", count % 64 ? `${st} ${word} + ${count % 64}` : `${st} ${word}`);
+  out.note("Each square is one block. Darker lines mark every 5th block and the center, so you can count from the middle.");
+
+  const cv = document.getElementById("grid");
+  const cell = Math.max(6, Math.min(22, Math.floor(720 / Math.max(W, H))));
+  cv.width = W * cell + 1; cv.height = H * cell + 1;
+  const g = cv.getContext("2d");
+  const css = getComputedStyle(document.documentElement);
+  const col = (name, fb) => (css.getPropertyValue(name).trim() || fb);
+  g.fillStyle = col("--bg", "#fff"); g.fillRect(0, 0, cv.width, cv.height);
+  g.fillStyle = col("--accent", "#2a7");
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (cells[y][x]) g.fillRect(x * cell, y * cell, cell, cell);
+  const cx = Math.floor(W / 2), cy = Math.floor(H / 2);
+  for (let i = 0; i <= Math.max(W, H); i++) {
+    if (i <= W) { g.strokeStyle = (i - cx) % 5 === 0 || (W % 2 === 0 && i === cx) ? col("--ink", "#333") : col("--line", "#ccc"); g.globalAlpha = (i - cx) % 5 === 0 ? 0.6 : 1;
+      g.beginPath(); g.moveTo(i * cell + 0.5, 0); g.lineTo(i * cell + 0.5, H * cell); g.stroke(); }
+    if (i <= H) { g.strokeStyle = (i - cy) % 5 === 0 || (H % 2 === 0 && i === cy) ? col("--ink", "#333") : col("--line", "#ccc"); g.globalAlpha = (i - cy) % 5 === 0 ? 0.6 : 1;
+      g.beginPath(); g.moveTo(0, i * cell + 0.5); g.lineTo(W * cell, i * cell + 0.5); g.stroke(); }
+  }
+  g.globalAlpha = 1;
+}));
+</script>
+<!-- article -->
+<h2>How block circles are drawn</h2>
+<p>A circle in blocks is an approximation. The generator imagines a perfect circle (or ellipse) over a grid of
+blocks and fills each block whose center falls inside the shape. For outlines, it keeps only the blocks on the edge:
+those with an empty neighbour.</p>
+<p>The <strong>thick</strong> outline counts diagonal neighbours too, so every block touches the next along a full
+side. That gives a wall with no gaps, ideal for towers, ponds and arenas. The <strong>thin</strong> outline only
+counts side neighbours, giving a lighter line that joins at the corners.</p>
+
+<h2>The formula</h2>
+<div class="formula">a block at column x, row y is inside when<br>
+((x + 0.5 − W/2) ÷ (W/2))² + ((y + 0.5 − H/2) ÷ (H/2))² ≤ 1</div>
+<p>For a circle, W and H are both the diameter. Using the block's center (the + 0.5) keeps the shape symmetric on
+all four sides.</p>
+
+<h2>Common sizes and block counts (thick outline)</h2>
+<p>Change the inputs above to get any size; these are popular starting points for towers and domes.</p>
+<table>
+  <tr><th>Use</th><th>Diameter</th></tr>
+  <tr><td>Small tower or well</td><td>7–9</td></tr>
+  <tr><td>Wizard tower, silo</td><td>11–15</td></tr>
+  <tr><td>Castle keep, fountain</td><td>21–31</td></tr>
+  <tr><td>Arena, big dome</td><td>45–65</td></tr>
+</table>
+
+<h2>Building tips</h2>
+<ul>
+  <li><strong>Mark the center first.</strong> Place a marker block, then build the four straight runs at the top, bottom, left and right before filling the curved parts.</li>
+  <li><strong>Build one quarter, mirror the rest.</strong> Circles are symmetric, so copying one quarter four times is faster and catches mistakes.</li>
+  <li><strong>Use odd sizes for doors.</strong> A single center block lets you put a 1-wide door or window exactly in the middle of a wall.</li>
+</ul>

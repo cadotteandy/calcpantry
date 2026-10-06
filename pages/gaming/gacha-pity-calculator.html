@@ -1,0 +1,171 @@
+---
+{
+  "title": "Gacha Pity Calculator: Genshin, Honkai Star Rail & ZZZ Pull Odds",
+  "description": "Find your chance of getting the featured 5-star in Genshin Impact, Honkai: Star Rail or Zenless Zone Zero from your pulls, current pity and 50/50 status, plus pulls needed for 50% and 90%.",
+  "h1": "Gacha Pity Calculator",
+  "short": "Gacha Pity Calculator",
+  "intro": "Enter your saved currency and pulls, your current pity and whether your next 5-star is guaranteed. See your odds of getting the featured character, and how many pulls you'd need to be safe.",
+  "updated": "October 2026",
+  "related": ["game-cost-per-hour-calculator", "level-grind-time-calculator", "kd-ratio-calculator", "mouse-sensitivity-converter"],
+  "faq": [
+    {"q": "How does pity work in Genshin Impact?", "a": "On the character event banner the base 5-star rate is 0.6% per pull. Players' data shows the rate climbing steeply from about the 74th pull (soft pity), and the 90th pull always gives a 5-star (hard pity). Your pity counter carries over between character banners until you get a 5-star."},
+    {"q": "What is the 50/50?", "a": "When you get a 5-star on a character event banner, there's a 50% chance it's the featured character. If it isn't (you 'lose the 50/50'), your next 5-star on that banner type is guaranteed to be the featured one. Since version 5.0, Genshin's Capturing Radiance system adds extra wins after repeated losses, so real odds are a little better than this calculator's classic model."},
+    {"q": "How many pulls do I need to guarantee a character?", "a": "In the worst case, 180 pulls from zero pity without a guarantee: 90 to reach the first 5-star, lose the 50/50, then 90 more. With a guarantee, 90 pulls is the maximum. On average it takes about 93 pulls without a guarantee and about 62 with one."},
+    {"q": "Do Honkai: Star Rail and Zenless Zone Zero use the same rates?", "a": "Their limited character banners follow the same pattern: 0.6% base rate, soft pity starting in the mid-70s, hard pity at 90 and a 50/50 with a guarantee after a loss. Light cone and W-Engine banners are different (hard pity at 80 and a 75/25 split), so use the custom option for those."},
+    {"q": "Are these exact official odds?", "a": "The base rate, hard pity and 50/50 are official. The soft pity increase is not published by the developers; the 6% per pull from pull 74 used here is the widely used estimate from large community pull datasets, and matches the official consolidated rate of about 1.6%."},
+    {"q": "How much currency is one pull?", "a": "160 Primogems in Genshin, 160 Stellar Jade in Star Rail and 160 Polychromes in Zenless Zone Zero buy one pull. This calculator converts your currency at 160 per pull."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="game">Game and banner</label>
+        <select id="game" name="game">
+          <option value="genshin">Genshin Impact: character event</option>
+          <option value="hsr">Honkai: Star Rail: limited character</option>
+          <option value="zzz">Zenless Zone Zero: limited agent</option>
+          <option value="custom">Custom rates</option>
+        </select>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="currency" data-out="currencyLabel">Primogems</label>
+          <input id="currency" name="currency" type="number" min="0" step="160" value="12800" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="tickets">Pulls / fates owned</label>
+          <input id="tickets" name="tickets" type="number" min="0" step="1" value="10" inputmode="numeric">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="pity">Current pity</label>
+          <input id="pity" name="pity" type="number" min="0" max="89" step="1" value="20" inputmode="numeric">
+          <div class="hint">Pulls since your last 5-star on this banner type.</div>
+        </div>
+        <div class="field">
+          <label for="copies">Copies wanted</label>
+          <select id="copies" name="copies">
+            <option value="1">1 (the character)</option>
+            <option value="2">2 (C1 / E1 / M1)</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7 (C6 / E6 / M6)</option>
+          </select>
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" name="guaranteed"> My next 5-star is guaranteed (lost the last 50/50)</label>
+      <div data-show="custom" hidden>
+        <div class="row2">
+          <div class="field"><label for="base">Base rate (%)</label><input id="base" name="base" type="number" min="0" step="0.1" value="0.6" inputmode="decimal"></div>
+          <div class="field"><label for="hard">Hard pity</label><input id="hard" name="hard" type="number" min="1" step="1" value="90" inputmode="numeric"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="soft">Soft pity starts at pull</label><input id="soft" name="soft" type="number" min="1" step="1" value="74" inputmode="numeric"></div>
+          <div class="field"><label for="step">Rate added per pull (%)</label><input id="step" name="step" type="number" min="0" step="0.5" value="6" inputmode="decimal"></div>
+        </div>
+        <div class="field"><label for="win">Featured chance on a 5-star (%)</label><input id="win" name="win" type="number" min="0" max="100" step="5" value="50" inputmode="numeric"></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Chance to get what you want</span><b data-out="chance">—</b></div>
+    <div class="result"><span>Pulls available</span><b data-out="pulls">—</b></div>
+    <div class="result"><span>Average pulls needed</span><b data-out="avg">—</b></div>
+    <div class="result"><span>Pulls for a 50% chance</span><b data-out="p50">—</b></div>
+    <div class="result"><span>Pulls for a 90% chance</span><b data-out="p90">—</b></div>
+    <div class="result"><span>Worst case (guaranteed)</span><b data-out="worst">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const P = {
+    genshin: { cur: "Primogems", base: 0.6, soft: 74, step: 6, hard: 90, win: 50 },
+    hsr:     { cur: "Stellar Jade", base: 0.6, soft: 74, step: 6, hard: 90, win: 50 },
+    zzz:     { cur: "Polychromes", base: 0.6, soft: 74, step: 6, hard: 90, win: 50 },
+    custom:  { cur: "Currency", base: v.base, soft: v.soft, step: v.step, hard: Math.max(1, Math.round(v.hard)) || 90, win: v.win },
+  }[v.game];
+  out.show("custom", v.game === "custom");
+  out.set("currencyLabel", P.cur);
+  const hard = P.hard, base = P.base / 100, step = P.step / 100, win = Math.min(1, Math.max(0, P.win / 100));
+  // Chance of a 5-star on the nth pull since the last one.
+  const rate = (n) => (n >= hard ? 1 : Math.min(1, base + (n >= P.soft ? step * (n - P.soft + 1) : 0)));
+  const K = parseInt(v.copies, 10);
+  const pulls = Math.floor(v.currency / 160) + Math.floor(v.tickets);
+  let pity = Math.min(hard - 1, Math.max(0, Math.floor(v.pity)));
+
+  // Distribution over (pity, guaranteed, copies); "done" collects reaching K copies.
+  const idx = (p, g, c) => (c * 2 + g) * hard + p;
+  let s = new Float64Array(hard * 2 * K);
+  s[idx(pity, v.guaranteed ? 1 : 0, 0)] = 1;
+  const worst = (v.guaranteed ? hard - pity : (win < 1 ? 2 * hard - pity : hard - pity)) + (K - 1) * (win < 1 ? 2 * hard : hard);
+  const doneAt = [];          // cumulative probability of being done after t pulls
+  let done = 0, mean = 0;
+  const maxT = Math.max(pulls, worst);
+  for (let t = 1; t <= maxT; t++) {
+    const n = new Float64Array(s.length);
+    for (let c = 0; c < K; c++) for (let g = 0; g < 2; g++) for (let p = 0; p < hard; p++) {
+      const m = s[idx(p, g, c)];
+      if (!m) continue;
+      const q = rate(p + 1);
+      if (p + 1 < hard) n[idx(p + 1, g, c)] += m * (1 - q);
+      const featured = m * q * (g ? 1 : win);
+      const lost = m * q * (g ? 0 : 1 - win);
+      if (c + 1 >= K) { done += featured; mean += featured * t; }
+      else n[idx(0, 0, c + 1)] += featured;
+      n[idx(0, 1, c)] += lost;
+    }
+    s = n;
+    doneAt.push(done);
+  }
+  const firstAt = (target) => { const i = doneAt.findIndex((d) => d >= target - 1e-9); return i < 0 ? NaN : i + 1; };
+  const chance = pulls > 0 ? doneAt[Math.min(pulls, doneAt.length) - 1] : 0;
+  out.set("chance", Calc.pct(chance, 1), chance >= 0.9 ? "pos" : chance < 0.5 ? "neg" : "");
+  out.set("pulls", `${Calc.num(pulls, 0)} (${Calc.num(pulls * 160, 0)} ${P.cur})`);
+  out.set("avg", Calc.num(mean / Math.max(done, 1e-12), 0) + " pulls");
+  const p50 = firstAt(0.5), p90 = firstAt(0.9);
+  const need = (x) => isNaN(x) ? "—" : `${x} pulls` + (x > pulls ? ` (${Calc.num((x - pulls) * 160, 0)} more ${P.cur})` : " ✓");
+  out.set("p50", need(p50));
+  out.set("p90", need(p90));
+  out.set("worst", `${worst} pulls` + (worst > pulls ? ` (${Calc.num((worst - pulls) * 160, 0)} more ${P.cur})` : " ✓"));
+  if (v.game === "genshin") out.note("Classic 50/50 model. Genshin's Capturing Radiance (since 5.0) makes winning slightly more likely after repeated losses, so your real odds are a touch better.");
+  else out.note("Soft pity uses the community estimate of +6% per pull from pull 74; base rate, hard pity and 50/50 are official.");
+}));
+</script>
+<!-- article -->
+<h2>How gacha pity works</h2>
+<p>Character banners in Genshin Impact, Honkai: Star Rail and Zenless Zone Zero all use the same system from
+HoYoverse. Each pull has a small chance of a 5-star (0.6%). After many pulls without one, the chance ramps up
+quickly (soft pity), and if you reach the 90th pull you're guaranteed a 5-star (hard pity).</p>
+<p>When the 5-star arrives, there's a 50% chance it's the featured character. If it isn't, your next 5-star on
+that banner is guaranteed to be featured. This calculator follows every possible path through those rules and adds
+up the odds exactly, rather than simulating random pulls.</p>
+
+<h2>The model</h2>
+<div class="formula">5-star chance on pull n since the last one:<br>
+n ≤ 73: 0.6%<br>
+74 ≤ n ≤ 89: 0.6% + 6% × (n − 73)<br>
+n = 90: 100%<br>
+featured on a 5-star: 50%, or 100% if guaranteed</div>
+
+<h2>Typical numbers (from 0 pity)</h2>
+<table>
+  <tr><th>Situation</th><th>Average pulls</th><th>90% chance by</th><th>Worst case</th></tr>
+  <tr><td>Any 5-star</td><td>about 62</td><td>about 80</td><td>90</td></tr>
+  <tr><td>Featured, guaranteed</td><td>about 62</td><td>about 80</td><td>90</td></tr>
+  <tr><td>Featured, 50/50</td><td>about 93</td><td>about 155</td><td>180</td></tr>
+</table>
+<p>Change the inputs above to see your own numbers, including higher constellations or eidolons.</p>
+
+<h2>Saving tips</h2>
+<ul>
+  <li><strong>Pity carries over.</strong> It doesn't reset between character banners, so pulling a little and stopping at 70 pity sets you up well for the next banner.</li>
+  <li><strong>Know your guarantee.</strong> If your last 5-star on the banner wasn't the featured one, your next one is. Tick the box above and your odds jump.</li>
+  <li><strong>Plan for 90%, not 50%.</strong> A 50% chance means half of players in your position miss. If you really want a character, save to the 90% line.</li>
+</ul>

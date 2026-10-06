@@ -1,0 +1,131 @@
+---
+{
+  "title": "Mouse Sensitivity Converter: CS2, Valorant, Apex, Overwatch 2, CoD",
+  "description": "Convert mouse sensitivity between CS2, Valorant, Apex Legends, Overwatch 2 and Call of Duty so your aim feels the same. Shows eDPI and cm/360 for any DPI change.",
+  "h1": "Mouse Sensitivity Converter",
+  "short": "Sensitivity Converter",
+  "intro": "Pick the game you're coming from and the one you're going to, enter your sensitivity and DPI, and get the setting that turns your view the same distance for the same hand movement.",
+  "updated": "October 2026",
+  "related": ["kd-ratio-calculator", "fps-frame-time-calculator", "gacha-pity-calculator", "game-cost-per-hour-calculator"],
+  "faq": [
+    {"q": "How do I convert CS2 sensitivity to Valorant?", "a": "Divide your CS2 sensitivity by about 3.18 (exactly 0.07 ÷ 0.022). A CS2 sensitivity of 2.0 at 800 DPI becomes 0.629 in Valorant at 800 DPI. The other way, multiply your Valorant sensitivity by 3.18."},
+    {"q": "Is Apex sensitivity the same as CS2?", "a": "Yes. Apex Legends uses the same Source-engine scale as CS2 (0.022 degrees per count), so the numbers carry over 1:1 at the same DPI, as long as you use the default hip-fire settings."},
+    {"q": "What is cm/360?", "a": "cm/360 is how far you move your mouse, in centimeters, to turn a full circle in game. It's the one number that compares fairly across every game and DPI. Many pro players sit between about 25 and 50 cm/360; lower numbers mean faster aim."},
+    {"q": "What is eDPI?", "a": "Effective DPI is DPI multiplied by in-game sensitivity. It's handy for comparing settings within one game: 800 DPI at 2.0 and 1600 DPI at 1.0 are both 1,600 eDPI in CS2 and feel identical. It isn't comparable across games with different scales; use cm/360 for that."},
+    {"q": "Does this convert scoped or ADS sensitivity?", "a": "No. This matches hip-fire (unscoped) sensitivity. Scopes and aim-down-sights use separate multipliers in each game, and Call of Duty also changes ADS feel with its monitor distance coefficient setting."},
+    {"q": "Should I change DPI or in-game sensitivity?", "a": "Either works, since cm/360 is what you feel. Many players use 800 or 1600 DPI and adjust in-game sensitivity. Very low in-game values at high DPI can make menus feel fast, and very high in-game values at low DPI can skip pixels in some games."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="from">From game</label>
+          <select id="from" name="from">
+            <option value="cs2">CS2 / CS:GO</option>
+            <option value="val">Valorant</option>
+            <option value="apex">Apex Legends</option>
+            <option value="ow">Overwatch 2</option>
+            <option value="cod">Call of Duty (MW, Warzone, BO6)</option>
+            <option value="tf2">TF2 / Source games</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="to">To game</label>
+          <select id="to" name="to">
+            <option value="cs2">CS2 / CS:GO</option>
+            <option value="val" selected>Valorant</option>
+            <option value="apex">Apex Legends</option>
+            <option value="ow">Overwatch 2</option>
+            <option value="cod">Call of Duty (MW, Warzone, BO6)</option>
+            <option value="tf2">TF2 / Source games</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="sens">Current sensitivity</label>
+        <input id="sens" name="sens" type="number" min="0" step="0.001" value="2" inputmode="decimal">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="dpi1">Current DPI</label>
+          <input id="dpi1" name="dpi1" type="number" min="1" step="50" value="800" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="dpi2">New DPI</label>
+          <input id="dpi2" name="dpi2" type="number" min="0" step="50" value="" placeholder="same" inputmode="numeric">
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="toLabel">New sensitivity</span><b data-out="newSens">—</b></div>
+    <div class="result"><span>cm/360 (same in both)</span><b data-out="cm">—</b></div>
+    <div class="result"><span>Inches/360</span><b data-out="inch">—</b></div>
+    <div class="result"><span>Current eDPI</span><b data-out="edpi1">—</b></div>
+    <div class="result"><span>New eDPI</span><b data-out="edpi2">—</b></div>
+    <div class="result"><span>Conversion factor</span><b data-out="factor">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  // Degrees turned per mouse count at sensitivity 1 (hip-fire, default settings).
+  const YAW = { cs2: 0.022, apex: 0.022, tf2: 0.022, val: 0.07, ow: 0.0066, cod: 0.0066 };
+  const NAME = { cs2: "CS2", apex: "Apex", tf2: "Source", val: "Valorant", ow: "Overwatch 2", cod: "Call of Duty" };
+  const dpi1 = v.dpi1 > 0 ? v.dpi1 : 800;
+  const dpi2 = v.dpi2 > 0 ? v.dpi2 : dpi1;
+  const degPerInch = dpi1 * v.sens * YAW[v.from];
+  const cm = degPerInch > 0 ? 360 / degPerInch * 2.54 : NaN;
+  const newSens = v.sens * (YAW[v.from] / YAW[v.to]) * (dpi1 / dpi2);
+  out.set("toLabel", `${NAME[v.to]} sensitivity at ${Calc.num(dpi2, 0)} DPI`);
+  out.set("newSens", Calc.num(newSens, 3));
+  out.set("cm", Calc.num(cm, 1) + " cm");
+  out.set("inch", Calc.num(cm / 2.54, 2) + " in");
+  out.set("edpi1", Calc.num(dpi1 * v.sens, 0) + ` (${NAME[v.from]})`);
+  out.set("edpi2", Calc.num(dpi2 * newSens, 0) + ` (${NAME[v.to]})`);
+  out.set("factor", "× " + Calc.num(newSens / v.sens, 4));
+  if (cm < 15) out.note("Under 15 cm/360 is very fast for most aim styles; many players aim between 25 and 50 cm/360.");
+  else if (cm > 80) out.note("Over 80 cm/360 is very slow and needs a large mouse pad.");
+  else out.note("Hip-fire only. Scoped and ADS sensitivities use each game's own multipliers.");
+}));
+</script>
+<!-- article -->
+<h2>How sensitivity conversion works</h2>
+<p>Every game turns your view by a fixed number of degrees for each "count" your mouse reports, multiplied by
+your in-game sensitivity. That base angle is called the yaw. Games built on different engines use different yaw
+values, which is why the same number feels completely different from game to game.</p>
+<p>To keep the same feel, you keep the same degrees turned per inch of mouse movement. That's the same as keeping
+the same cm/360: how far you move to spin all the way around.</p>
+
+<h2>The formula</h2>
+<div class="formula">new sens = old sens × (old game yaw ÷ new game yaw) × (old DPI ÷ new DPI)<br>
+cm/360 = 360 ÷ (DPI × sens × yaw) × 2.54<br>
+eDPI = DPI × sens</div>
+
+<h2>Yaw values used</h2>
+<table>
+  <tr><th>Game</th><th>Yaw (degrees per count)</th><th>From CS2, multiply by</th></tr>
+  <tr><td>CS2, CS:GO, Apex Legends, TF2 and other Source games</td><td>0.022</td><td>1</td></tr>
+  <tr><td>Valorant</td><td>0.07</td><td>0.3143 (÷ 3.18)</td></tr>
+  <tr><td>Overwatch 2</td><td>0.0066</td><td>3.333</td></tr>
+  <tr><td>Call of Duty (Modern Warfare, Warzone, Black Ops 6)</td><td>0.0066</td><td>3.333</td></tr>
+</table>
+
+<h2>Example: CS2 to Valorant</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>CS2 sensitivity 2.0 at 800 DPI</td><td>eDPI 1,600</td></tr>
+  <tr><td>cm/360: 360 ÷ (800 × 2 × 0.022) × 2.54</td><td>26.0 cm</td></tr>
+  <tr><td>Valorant: 2.0 × 0.022 ÷ 0.07</td><td><strong>0.629</strong></td></tr>
+</table>
+
+<h2>Tips when switching games</h2>
+<ul>
+  <li><strong>Turn off mouse acceleration</strong> in Windows (Enhance pointer precision) and in game, or no conversion will feel right.</li>
+  <li><strong>Field of view matters.</strong> The same cm/360 can feel different at a different FOV because targets move across the screen at a different speed. Give it a few sessions.</li>
+  <li><strong>Check raw input.</strong> Make sure raw input is on in games that offer it, so Windows settings don't interfere.</li>
+</ul>

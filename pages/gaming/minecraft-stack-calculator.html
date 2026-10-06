@@ -1,0 +1,129 @@
+---
+{
+  "title": "Minecraft Stack Calculator: Items to Stacks, Shulker Boxes & Chests",
+  "description": "Convert a Minecraft item count into stacks, shulker boxes, chests and double chests, for 64, 16 or unstackable items. Or work backwards from stacks to items.",
+  "h1": "Minecraft Stack Calculator",
+  "short": "Minecraft Stack Calculator",
+  "intro": "Enter how many items you need or have. See how many stacks, shulker boxes and chests that fills, for blocks that stack to 64, items that stack to 16, or unstackables.",
+  "updated": "October 2026",
+  "related": ["minecraft-nether-portal-calculator", "minecraft-circle-generator", "level-grind-time-calculator", "game-cost-per-hour-calculator"],
+  "faq": [
+    {"q": "How many items are in a Minecraft stack?", "a": "Most blocks and items stack to 64. Some stack to 16: ender pearls, snowballs, eggs, signs, empty buckets, banners and armor stands, among others. Tools, weapons, armor, potions and filled buckets don't stack at all (1 per slot)."},
+    {"q": "How many items fit in a shulker box?", "a": "A shulker box has 27 slots, the same as a single chest. With 64-stack items that's 1,728 items. A full double chest of shulker boxes (54 boxes) holds 93,312 items."},
+    {"q": "How many items fit in a double chest?", "a": "A double chest has 54 slots, so it holds 3,456 items that stack to 64, or 864 items that stack to 16."},
+    {"q": "How many stacks are in a player inventory?", "a": "The main inventory has 36 slots (27 plus the 9-slot hotbar), so a full inventory carries 2,304 items that stack to 64. Armor and offhand slots are extra but only hold specific items."},
+    {"q": "Can I put a shulker box inside a shulker box?", "a": "No. Shulker boxes can't be placed inside other shulker boxes, but they can go in chests, barrels and ender chests, which is how players move huge amounts of items."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="mode">I want to convert</label>
+        <select id="mode" name="mode">
+          <option value="items">Items → stacks and storage</option>
+          <option value="stacks">Stacks → items</option>
+        </select>
+      </div>
+      <div class="field" data-show="items">
+        <label for="items">Number of items</label>
+        <input id="items" name="items" type="number" min="0" step="1" value="5000" inputmode="numeric">
+      </div>
+      <div class="row2" data-show="stacks" hidden>
+        <div class="field">
+          <label for="stacks">Full stacks</label>
+          <input id="stacks" name="stacks" type="number" min="0" step="1" value="12" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="extra">Plus loose items</label>
+          <input id="extra" name="extra" type="number" min="0" step="1" value="0" inputmode="numeric">
+        </div>
+      </div>
+      <div class="field">
+        <label for="size">Stack size</label>
+        <select id="size" name="size">
+          <option value="64">64 (most blocks and items)</option>
+          <option value="16">16 (ender pearls, eggs, snowballs, signs…)</option>
+          <option value="1">1 (tools, armor, potions…)</option>
+        </select>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="bigLabel">Stacks</span><b data-out="big">—</b></div>
+    <div class="result"><span>Slots needed</span><b data-out="slots">—</b></div>
+    <div class="result"><span>Shulker boxes / single chests (27 slots)</span><b data-out="shulkers">—</b></div>
+    <div class="result"><span>Double chests (54 slots)</span><b data-out="doubles">—</b></div>
+    <div class="result"><span>Player inventories (36 slots)</span><b data-out="invs">—</b></div>
+    <div class="result"><span>Double chests of full shulker boxes</span><b data-out="dcshulk">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const size = parseInt(v.size, 10);
+  const itemsMode = v.mode === "items";
+  out.show("items", itemsMode);
+  out.show("stacks", !itemsMode);
+  const items = Math.max(0, Math.floor(itemsMode ? v.items : v.stacks * size + v.extra));
+  const full = Math.floor(items / size), rest = items % size;
+  const slots = Math.ceil(items / size);
+  if (itemsMode) {
+    out.set("bigLabel", "Stacks");
+    const word = full === 1 ? "stack" : "stacks";
+    out.set("big", rest ? `${Calc.num(full, 0)} ${word} + ${rest}` : `${Calc.num(full, 0)} ${word}`);
+  } else {
+    out.set("bigLabel", "Total items");
+    out.set("big", Calc.num(items, 0));
+  }
+  const split = (n, per) => {
+    const whole = Math.floor(n / per), left = n % per;
+    return left ? `${Calc.num(Math.ceil(n / per), 0)} (${Calc.num(whole, 0)} full + ${left} slots)` : Calc.num(whole, 0);
+  };
+  out.set("slots", Calc.num(slots, 0));
+  out.set("shulkers", split(slots, 27));
+  out.set("doubles", split(slots, 54));
+  out.set("invs", split(slots, 36));
+  out.set("dcshulk", Calc.num(slots / (27 * 54), 3));
+  out.note(`One full shulker box holds ${Calc.num(27 * size, 0)} of these; one double chest holds ${Calc.num(54 * size, 0)}.`);
+}));
+</script>
+<!-- article -->
+<h2>How Minecraft storage math works</h2>
+<p>Every container in Minecraft is measured in slots, and each slot holds one stack. How many items a slot holds
+depends on the item: 64 for most blocks, 16 for a handful of items, and just 1 for tools, armor and other
+unstackables. So the first step is always items ÷ stack size, rounded up, to get slots.</p>
+
+<h2>The formula</h2>
+<div class="formula">slots = ⌈items ÷ stack size⌉<br>
+shulker boxes or chests = ⌈slots ÷ 27⌉<br>
+double chests = ⌈slots ÷ 54⌉</div>
+
+<h2>Example: 5,000 cobblestone</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Stacks: 5,000 ÷ 64</td><td><strong>78 stacks + 8</strong></td></tr>
+  <tr><td>Slots needed</td><td>79</td></tr>
+  <tr><td>Shulker boxes: 79 ÷ 27</td><td>3 (2 full + 25 slots)</td></tr>
+  <tr><td>Double chests: 79 ÷ 54</td><td>2 (1 full + 25 slots)</td></tr>
+</table>
+
+<h2>Container capacity at a glance</h2>
+<table>
+  <tr><th>Container</th><th>Slots</th><th>64-stack items</th><th>16-stack items</th></tr>
+  <tr><td>Hopper</td><td>5</td><td>320</td><td>80</td></tr>
+  <tr><td>Dispenser / dropper</td><td>9</td><td>576</td><td>144</td></tr>
+  <tr><td>Chest, barrel, shulker box</td><td>27</td><td>1,728</td><td>432</td></tr>
+  <tr><td>Player inventory (with hotbar)</td><td>36</td><td>2,304</td><td>576</td></tr>
+  <tr><td>Double chest</td><td>54</td><td>3,456</td><td>864</td></tr>
+  <tr><td>Double chest of full shulker boxes</td><td>54 × 27</td><td>93,312</td><td>23,328</td></tr>
+</table>
+
+<h2>Tips for big builds</h2>
+<ul>
+  <li><strong>Count in shulker boxes.</strong> For mega builds, think in shulkers: 1,728 blocks each. A 100 × 100 floor is 10,000 blocks, about 6 shulker boxes.</li>
+  <li><strong>Ender chests travel with you.</strong> Your ender chest holds 27 more slots, and filling it with shulker boxes multiplies what you can carry.</li>
+  <li><strong>Barrels pack tighter.</strong> Barrels hold the same 27 slots as a chest but can sit side by side and stack without blocking each other.</li>
+</ul>

@@ -1,0 +1,120 @@
+---
+{
+  "title": "Level Grind Time Calculator: How Long to Reach Your Target Level",
+  "description": "Find how long it takes to grind to a level or XP goal in any game from your current XP, target XP and XP per hour, including bonus XP events and daily play time.",
+  "h1": "Level Grind Time Calculator",
+  "short": "Grind Time Calculator",
+  "intro": "Enter the XP you have, the XP you need and how fast you earn it. See the hours of grinding left and the date you'll get there at your usual daily play time.",
+  "updated": "October 2026",
+  "related": ["game-cost-per-hour-calculator", "gacha-pity-calculator", "kd-ratio-calculator", "minecraft-stack-calculator"],
+  "faq": [
+    {"q": "How do I work out my XP per hour?", "a": "Note your XP, play for a timed session (30 to 60 minutes of your normal grind), then note it again. XP gained ÷ minutes played × 60 is your XP per hour. Measure a few sessions and average them for a reliable number."},
+    {"q": "How do double XP events change the time?", "a": "A 2x multiplier halves the time for the same XP. This calculator applies your bonus to the whole remaining grind; if the event only lasts part of the time, run it twice with and without the bonus to see the split."},
+    {"q": "Does this work for battle passes?", "a": "Yes. Use battle pass tiers or stars instead of XP: current progress, total needed and the amount you earn per hour or per day. Add your days left in the season to check whether you'll finish in time."},
+    {"q": "Why do later levels take so much longer?", "a": "Most games increase the XP needed per level as you go, so the last few levels can take as long as all the early ones. Use total XP (not levels) for the current and target fields when your game shows it."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="have">Current XP</label>
+          <input id="have" name="have" type="number" min="0" step="1" value="125000" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="need">Target XP</label>
+          <input id="need" name="need" type="number" min="0" step="1" value="400000" inputmode="numeric">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="rate">XP per hour</label>
+          <input id="rate" name="rate" type="number" min="0" step="1" value="18000" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="mult">XP bonus</label>
+          <select id="mult" name="mult">
+            <option value="1">None (1x)</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2x (double XP)</option>
+            <option value="3">3x</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="daily">Hours you play per day</label>
+          <input id="daily" name="daily" type="number" min="0" step="0.5" value="2" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="days">Days left (season or event)</label>
+          <input id="days" name="days" type="number" min="0" step="1" value="" placeholder="optional" inputmode="numeric">
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Grind time left</span><b data-out="time">—</b></div>
+    <div class="result"><span>XP remaining</span><b data-out="left">—</b></div>
+    <div class="result"><span>Progress</span><b data-out="progress">—</b></div>
+    <div class="result"><span>Days at your daily play time</span><b data-out="daysOut">—</b></div>
+    <div class="result"><span>Finish date</span><b data-out="date">—</b></div>
+    <div class="result"><span data-out="deadlineLabel">Hours per day to finish in time</span><b data-out="deadline">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const left = Math.max(0, v.need - v.have);
+  const rate = v.rate * parseFloat(v.mult);
+  const hours = rate > 0 ? left / rate : NaN;
+  const fmt = (h) => !isFinite(h) ? "—" : h < 1 ? `${Math.round(h * 60)} min` : `${Math.floor(h)} h ${Math.round((h % 1) * 60)} min`;
+  out.set("time", left === 0 ? "Done ✓" : fmt(hours));
+  out.set("left", Calc.num(left, 0) + " XP");
+  out.set("progress", v.need > 0 ? Calc.pct(Math.min(1, v.have / v.need), 1) : "—");
+  if (v.daily > 0 && isFinite(hours)) {
+    const days = Math.ceil(hours / v.daily);
+    out.set("daysOut", `${Calc.num(days, 0)} days`);
+    const d = new Date(); d.setDate(d.getDate() + days);
+    out.set("date", d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }));
+  } else { out.set("daysOut", "—"); out.set("date", "—"); }
+  if (v.days > 0 && isFinite(hours)) {
+    const per = hours / v.days;
+    out.set("deadline", `${fmt(per)} per day`, per <= v.daily ? "pos" : "neg");
+    out.note(per <= v.daily ? "You're on track to finish before the deadline at your current pace." : "At your current daily play time you won't make it. Play more each day or wait for an XP event.");
+  } else {
+    out.set("deadline", "Enter days left");
+    out.note("XP per hour is best measured over a few real sessions of the grind you'll be doing.");
+  }
+}));
+</script>
+<!-- article -->
+<h2>How the grind time is worked out</h2>
+<p>Whether it's an MMO level cap, a battle pass, a skill in RuneScape or a prestige rank, every grind is the same
+sum: what's left divided by how fast you earn it. The hard part is knowing your real XP per hour, so measure a few
+normal sessions rather than using your best one.</p>
+
+<h2>The formula</h2>
+<div class="formula">XP left = target − current<br>
+hours = XP left ÷ (XP per hour × bonus)<br>
+days = hours ÷ hours played per day<br>
+hours per day for a deadline = hours ÷ days left</div>
+
+<h2>Example</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>XP left: 400,000 − 125,000</td><td>275,000 XP</td></tr>
+  <tr><td>Hours: 275,000 ÷ 18,000</td><td><strong>15 h 17 min</strong></td></tr>
+  <tr><td>At 2 hours a day</td><td>8 days</td></tr>
+  <tr><td>With double XP</td><td>7 h 38 min</td></tr>
+</table>
+
+<h2>Grinding smarter</h2>
+<ul>
+  <li><strong>Save it for bonus events.</strong> Double XP weekends halve the time; plan big sessions around them.</li>
+  <li><strong>Stack daily rewards.</strong> Daily quests and first-win bonuses often beat hours of repetitive farming per minute played.</li>
+  <li><strong>Take breaks.</strong> Your XP per hour drops when you're tired; two focused hours usually beat four sluggish ones.</li>
+</ul>

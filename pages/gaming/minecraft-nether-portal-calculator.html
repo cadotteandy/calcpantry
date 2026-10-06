@@ -1,0 +1,103 @@
+---
+{
+  "title": "Minecraft Nether Portal Calculator: Overworld to Nether Coordinates",
+  "description": "Convert Minecraft coordinates between the Overworld and the Nether (divide or multiply X and Z by 8) so linked portals land where you want them. Java and Bedrock.",
+  "h1": "Minecraft Nether Portal Calculator",
+  "short": "Nether Portal Calculator",
+  "intro": "Enter coordinates from either dimension and get the matching spot in the other one, so you can build a portal that links exactly where you want it.",
+  "updated": "October 2026",
+  "related": ["minecraft-stack-calculator", "minecraft-circle-generator", "game-cost-per-hour-calculator", "level-grind-time-calculator"],
+  "faq": [
+    {"q": "How do Nether coordinates work in Minecraft?", "a": "One block in the Nether equals eight blocks in the Overworld horizontally. To find the Nether spot for an Overworld location, divide X and Z by 8. To go the other way, multiply by 8. The Y coordinate (height) is not scaled."},
+    {"q": "Does the Y level matter when linking portals?", "a": "Y isn't divided by 8, but it still matters for linking. The game searches for an existing portal near the target X and Z across the whole height range and picks the closest one in 3D distance, so building at a similar height helps avoid links to the wrong portal."},
+    {"q": "Why did my portal link to the wrong place?", "a": "The game looks for the nearest existing portal within a search area around the target spot: 128 blocks in each direction in the Overworld and 16 in the Nether (Java Edition). If another portal is closer than the one you meant, it links there. Build the Nether-side portal at the exact converted coordinates to force the link."},
+    {"q": "Is it the same on Bedrock and Java?", "a": "Yes, the 8:1 ratio is the same on both. The portal search distances differ slightly between editions, but converting coordinates and building at the exact spot works on both."},
+    {"q": "How do I see my coordinates?", "a": "On Java Edition press F3 and read the XYZ line. On Bedrock, turn on Show Coordinates in the world settings, and they appear in the top left corner."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="from">I have coordinates in the</label>
+        <select id="from" name="from">
+          <option value="over">Overworld (convert to Nether)</option>
+          <option value="nether">Nether (convert to Overworld)</option>
+        </select>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="x">X</label>
+          <input id="x" name="x" type="number" step="1" value="1200" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="z">Z</label>
+          <input id="z" name="z" type="number" step="1" value="-640" inputmode="numeric">
+        </div>
+      </div>
+      <div class="field">
+        <label for="y">Y (height, optional)</label>
+        <input id="y" name="y" type="number" step="1" value="70" inputmode="numeric">
+        <div class="hint">Height isn't scaled. Keep Nether portals between about Y 1 and Y 122, under the bedrock ceiling at Y 127.</div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="toLabel">Nether coordinates</span><b data-out="coords">—</b></div>
+    <div class="result"><span>Exact (before rounding)</span><b data-out="exact">—</b></div>
+    <div class="result"><span>Y (height)</span><b data-out="ycoord">—</b></div>
+    <div class="result"><span>Straight-line distance saved</span><b data-out="saved">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const toNether = v.from === "over";
+  const f = toNether ? 1 / 8 : 8;
+  const ex = v.x * f, ez = v.z * f;
+  // Block coordinates: floor, so -0.5 lands in block -1 the way the game counts.
+  const bx = Math.floor(ex), bz = Math.floor(ez);
+  out.set("toLabel", toNether ? "Build your Nether portal at" : "Build your Overworld portal at");
+  out.set("coords", `X ${bx}, Z ${bz}`);
+  out.set("exact", `X ${Calc.num(ex, 3)}, Z ${Calc.num(ez, 3)}`);
+  let y = v.y;
+  if (toNether) y = Math.min(122, Math.max(1, y));
+  out.set("ycoord", `Y ${Math.round(y)}`);
+  const overDist = Math.hypot(toNether ? v.x : ex, toNether ? v.z : ez);
+  out.set("saved", `${Calc.num(overDist * 7 / 8, 0)} blocks (travel ${Calc.num(overDist / 8, 0)} in the Nether instead of ${Calc.num(overDist, 0)} from 0, 0)`);
+  if (toNether && v.y !== y) out.note("Nether portals can't go above the bedrock roof or below Y 1, so the height was clamped. Build as close to that Y as you can.");
+  else out.note(toNether ? "Build the Nether portal exactly here, then light it. Your Overworld portal will link to it if it's the closest one."
+                         : "Build the Overworld portal at these X and Z, at a sensible ground height near the Y shown.");
+}));
+</script>
+<!-- article -->
+<h2>How Nether portal coordinates work</h2>
+<p>The Nether is a compressed copy of the Overworld. Every block you walk in the Nether covers eight blocks in the
+Overworld along X and Z. That's what makes Nether travel fast, and it's also why portals sometimes link somewhere
+unexpected: the game converts your position, then looks for the nearest portal to that converted spot.</p>
+<p>If you build the second portal at the exact converted coordinates yourself, the two link reliably in both
+directions. This calculator gives you those coordinates.</p>
+
+<h2>The formula</h2>
+<div class="formula">Overworld → Nether: X ÷ 8, Z ÷ 8, Y unchanged<br>
+Nether → Overworld: X × 8, Z × 8, Y unchanged</div>
+<p>Results are rounded down to whole blocks, the same way the game numbers blocks (so −80.5 becomes −81).</p>
+
+<h2>Example: linking a base at X 1200, Z −640</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>X: 1200 ÷ 8</td><td><strong>150</strong></td></tr>
+  <tr><td>Z: −640 ÷ 8</td><td><strong>−80</strong></td></tr>
+  <tr><td>Y</td><td>Keep around 70 (any height from 1 to 122 in the Nether)</td></tr>
+  <tr><td>Distance from spawn</td><td>About 1,360 blocks in the Overworld, 170 in the Nether</td></tr>
+</table>
+
+<h2>Tips for clean portal links</h2>
+<ul>
+  <li><strong>Build both ends yourself.</strong> Letting the game generate the return portal is what causes most mislinks, because it may place it far from where you'd like.</li>
+  <li><strong>Keep portals spread out.</strong> In the Overworld, portals closer than about 128 blocks (on Java) can grab each other's links. Space bases far apart or match their Nether portals carefully.</li>
+  <li><strong>Make a Nether hub.</strong> Many players build a tunnel network at the Nether roof level or around Y 15 with one portal per base, so every trip is a short walk.</li>
+  <li><strong>Mind the height.</strong> If two portals are close horizontally, the game picks the one nearest in 3D, so a big height difference can steer the link.</li>
+</ul>
