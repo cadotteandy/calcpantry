@@ -1,0 +1,157 @@
+---
+{
+  "title": "Speaker Impedance Calculator: Series, Parallel & Mixed Ohms",
+  "description": "Find the total impedance of speakers wired in series, parallel or series-parallel, or of mixed speakers in parallel. Check it against your amp's minimum load and see how power splits.",
+  "h1": "Speaker Impedance Calculator",
+  "short": "Speaker Impedance (Ohms)",
+  "intro": "Choose how your speakers are wired and their impedance. You'll get the total load your amplifier sees, whether it's safe for the amp, and how much power each speaker gets.",
+  "updated": "October 2026",
+  "related": ["note-frequency-calculator", "audio-file-size-calculator", "psu-wattage-calculator", "pc-power-cost-calculator"],
+  "faq": [
+    {"q": "What happens when you wire two 8 ohm speakers in parallel?", "a": "The total impedance halves to 4 ohms. Two identical speakers in parallel give half the impedance of one, three give a third, and so on. Make sure your amplifier is rated for a 4 ohm load before connecting them."},
+    {"q": "What happens when you wire speakers in series?", "a": "The impedances add up. Two 8 ohm speakers in series make a 16 ohm load. A higher load is safe for most solid-state amplifiers, but they deliver less power into it, so the speakers will play quieter."},
+    {"q": "Is it bad to run speakers below the amp's rated impedance?", "a": "Yes. A load lower than the amp's minimum makes it draw more current than it's designed for, which can overheat it, trigger its protection circuit or damage the output stage. Stay at or above the minimum load printed on the amp or in its manual."},
+    {"q": "How do I wire four speakers to get the same impedance as one?", "a": "Use series-parallel wiring: connect the speakers in two series pairs, then connect the two pairs in parallel. Four 8 ohm speakers wired this way present 8 ohms, and each speaker gets a quarter of the power."},
+    {"q": "Can I mix speakers with different impedances?", "a": "You can wire them in parallel, and the calculator handles that, but they won't share power equally. In parallel, each speaker gets the same voltage, so a 4 ohm speaker draws twice the power of an 8 ohm one. In series it's the reverse, and the crossover behavior of each speaker can change, so mixing is best avoided for hi-fi."},
+    {"q": "Do tube amps work the same way?", "a": "The impedance math is identical, but tube amps prefer a matched load. Set the amp's output tap (4, 8 or 16 ohms) to the total impedance from this calculator. Running a tube amp with no load, or far from its tap setting, can damage the output transformer."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="mode">Speakers</label>
+        <select id="mode" name="mode">
+          <option value="same">All the same impedance</option>
+          <option value="custom">Different impedances, in parallel</option>
+        </select>
+      </div>
+      <div class="field" data-show="sameIn">
+        <label for="wiring">Wiring</label>
+        <select id="wiring" name="wiring">
+          <option value="parallel">Parallel</option>
+          <option value="series">Series</option>
+          <option value="sp">Series-parallel (series pairs, wired in parallel)</option>
+        </select>
+      </div>
+      <div class="row2" data-show="sameIn">
+        <div class="field">
+          <label for="count">Number of speakers</label>
+          <input id="count" name="count" type="number" min="1" max="32" step="1" value="2" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="ohms">Each speaker</label>
+          <div class="input"><input id="ohms" name="ohms" type="number" min="0.5" step="0.5" value="8" inputmode="decimal"><span class="unit">Ω</span></div>
+        </div>
+      </div>
+      <div class="field" data-show="customIn" hidden>
+        <label for="list">Speaker impedances (Ω)</label>
+        <input id="list" name="list" type="text" value="8, 8, 4" inputmode="decimal" autocomplete="off">
+        <div class="hint">Separate with commas or spaces, e.g. 8, 8, 4.</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="minLoad">Amp minimum load</label>
+          <div class="input"><input id="minLoad" name="minLoad" type="number" min="0" step="0.5" value="4" inputmode="decimal"><span class="unit">Ω</span></div>
+        </div>
+        <div class="field">
+          <label for="watts">Amp power output</label>
+          <div class="input"><input id="watts" name="watts" type="number" min="0" step="1" value="100" inputmode="decimal"><span class="unit">W</span></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Total impedance</span><b data-out="total">—</b></div>
+    <div class="result"><span>Wiring</span><b data-out="desc">—</b></div>
+    <div class="result"><span>Amp load check</span><b data-out="check">—</b></div>
+    <div class="result"><span>Power per speaker</span><b data-out="power">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const custom = v.mode === "custom";
+  out.show("sameIn", !custom);
+  out.show("customIn", custom);
+  const ohm = (z) => Calc.num(z, 2) + " Ω";
+  const w = (p) => Calc.num(p, 1) + " W";
+  const clear = (msg) => { ["total", "desc", "check", "power"].forEach((k) => out.set(k, "—")); out.note(msg); };
+
+  let total, desc, power;
+  if (!custom) {
+    const n = Math.round(v.count), z = v.ohms;
+    if (!(n >= 1) || !(z > 0)) return clear("Enter the number of speakers and their impedance.");
+    if (v.wiring === "parallel") { total = z / n; desc = `${n} × ${ohm(z)} in parallel`; }
+    else if (v.wiring === "series") { total = z * n; desc = `${n} × ${ohm(z)} in series`; }
+    else {
+      if (n < 2 || n % 2) return clear("Series-parallel wiring needs an even number of speakers (2, 4, 6 …).");
+      total = (2 * z) / (n / 2);                              // pairs of 2z, n/2 pairs in parallel
+      desc = `${n / 2} series pair${n === 2 ? "" : "s"} in parallel`;
+    }
+    power = v.watts > 0 ? `${w(v.watts / n)} each` : "—";
+  } else {
+    const zs = String(v.list).split(/[\s,;]+/).map(parseFloat).filter((x) => x > 0);
+    if (!zs.length) return clear("Enter at least one impedance, like 8, 8, 4.");
+    const sumInv = zs.reduce((s, z) => s + 1 / z, 0);
+    total = 1 / sumInv;
+    desc = `${zs.length} speakers in parallel`;
+    power = v.watts > 0 ? zs.map((z) => `${Calc.num(z, 2)} Ω: ${w(v.watts * (1 / z) / sumInv)}`).join(" · ") : "—";
+  }
+
+  out.set("total", ohm(total));
+  out.set("desc", desc);
+  const tol = 1e-9;
+  if (!(v.minLoad > 0)) out.set("check", "Enter the amp's minimum");
+  else if (total < v.minLoad - tol) out.set("check", `Too low: below ${ohm(v.minLoad)}`, "neg");
+  else if (Math.abs(total - v.minLoad) <= tol) out.set("check", `OK: equals the ${ohm(v.minLoad)} minimum`, "pos");
+  else out.set("check", `OK: above the ${ohm(v.minLoad)} minimum`, "pos");
+  out.set("power", power);
+
+  if (v.minLoad > 0 && total < v.minLoad - tol) out.note("This load could overheat the amplifier or trip its protection. Rewire in series or series-parallel, or use speakers with a higher impedance.");
+  else if (v.minLoad > 0 && total >= v.minLoad * 2) out.note("Safe, but a solid-state amp makes noticeably less power into a load this much higher than its rating, often around half when the impedance doubles.");
+  else out.note("Power per speaker assumes the amp delivers the wattage you entered into this total load. Nominal impedances are approximate; a speaker's real impedance varies with frequency.");
+}));
+</script>
+<!-- article -->
+<h2>How speaker wiring changes impedance</h2>
+<p>Impedance is the load a speaker presents to the amplifier, measured in ohms (Ω). Wiring speakers together changes
+the total load. <strong>Series</strong> wiring (positive of one speaker to negative of the next) adds the impedances.
+<strong>Parallel</strong> wiring (all positives together, all negatives together) lowers it.
+<strong>Series-parallel</strong> combines both to keep the total near one speaker's rating while driving more speakers.</p>
+<p>The amp's minimum load is the lowest impedance it's designed to drive, often 4 or 8 Ω for home and guitar amps,
+and sometimes 2 Ω for car amps. Go below it and the amp works harder than it should.</p>
+
+<h2>The formula</h2>
+<div class="formula">series: Z = Z1 + Z2 + … (identical: Z × N)<br>
+parallel: 1 ÷ Z = 1 ÷ Z1 + 1 ÷ Z2 + … (identical: Z ÷ N)<br>
+series-parallel pairs: Z = 2 × Zspeaker ÷ (N ÷ 2)<br>
+power to speaker i in parallel = P × (1 ÷ Zi) ÷ Σ(1 ÷ Z)</div>
+
+<h2>Example: two 8 Ω speakers in parallel</h2>
+<p>You connect two 8 Ω cabinets in parallel to an amp rated at 100 W into a 4 Ω minimum load.</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Total: 8 ÷ 2</td><td><strong>4 Ω</strong></td></tr>
+  <tr><td>Check against 4 Ω minimum</td><td>OK: equals the minimum</td></tr>
+  <tr><td>Power per speaker: 100 W ÷ 2</td><td>50 W each</td></tr>
+</table>
+
+<h2>Common setups</h2>
+<table>
+  <tr><th>Speakers</th><th>Series</th><th>Parallel</th><th>Series-parallel</th></tr>
+  <tr><td>2 × 8 Ω</td><td>16 Ω</td><td>4 Ω</td><td>16 Ω (one pair)</td></tr>
+  <tr><td>2 × 4 Ω</td><td>8 Ω</td><td>2 Ω</td><td>8 Ω (one pair)</td></tr>
+  <tr><td>4 × 8 Ω</td><td>32 Ω</td><td>2 Ω</td><td>8 Ω</td></tr>
+  <tr><td>4 × 16 Ω</td><td>64 Ω</td><td>4 Ω</td><td>16 Ω</td></tr>
+</table>
+
+<h2>Tips</h2>
+<ul>
+  <li><strong>Never go below the minimum.</strong> Equal to it is fine; higher is safe but quieter on solid-state amps.</li>
+  <li><strong>Match the tap on tube amps.</strong> Set the output selector to the total impedance and never run a tube amp without a load.</li>
+  <li><strong>Mind the power ratings.</strong> Each speaker should handle at least its share of the amp's power, with some headroom.</li>
+  <li><strong>Keep polarity consistent.</strong> Reversing one speaker's wires makes it cancel the others and thins the bass.</li>
+</ul>

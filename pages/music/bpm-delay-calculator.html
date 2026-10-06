@@ -1,0 +1,145 @@
+---
+{
+  "title": "BPM to Delay Time Calculator: Note Lengths in ms & Hz",
+  "description": "Convert BPM to delay and reverb times in milliseconds and hertz for whole to 32nd notes, straight, dotted and triplet. Or turn a delay time back into BPM.",
+  "h1": "BPM to Delay Time Calculator",
+  "short": "BPM to Delay (ms)",
+  "intro": "Enter your song's tempo to get tempo-synced delay, reverb pre-delay and LFO times for every common note value, straight, dotted and triplet. Already have a delay time? Switch modes to find the BPM.",
+  "updated": "October 2026",
+  "related": ["tap-tempo-bpm-calculator", "song-length-calculator", "note-frequency-calculator", "audio-file-size-calculator"],
+  "faq": [
+    {"q": "How do I calculate delay time from BPM?", "a": "Divide 60,000 by the BPM to get one quarter note in milliseconds. At 120 BPM that's 500 ms. Halve it for an eighth note (250 ms), double it for a half note (1,000 ms), multiply by 1.5 for dotted notes and by 2/3 for triplets."},
+    {"q": "What is a dotted eighth delay?", "a": "A dotted eighth note is three sixteenths long, or 0.75 of a quarter note. At 120 BPM it's 375 ms. Set against straight eighth-note playing, the repeats fall between your notes, which creates the rhythmic, cascading guitar delay sound heard in a lot of rock and worship music."},
+    {"q": "Why convert note lengths to Hz?", "a": "Hertz is cycles per second, which is how many tremolo, auto-pan, filter or chorus LFOs set their rate. Hz = 1,000 ÷ milliseconds, so a quarter note at 120 BPM is 2 Hz: the LFO completes two full cycles every second, one per beat."},
+    {"q": "How do I set reverb pre-delay to the tempo?", "a": "Pick a short note value, often a 1/32 or 1/64 note, so the reverb starts just after the dry sound in time with the groove. At 120 BPM a 1/32 note is 62.5 ms. Some engineers also time the reverb's decay to end around a half or whole note so the tail clears before the next phrase."},
+    {"q": "How do I find the BPM of a delay time?", "a": "Divide 60,000 by the delay in milliseconds to get the BPM if that delay is a quarter note. If it's an eighth note, divide 30,000 instead; for a dotted eighth, divide 45,000. Use the delay time mode above and pick the note value."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="mode">I know the</label>
+        <select id="mode" name="mode">
+          <option value="bpm">Tempo (BPM)</option>
+          <option value="ms">Delay time (ms)</option>
+        </select>
+      </div>
+      <div class="field" data-show="bpmIn">
+        <label for="bpm">Tempo</label>
+        <div class="input"><input id="bpm" name="bpm" type="number" min="1" step="0.1" value="120" inputmode="decimal"><span class="unit">BPM</span></div>
+      </div>
+      <div class="row2" data-show="msIn" hidden>
+        <div class="field">
+          <label for="ms">Delay time</label>
+          <div class="input"><input id="ms" name="ms" type="number" min="1" step="0.1" value="500" inputmode="decimal"><span class="unit">ms</span></div>
+        </div>
+        <div class="field">
+          <label for="note">That delay is a</label>
+          <select id="note" name="note">
+            <option value="whole">Whole note</option>
+            <option value="half">Half note</option>
+            <option value="quarter" selected>Quarter note</option>
+            <option value="dotted8">Dotted eighth</option>
+            <option value="eighth">Eighth note</option>
+            <option value="triplet8">Eighth triplet</option>
+            <option value="sixteenth">Sixteenth note</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Quarter note</span><b data-out="quarter">—</b></div>
+    <div class="result"><span>Tempo</span><b data-out="tempo">—</b></div>
+    <div class="result"><span>Quarter note rate</span><b data-out="qhz">—</b></div>
+    <div class="result"><span>Dotted eighth</span><b data-out="dotted8">—</b></div>
+    <div class="result"><span>One bar of 4/4</span><b data-out="bar">—</b></div>
+    <div class="bpm-table-wrap" data-table></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<style>
+.bpm-table-wrap { margin-top: 10px; overflow-x: auto; }
+.bpm-table-wrap .cap { font-size: 12.5px; color: var(--muted); margin: 0 0 4px; }
+.bpm-table { width: 100%; border-collapse: collapse; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+.bpm-table th, .bpm-table td { padding: 5px 4px; text-align: right; border-bottom: 1px dashed color-mix(in srgb, var(--muted) 30%, transparent); }
+.bpm-table th { font-size: 12px; color: var(--muted); font-weight: 600; }
+.bpm-table th:first-child, .bpm-table td:first-child { text-align: left; font-weight: 600; }
+.bpm-table tr:last-child td { border-bottom: 0; }
+.bpm-table small { display: block; color: var(--muted); font-size: 11.5px; }
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  // Note lengths measured in quarter notes.
+  const ROWS = [["1/1", 4], ["1/2", 2], ["1/4", 1], ["1/8", 0.5], ["1/16", 0.25], ["1/32", 0.125]];
+  const REV = { whole: 4, half: 2, quarter: 1, dotted8: 0.75, eighth: 0.5, triplet8: 1 / 3, sixteenth: 0.25 };
+  const rev = v.mode === "ms";
+  out.show("bpmIn", !rev);
+  out.show("msIn", rev);
+  const bpm = rev ? (v.ms > 0 ? 60000 * REV[v.note] / v.ms : 0) : v.bpm;
+  const wrap = document.querySelector("[data-table]");
+  if (!(bpm > 0)) {
+    ["quarter", "tempo", "qhz", "dotted8", "bar"].forEach((k) => out.set(k, "—"));
+    wrap.innerHTML = "";
+    out.note("Enter a tempo or delay time above zero.");
+    return;
+  }
+  const q = 60000 / bpm;                                   // quarter note in ms
+  const ms = (x) => Calc.num(x, x < 100 ? 2 : 1);
+  const hz = (x) => Calc.num(1000 / x, 2);
+  out.set("quarter", ms(q) + " ms");
+  out.set("tempo", Calc.num(bpm, 2) + " BPM");
+  out.set("qhz", Calc.num(1000 / q, 3) + " Hz");
+  out.set("dotted8", ms(q * 0.75) + " ms");
+  out.set("bar", ms(q * 4) + " ms");
+
+  const cell = (t) => `<td>${ms(t)}<small>${hz(t)}</small></td>`;
+  let html = '<p class="cap">Milliseconds, with Hz underneath</p><table class="bpm-table"><thead><tr><th>Note</th><th>Straight</th><th>Dotted</th><th>Triplet</th></tr></thead><tbody>';
+  for (const [name, len] of ROWS) {
+    const t = q * len;
+    html += `<tr><td>${name}</td>${cell(t)}${cell(t * 1.5)}${cell(t * 2 / 3)}</tr>`;
+  }
+  wrap.innerHTML = html + "</tbody></table>";
+  out.note("Dotted = 1.5 × the straight time, triplet = 2/3 of it. Use Hz for LFO, tremolo and auto-pan rates.");
+}));
+</script>
+<!-- article -->
+<h2>Why sync delay and reverb to the tempo</h2>
+<p>A delay set to a note value of the song repeats in rhythm, so the echoes lock into the groove instead of
+blurring it. The same goes for reverb pre-delay and the rate of tremolo, auto-pan or filter LFOs. Most plugins
+have a sync button, but hardware pedals, older units and some reverbs still want a number in milliseconds or
+hertz. That's what this table gives you.</p>
+
+<h2>The formula</h2>
+<div class="formula">quarter note (ms) = 60,000 ÷ BPM<br>
+note (ms) = quarter note × length in quarter notes (whole = 4, eighth = 0.5 …)<br>
+dotted = note × 1.5 &nbsp; · &nbsp; triplet = note × 2/3<br>
+rate (Hz) = 1,000 ÷ note (ms)<br>
+BPM from a delay = 60,000 × length in quarter notes ÷ delay (ms)</div>
+<p>There are 60,000 milliseconds in a minute, and BPM counts quarter-note beats per minute, so dividing one by the
+other gives the length of one beat.</p>
+
+<h2>Example: a song at 120 BPM</h2>
+<p>At 120 BPM a quarter note is 60,000 ÷ 120 = 500 ms, a dotted eighth is 375 ms and one bar of 4/4 is 2,000 ms.
+Here is the full set of note lengths in milliseconds:</p>
+<table>
+  <tr><th>Note</th><th>Straight</th><th>Dotted</th><th>Triplet</th></tr>
+  <tr><td>1/1 (whole)</td><td>2,000</td><td>3,000</td><td>1,333.3</td></tr>
+  <tr><td>1/2 (half)</td><td>1,000</td><td>1,500</td><td>666.7</td></tr>
+  <tr><td>1/4 (quarter)</td><td><strong>500</strong></td><td>750</td><td>333.3</td></tr>
+  <tr><td>1/8 (eighth)</td><td>250</td><td>375</td><td>166.7</td></tr>
+  <tr><td>1/16 (sixteenth)</td><td>125</td><td>187.5</td><td>83.33</td></tr>
+  <tr><td>1/32 (thirty-second)</td><td>62.5</td><td>93.75</td><td>41.67</td></tr>
+</table>
+<p>In hertz, the quarter note is 1,000 ÷ 500 = 2 Hz and the eighth note is 4 Hz.</p>
+
+<h2>Tips for tempo-synced effects</h2>
+<ul>
+  <li><strong>Dotted eighth for guitar.</strong> Play straight eighths against a dotted-eighth delay and the repeats fill the gaps between your notes.</li>
+  <li><strong>Quarter or eighth for vocals.</strong> A quarter-note slapback-style repeat, mixed low and filtered, adds depth without cluttering the lyric.</li>
+  <li><strong>Short pre-delay keeps vocals clear.</strong> A 1/32 or 1/64 note of pre-delay lets the dry word speak before the reverb arrives.</li>
+  <li><strong>Round to taste.</strong> A millisecond or two either way is inaudible; set the time slightly shorter if the repeats feel like they drag.</li>
+</ul>

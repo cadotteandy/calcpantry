@@ -1,0 +1,167 @@
+---
+{
+  "title": "Song Length Calculator: Bars & BPM to Minutes and Seconds",
+  "description": "Work out how long a song or section lasts from its tempo, time signature and number of bars, or how many bars you need to fill a target length like 3:30.",
+  "h1": "Song Length Calculator",
+  "short": "Song Length (Bars ↔ Time)",
+  "intro": "Enter the tempo, time signature and number of bars to get the length in minutes and seconds. Or enter a target length and find how many bars fit.",
+  "updated": "October 2026",
+  "related": ["bpm-delay-calculator", "tap-tempo-bpm-calculator", "audio-file-size-calculator", "streaming-royalty-calculator"],
+  "faq": [
+    {"q": "How do you calculate the length of a song from BPM?", "a": "Multiply the number of bars by the beats in each bar to get the total beats, then divide by the BPM to get minutes. 64 bars of 4/4 at 120 BPM is 256 beats ÷ 120 = 2.13 minutes, or 2:08."},
+    {"q": "How many bars is a 3 minute song?", "a": "It depends on the tempo. In 4/4 at 120 BPM each bar lasts 2 seconds, so 3 minutes is 90 bars. At 100 BPM a bar is 2.4 seconds and 3 minutes is 75 bars. Use the length-to-bars mode for your tempo."},
+    {"q": "How does BPM work in 6/8 time?", "a": "It depends on what the tempo counts. Most DAWs measure tempo in quarter notes by default, so a bar of 6/8 lasts three quarter notes. Musicians often count 6/8 in two dotted-quarter beats per bar, and some scores count every eighth note. Choose the option that matches how your tempo is written; the calculator converts the bar length for you."},
+    {"q": "How long is a bar of music?", "a": "In 4/4, a bar lasts 240 ÷ BPM seconds: 2 seconds at 120 BPM, 2.4 seconds at 100 BPM and 1.6 seconds at 150 BPM. In 3/4 it's three quarters of that."},
+    {"q": "What length should a song be for radio or streaming?", "a": "Most popular songs run about 2:30 to 4:00. Streaming has pushed many songs shorter; Spotify, for example, counts a stream after 30 seconds of listening, however long the track is. Radio edits are often trimmed to under about 3:30."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="mode">I want to find</label>
+        <select id="mode" name="mode">
+          <option value="time">Length from number of bars</option>
+          <option value="bars">Bars needed for a length</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="bpm">Tempo</label>
+        <div class="input"><input id="bpm" name="bpm" type="number" min="1" step="0.1" value="120" inputmode="decimal"><span class="unit">BPM</span></div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="top">Beats per bar (top)</label>
+          <input id="top" name="top" type="number" min="1" max="32" step="1" value="4" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="bottom">Beat unit (bottom)</label>
+          <select id="bottom" name="bottom">
+            <option value="2">2 (half note)</option>
+            <option value="4" selected>4 (quarter note)</option>
+            <option value="8">8 (eighth note)</option>
+            <option value="16">16 (sixteenth)</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="counts">The BPM counts</label>
+        <select id="counts" name="counts">
+          <option value="q">Quarter notes (DAW default)</option>
+          <option value="den">The bottom-number note (e.g. eighths in 6/8)</option>
+          <option value="dq">Dotted quarters (e.g. 2 per bar in 6/8)</option>
+        </select>
+        <div class="hint">Only matters when the bottom number isn't 4.</div>
+      </div>
+      <div class="field" data-show="barsIn">
+        <label for="bars">Number of bars</label>
+        <input id="bars" name="bars" type="number" min="0" step="1" value="64" inputmode="numeric">
+      </div>
+      <div class="row2" data-show="timeIn" hidden>
+        <div class="field">
+          <label for="min">Target minutes</label>
+          <input id="min" name="min" type="number" min="0" step="1" value="3" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="sec">Seconds</label>
+          <input id="sec" name="sec" type="number" min="0" max="59" step="1" value="30" inputmode="numeric">
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="bigLabel">Length</span><b data-out="big">—</b></div>
+    <div class="result" data-show="roundRows" hidden><span>Round down</span><b data-out="down">—</b></div>
+    <div class="result" data-show="roundRows" hidden><span>Round up</span><b data-out="up">—</b></div>
+    <div class="result"><span>Seconds per bar</span><b data-out="perBar">—</b></div>
+    <div class="result"><span>Beats per bar (as counted)</span><b data-out="beatsBar">—</b></div>
+    <div class="result"><span>Total beats</span><b data-out="beats">—</b></div>
+    <div class="result"><span>Total seconds</span><b data-out="secs">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const findBars = v.mode === "bars";
+  out.show("barsIn", !findBars);
+  out.show("timeIn", findBars);
+  out.show("roundRows", false);
+  const top = Math.round(v.top), bottom = parseInt(v.bottom, 10);
+  const keys = ["big", "perBar", "beatsBar", "beats", "secs"];
+  if (!(v.bpm > 0) || !(top > 0)) {
+    keys.forEach((k) => out.set(k, "—"));
+    out.note("Enter a tempo and beats per bar above zero.");
+    return;
+  }
+  const quartersPerBar = top * 4 / bottom;                 // bar length in quarter notes
+  const beatInQuarters = { q: 1, den: 4 / bottom, dq: 1.5 }[v.counts];
+  const beatsPerBar = quartersPerBar / beatInQuarters;     // in the unit the BPM counts
+  const secPerBar = beatsPerBar * 60 / v.bpm;
+  const clock = (s) => {
+    const r = Math.round(s), h = Math.floor(r / 3600), m = Math.floor(r % 3600 / 60), ss = String(r % 60).padStart(2, "0");
+    return h ? `${h}:${String(m).padStart(2, "0")}:${ss}` : `${m}:${ss}`;
+  };
+  out.set("perBar", Calc.num(secPerBar, 3) + " s");
+  out.set("beatsBar", Calc.num(beatsPerBar, 2));
+
+  let bars, secs;
+  if (!findBars) {
+    bars = Math.max(0, v.bars);
+    secs = bars * secPerBar;
+    out.set("bigLabel", "Length");
+    out.set("big", clock(secs));
+  } else {
+    secs = Math.max(0, v.min * 60 + v.sec);
+    bars = secs / secPerBar;
+    out.set("bigLabel", "Bars needed");
+    const whole = Math.abs(bars - Math.round(bars)) < 1e-9;
+    out.set("big", whole ? `${Calc.num(Math.round(bars), 0)} bars` : `${Calc.num(bars, 2)} bars`);
+    if (!whole) {
+      out.show("roundRows", true);
+      const lo = Math.floor(bars), hi = Math.ceil(bars);
+      out.set("down", `${lo} bars = ${clock(lo * secPerBar)}`);
+      out.set("up", `${hi} bars = ${clock(hi * secPerBar)}`);
+    }
+  }
+  out.set("beats", Calc.num(bars * beatsPerBar, 2));
+  out.set("secs", Calc.num(secs, 2) + " s");
+  if (bottom !== 4 && v.counts === "q") out.note(`A bar of ${top}/${bottom} lasts ${Calc.num(quartersPerBar, 3)} quarter notes, so at ${Calc.num(v.bpm, 1)} quarter-note BPM each bar is ${Calc.num(secPerBar, 3)} seconds.`);
+  else if (v.counts === "dq" && bottom !== 8) out.note("Dotted-quarter tempos are normally used for compound meters like 6/8, 9/8 and 12/8.");
+  else if (!findBars) out.note("Times are rounded to the nearest second. Tempo changes, pauses and fades aren't included.");
+}));
+</script>
+<!-- article -->
+<h2>How song length is worked out</h2>
+<p>Tempo tells you how many beats pass each minute, and the time signature tells you how many beats are in a bar.
+Multiply bars by beats per bar to get the total beats, divide by the BPM, and you have the length in minutes. It's
+handy for planning arrangements, cutting a track to fit a video or ad slot, or checking how long an intro really is.</p>
+<p>The one thing to watch is what your BPM counts. In 4/4 and 3/4 it's always the quarter note. In meters like 6/8
+it varies: most DAWs keep counting quarter notes by default (a 6/8 bar is three quarter notes long), musicians often
+feel two dotted-quarter beats per bar, and some charts count every eighth note. Pick the option that matches your tempo.</p>
+
+<h2>The formula</h2>
+<div class="formula">bar length in quarter notes = top × 4 ÷ bottom<br>
+beats per bar = bar length ÷ length of the counted beat (quarter = 1, dotted quarter = 1.5, eighth = 0.5)<br>
+seconds per bar = beats per bar × 60 ÷ BPM<br>
+length (s) = bars × seconds per bar &nbsp; · &nbsp; bars = length (s) ÷ seconds per bar</div>
+
+<h2>Example: 64 bars of 4/4 at 120 BPM</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Beats per bar</td><td>4</td></tr>
+  <tr><td>Seconds per bar: 4 × 60 ÷ 120</td><td>2 s</td></tr>
+  <tr><td>Total beats: 64 × 4</td><td>256</td></tr>
+  <tr><td>Total seconds: 64 × 2</td><td>128 s</td></tr>
+  <tr><td>Length</td><td><strong>2:08</strong></td></tr>
+</table>
+<p>Going the other way at the same tempo, a 3:30 target is 210 ÷ 2 = 105 bars.</p>
+
+<h2>Tips for arranging to a length</h2>
+<ul>
+  <li><strong>Think in 4- and 8-bar phrases.</strong> If you need 105 bars, an extra bar of silence or a 4-bar tag usually sounds better than an odd phrase.</li>
+  <li><strong>Leave room for the tail.</strong> Reverb and delay ring past the last bar; allow a second or two before a hard cut.</li>
+  <li><strong>Fit to picture by nudging tempo.</strong> Small tempo changes of 1 to 2 BPM rarely feel different but can shift the end by several seconds.</li>
+  <li><strong>Check DAW settings</strong> for compound meters; if the arrangement runs long or short by a factor of 1.5 or 2, the BPM is counting a different note.</li>
+</ul>

@@ -1,0 +1,157 @@
+---
+{
+  "title": "Tap Tempo BPM Calculator: Find the Tempo of Any Song",
+  "description": "Tap along to a song to find its BPM, with half-time and double-time readings. Or count beats over a few seconds and convert them to beats per minute.",
+  "h1": "Tap Tempo BPM Calculator",
+  "short": "Tap Tempo (BPM)",
+  "intro": "Tap the button in time with the beat and the BPM appears after two taps, getting more accurate as you keep going. No mouse handy? Count beats against a clock and use the manual calculator below.",
+  "updated": "October 2026",
+  "related": ["bpm-delay-calculator", "song-length-calculator", "note-frequency-calculator", "capo-transpose-calculator"],
+  "faq": [
+    {"q": "How does tap tempo work?", "a": "Every time you tap, the calculator records the time. It averages the gaps between your last eight or so taps and converts that average to beats per minute: BPM = 60,000 ÷ average gap in milliseconds. Pause for two seconds and it starts a fresh count on your next tap."},
+    {"q": "How many times should I tap?", "a": "Two taps give a rough reading; eight or more steady taps give a reliable one. Tap on every beat, usually the kick and snare pulse, and keep going until the number settles."},
+    {"q": "Why does the BPM show half or double what I expected?", "a": "Tempo is ambiguous: a song can feel like 70 BPM or 140 BPM depending on whether you count the snare or the hi-hat. That's why half-time and double-time readings are shown. Genres have conventions; drum and bass is usually counted around 170 BPM, not 85."},
+    {"q": "How do I find BPM without tapping?", "a": "Count the beats you hear in 15 seconds and multiply by 4, or count for 30 seconds and multiply by 2. The manual calculator does this for any count and time span. Counting for longer gives a more accurate result."},
+    {"q": "What BPM are most songs?", "a": "Most pop and rock sits between about 90 and 130 BPM. Hip-hop is often 80 to 100, house around 120 to 128, and drum and bass around 160 to 180. Ballads can drop below 70."}
+  ]
+}
+---
+<div class="tap-box">
+  <button type="button" id="tap" class="tap-btn" aria-describedby="tapSub">Tap</button>
+  <div class="tap-read" aria-live="polite">
+    <div class="tap-label">Tapped tempo</div>
+    <div class="tap-bpm"><span id="tapBpm">—</span> <small>BPM</small></div>
+    <div class="tap-stats">Half time <b id="tapHalf">—</b> · Double time <b id="tapDouble">—</b> · Taps <b id="tapCount">0</b></div>
+    <p class="tap-sub" id="tapSub">Tap the button on every beat. You can also click it once, then press Space or Enter.</p>
+    <button type="button" id="tapReset" class="tap-reset">Reset</button>
+  </div>
+</div>
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <p class="hint" style="margin:0">Manual mode: count beats against a clock.</p>
+      <div class="row2">
+        <div class="field">
+          <label for="beats">Beats counted</label>
+          <input id="beats" name="beats" type="number" min="1" step="1" value="30" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="secs">In this many seconds</label>
+          <div class="input"><input id="secs" name="secs" type="number" min="1" step="1" value="15" inputmode="decimal"><span class="unit">sec</span></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Tempo</span><b data-out="bpm">—</b></div>
+    <div class="result"><span>Half time</span><b data-out="half">—</b></div>
+    <div class="result"><span>Double time</span><b data-out="double">—</b></div>
+    <div class="result"><span>Time between beats</span><b data-out="gap">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<style>
+.tap-box { display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 20px; align-items: center;
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+@media (max-width: 640px) { .tap-box { grid-template-columns: minmax(0, 1fr); text-align: center; } }
+.tap-btn { width: 100%; aspect-ratio: 1; max-width: 200px; margin: 0 auto; display: block; border-radius: 50%;
+  border: 0; background: var(--accent); color: var(--panel); font: 800 34px/1 system-ui, sans-serif; letter-spacing: .04em;
+  cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none; transition: transform .06s; }
+.tap-btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+.tap-btn.hit { transform: scale(.94); }
+.tap-label { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.tap-bpm { font-size: 48px; font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.tap-bpm small { font-size: 18px; color: var(--muted); font-weight: 600; }
+.tap-stats { font-size: 15px; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.tap-sub { font-size: 13.5px; color: var(--muted); margin: 8px 0; }
+.tap-reset { font: inherit; font-size: 14px; padding: 6px 14px; border: 1px solid var(--line); border-radius: 10px;
+  background: var(--bg); color: var(--ink); cursor: pointer; }
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const $ = (id) => document.getElementById(id);
+  const btn = $("tap"), MAX_TAPS = 9, TIMEOUT = 2000;     // 9 taps = 8 intervals averaged
+  let taps = [], timer = null;
+  const fmt = (n) => Calc.num(n, 1);
+  function render() {
+    const n = taps.length;
+    $("tapCount").textContent = String(n);
+    if (n < 2) {
+      ["tapBpm", "tapHalf", "tapDouble"].forEach((id) => { $(id).textContent = "—"; });
+      $("tapSub").textContent = n ? "Keep tapping on every beat…" : "Tap the button on every beat. You can also click it once, then press Space or Enter.";
+      return;
+    }
+    const bpm = 60000 / ((taps[n - 1] - taps[0]) / (n - 1));
+    $("tapBpm").textContent = fmt(bpm);
+    $("tapHalf").textContent = fmt(bpm / 2);
+    $("tapDouble").textContent = fmt(bpm * 2);
+    $("tapSub").textContent = n < MAX_TAPS ? "Keep going; the reading steadies after about eight taps." : "Averaging your last eight beats.";
+  }
+  function tap() {
+    const now = performance.now();
+    if (taps.length && now - taps[taps.length - 1] > TIMEOUT) taps = [];
+    taps.push(now);
+    if (taps.length > MAX_TAPS) taps.shift();
+    render();
+    btn.classList.add("hit");
+    setTimeout(() => btn.classList.remove("hit"), 80);
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      const had = taps.length > 1;
+      taps = [];
+      $("tapSub").textContent = had ? "Stopped. The last reading stays here; tap again to start a new count." : "Tap the button on every beat. You can also click it once, then press Space or Enter.";
+    }, TIMEOUT);
+  }
+  btn.addEventListener("pointerdown", (e) => { if (e.button === 0) tap(); });
+  btn.addEventListener("keydown", (e) => {
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); if (!e.repeat) tap(); }
+  });
+  $("tapReset").addEventListener("click", () => { clearTimeout(timer); taps = []; render(); });
+});
+
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  if (!(v.beats > 0) || !(v.secs > 0)) {
+    ["bpm", "half", "double", "gap"].forEach((k) => out.set(k, "—"));
+    out.note("Enter the number of beats and the seconds you counted for.");
+    return;
+  }
+  const bpm = v.beats * 60 / v.secs;
+  out.set("bpm", Calc.num(bpm, 1) + " BPM");
+  out.set("half", Calc.num(bpm / 2, 1) + " BPM");
+  out.set("double", Calc.num(bpm * 2, 1) + " BPM");
+  out.set("gap", Calc.num(60000 / bpm, 1) + " ms");
+  if (v.secs < 10) out.note("Counting for 15 seconds or more gives a more accurate tempo; one missed beat in 5 seconds shifts the result by 12 BPM.");
+}));
+</script>
+<!-- article -->
+<h2>How to find a song's BPM</h2>
+<p>Put the song on and tap the big button on every beat: usually the steady pulse you'd nod your head to, where the
+kick and snare land. After two taps you get a reading, and it settles as you keep tapping. The calculator averages
+the gaps between your last eight beats, so one early or late tap doesn't throw it off. Stop for two seconds and the
+next tap starts a new count.</p>
+<p>If you'd rather not tap, count beats while watching a clock and enter the count and the seconds in the manual
+calculator.</p>
+
+<h2>The formula</h2>
+<div class="formula">tap tempo: BPM = 60,000 ÷ average gap between taps (ms)<br>
+manual: BPM = beats counted × 60 ÷ seconds<br>
+half time = BPM ÷ 2 &nbsp; · &nbsp; double time = BPM × 2</div>
+
+<h2>Example: counting for 15 seconds</h2>
+<p>You count 30 beats in 15 seconds.</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Tempo: 30 × 60 ÷ 15</td><td><strong>120 BPM</strong></td></tr>
+  <tr><td>Half time: 120 ÷ 2</td><td>60 BPM</td></tr>
+  <tr><td>Double time: 120 × 2</td><td>240 BPM</td></tr>
+  <tr><td>Time between beats: 60,000 ÷ 120</td><td>500 ms</td></tr>
+</table>
+
+<h2>Tips for an accurate reading</h2>
+<ul>
+  <li><strong>Tap at least eight times.</strong> Human timing wobbles by a few milliseconds, and averaging more taps smooths that out.</li>
+  <li><strong>Lock onto the snare or kick,</strong> not the vocal, which often pushes ahead of or lags behind the beat.</li>
+  <li><strong>Check half and double time.</strong> If the reading feels too slow or too fast for the genre, the other one is probably what a DJ or DAW would call it.</li>
+  <li><strong>Watch for tempo changes.</strong> Live recordings drift; tap through a full chorus for a fair average, or reset and tap each section.</li>
+</ul>

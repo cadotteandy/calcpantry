@@ -1,0 +1,174 @@
+---
+{
+  "title": "Streaming Royalty Calculator: Spotify, Apple Music & More",
+  "description": "Estimate what your streams pay on Spotify, Apple Music, YouTube Music, Amazon Music and Tidal using typical per-stream averages, after your distributor's cut and band or label splits.",
+  "h1": "Streaming Royalty Calculator",
+  "short": "Streaming Royalties",
+  "intro": "Enter your streams on each platform. The calculator applies rough average per-stream payouts (which you can edit), takes off your distributor's cut, and shows your share after splitting with bandmates or a label.",
+  "updated": "October 2026",
+  "related": ["side-hustle-tax-calculator", "freelance-rate-calculator", "song-length-calculator", "hourly-to-salary-calculator"],
+  "faq": [
+    {"q": "How much does Spotify pay per stream?", "a": "Spotify doesn't pay a fixed rate per stream. It pays rights holders a share of its revenue in each market based on their share of total streams. Averaged out, industry analyses commonly put recorded-music payouts at roughly $0.003 to $0.005 per stream, but your figure depends on where your listeners are and whether they're on free or Premium plans."},
+    {"q": "How much do 1 million streams pay?", "a": "Using typical averages, 1 million Spotify streams generate somewhere around $3,000 to $5,000 in recorded royalties before your distributor, label and bandmates take their shares. The same streams on Apple Music would usually pay more, roughly $6,000 to $10,000, because its average per-stream payout is higher."},
+    {"q": "Which streaming service pays artists the most?", "a": "On a per-stream basis, Tidal and Apple Music are usually reported as paying more than Spotify, and YouTube Music less. But Spotify has far more listeners, so for most artists it still produces the most total income."},
+    {"q": "Do I get paid for songs with under 1,000 streams on Spotify?", "a": "Not for recorded royalties. Since early 2024, Spotify requires a track to reach at least 1,000 streams in the previous 12 months before it generates recorded-music royalties. Streams on tracks below that threshold earn nothing from Spotify for the recording."},
+    {"q": "Is this all the money a song earns from streaming?", "a": "No. These estimates cover the recording (master) royalties paid through your distributor or label. Songwriters and publishers also earn separate mechanical and performance royalties from streams, collected through organizations such as a performing rights organization, a publishing administrator or The MLC in the US."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="sp">Spotify streams</label>
+          <input id="sp" name="sp" type="number" min="0" step="1" value="100000" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="spR">Spotify $/stream</label>
+          <div class="input"><span class="unit pre">$</span><input id="spR" name="spR" type="number" min="0" step="0.0001" value="0.004" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="ap">Apple Music streams</label>
+          <input id="ap" name="ap" type="number" min="0" step="1" value="20000" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="apR">Apple $/stream</label>
+          <div class="input"><span class="unit pre">$</span><input id="apR" name="apR" type="number" min="0" step="0.0001" value="0.008" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="yt">YouTube Music streams</label>
+          <input id="yt" name="yt" type="number" min="0" step="1" value="10000" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="ytR">YouTube Music $/stream</label>
+          <div class="input"><span class="unit pre">$</span><input id="ytR" name="ytR" type="number" min="0" step="0.0001" value="0.002" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="am">Amazon Music streams</label>
+          <input id="am" name="am" type="number" min="0" step="1" value="10000" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="amR">Amazon $/stream</label>
+          <div class="input"><span class="unit pre">$</span><input id="amR" name="amR" type="number" min="0" step="0.0001" value="0.004" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="ti">Tidal streams</label>
+          <input id="ti" name="ti" type="number" min="0" step="1" value="2000" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="tiR">Tidal $/stream</label>
+          <div class="input"><span class="unit pre">$</span><input id="tiR" name="tiR" type="number" min="0" step="0.0001" value="0.01" inputmode="decimal"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="dist">Distributor's cut</label>
+          <div class="input"><input id="dist" name="dist" type="number" min="0" max="100" step="1" value="10" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+        <div class="field">
+          <label for="share">Your share</label>
+          <div class="input"><input id="share" name="share" type="number" min="0" max="100" step="1" value="25" inputmode="decimal"><span class="unit">%</span></div>
+        </div>
+      </div>
+      <div class="hint">Rates are rough averages; edit them if you know your own. Your share: e.g. 25% for an even four-way band split, or your percentage under a label deal.</div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Estimated payout</h2>
+    <div class="result big"><span>Your share</span><b data-out="mine">—</b></div>
+    <div class="result"><span>Spotify</span><b data-out="spOut">—</b></div>
+    <div class="result"><span>Apple Music</span><b data-out="apOut">—</b></div>
+    <div class="result"><span>YouTube Music</span><b data-out="ytOut">—</b></div>
+    <div class="result"><span>Amazon Music</span><b data-out="amOut">—</b></div>
+    <div class="result"><span>Tidal</span><b data-out="tiOut">—</b></div>
+    <div class="result"><span>Total before cuts</span><b data-out="gross">—</b></div>
+    <div class="result"><span>Distributor keeps</span><b data-out="distOut">—</b></div>
+    <div class="result"><span>After distributor (all rights holders)</span><b data-out="net">—</b></div>
+    <div class="result"><span>Blended rate per stream</span><b data-out="blend">—</b></div>
+    <div class="result"><span>Streams for $1,000 to you</span><b data-out="per1k">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const P = ["sp", "ap", "yt", "am", "ti"];
+  let gross = 0, streams = 0;
+  for (const k of P) {
+    const s = Math.max(0, v[k]), r = Math.max(0, v[k + "R"]), earned = s * r;
+    gross += earned; streams += s;
+    out.set(k + "Out", Calc.money(earned));
+  }
+  const dist = Math.min(100, Math.max(0, v.dist)) / 100, share = Math.min(100, Math.max(0, v.share)) / 100;
+  const net = gross * (1 - dist), mine = net * share;
+  out.set("gross", Calc.money(gross));
+  out.set("distOut", Calc.money(gross * dist));
+  out.set("net", Calc.money(net));
+  out.set("mine", Calc.money(mine));
+  out.set("blend", streams > 0 ? "$" + Calc.num(gross / streams, 5) : "—");
+  const perStreamToYou = streams > 0 ? mine / streams : 0;
+  out.set("per1k", perStreamToYou > 0 ? Calc.num(Math.ceil(1000 / perStreamToYou), 0) : "—");
+  if (v.sp > 0 && v.sp < 1000) out.note("Spotify only pays recorded royalties on tracks with at least 1,000 streams in the past 12 months, so a track below that would earn $0 from Spotify.");
+  else out.note("Estimates only. Platforms don't pay a fixed rate per stream; real payouts vary by listener country, free vs. paid plans and your deal. Songwriting royalties are separate.");
+}));
+</script>
+<!-- article -->
+<h2>How streaming royalties really work</h2>
+<p>No streaming service pays a set amount per play. Most use a pro-rata model: each month, in each country, they put
+a share of their subscription and ad revenue into a pool and divide it among rights holders according to their
+share of all streams. Your effective per-stream rate therefore moves with where your fans live, how many are paying
+subscribers, the exchange rate and your contract. The money flows to the owner of the recording, usually via a
+distributor or label, who then pays you.</p>
+<p>That's why this calculator uses <strong>rough averages</strong> drawn from the per-stream figures widely reported in
+2024–2025 industry analyses. Treat the results as a ballpark, and replace the rates with numbers from your own
+distributor statements once you have them.</p>
+
+<h2>The formula</h2>
+<div class="formula">platform payout = streams × average $ per stream<br>
+gross = sum of all platforms<br>
+after distributor = gross × (1 − distributor %)<br>
+your share = after distributor × your %</div>
+
+<h2>Example: a small independent release</h2>
+<p>A four-piece band splits everything evenly (25% each) and uses a distributor that takes 10%.</p>
+<table>
+  <tr><th>Platform</th><th>Streams</th><th>Est. $/stream</th><th>Payout</th></tr>
+  <tr><td>Spotify</td><td>100,000</td><td>$0.004</td><td>$400.00</td></tr>
+  <tr><td>Apple Music</td><td>20,000</td><td>$0.008</td><td>$160.00</td></tr>
+  <tr><td>YouTube Music</td><td>10,000</td><td>$0.002</td><td>$20.00</td></tr>
+  <tr><td>Amazon Music</td><td>10,000</td><td>$0.004</td><td>$40.00</td></tr>
+  <tr><td>Tidal</td><td>2,000</td><td>$0.01</td><td>$20.00</td></tr>
+  <tr><td><strong>Total</strong></td><td>142,000</td><td>$0.00451 blended</td><td><strong>$640.00</strong></td></tr>
+  <tr><td>Distributor 10%</td><td></td><td></td><td>−$64.00</td></tr>
+  <tr><td>After distributor</td><td></td><td></td><td>$576.00</td></tr>
+  <tr><td>Each member's 25%</td><td></td><td></td><td><strong>$144.00</strong></td></tr>
+</table>
+<p>At that blend, each member needs about 986,112 total streams to earn $1,000.</p>
+
+<h2>Typical per-stream ranges</h2>
+<table>
+  <tr><th>Platform</th><th>Commonly reported average</th><th>Default used</th></tr>
+  <tr><td>Spotify</td><td>about $0.003–$0.005</td><td>$0.004</td></tr>
+  <tr><td>Apple Music</td><td>about $0.006–$0.01</td><td>$0.008</td></tr>
+  <tr><td>Amazon Music</td><td>about $0.004</td><td>$0.004</td></tr>
+  <tr><td>YouTube Music</td><td>about $0.002</td><td>$0.002</td></tr>
+  <tr><td>Tidal</td><td>about $0.01</td><td>$0.01</td></tr>
+</table>
+<p>These are estimates, not published rates. Streams from free tiers and lower-income countries pay less;
+streams from paid subscribers in the US, UK and Western Europe usually pay more.</p>
+
+<h2>Tips</h2>
+<ul>
+  <li><strong>Check the Spotify threshold.</strong> Since 2024, a track needs at least 1,000 streams in the past 12 months to earn recorded royalties on Spotify.</li>
+  <li><strong>Register your songs too.</strong> If you write your own music, sign up with a performing rights organization and a publishing administrator to collect songwriting royalties, which this calculator doesn't include.</li>
+  <li><strong>Compare distributor models.</strong> Some charge a yearly fee and keep 0% of royalties; others charge nothing upfront but take a percentage. The better deal depends on how much you earn.</li>
+  <li><strong>Agree on splits in writing</strong> before release, including who owns the master and how producers and featured artists are paid.</li>
+</ul>

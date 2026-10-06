@@ -1,0 +1,171 @@
+---
+{
+  "title": "Audio File Size Calculator: WAV, AIFF, MP3 & AAC",
+  "description": "Calculate the size of a WAV or AIFF file from sample rate, bit depth, channels and length, or of an MP3 or AAC file from its bitrate. Results in MB, GB and MiB.",
+  "h1": "Audio File Size Calculator",
+  "short": "Audio File Size",
+  "intro": "Choose uncompressed (WAV/AIFF) or compressed (MP3/AAC), enter the length and format details, and see how much space the audio takes up, for one file or a whole multitrack session.",
+  "updated": "October 2026",
+  "related": ["song-length-calculator", "bpm-delay-calculator", "download-time-calculator", "streaming-royalty-calculator"],
+  "faq": [
+    {"q": "How big is a 3 minute WAV file?", "a": "At CD quality (44.1 kHz, 16-bit, stereo), audio takes about 10.58 MB per minute, so 3 minutes is about 31.75 MB. At 48 kHz and 24-bit stereo it's about 17.28 MB per minute, or 51.84 MB for 3 minutes."},
+    {"q": "How do you calculate WAV file size?", "a": "Multiply the sample rate by the bit depth divided by 8, by the number of channels, and by the length in seconds. That gives bytes. 44,100 × 2 bytes × 2 channels × 60 seconds = 10,584,000 bytes, about 10.58 MB per minute. The file header adds only a few dozen bytes."},
+    {"q": "How big is a 320 kbps MP3?", "a": "320 kilobits per second is 40,000 bytes per second, or 2.4 MB per minute. A 4 minute song is about 9.6 MB. At 128 kbps the same song is about 3.84 MB."},
+    {"q": "What is the difference between MB and MiB?", "a": "A megabyte (MB) is 1,000,000 bytes; a mebibyte (MiB) is 1,048,576 bytes. Drive makers and macOS use MB; Windows File Explorer shows MiB but labels them MB, which is why the same file can look about 5% smaller there."},
+    {"q": "Is there a size limit for WAV files?", "a": "Standard WAV files store their size in a 32-bit field, so they top out at about 4 GiB, roughly 6.7 hours of CD-quality stereo or about 4.1 hours at 48 kHz, 24-bit stereo. For longer recordings, recorders and DAWs switch to formats such as RF64 or split the take into several files."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="mode">Format</label>
+        <select id="mode" name="mode">
+          <option value="pcm">Uncompressed (WAV / AIFF)</option>
+          <option value="lossy">Compressed (MP3 / AAC / Ogg)</option>
+        </select>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="min">Minutes</label>
+          <input id="min" name="min" type="number" min="0" step="1" value="3" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="sec">Seconds</label>
+          <input id="sec" name="sec" type="number" min="0" step="1" value="30" inputmode="numeric">
+        </div>
+      </div>
+      <div class="row2" data-show="pcmIn">
+        <div class="field">
+          <label for="rate">Sample rate</label>
+          <select id="rate" name="rate">
+            <option value="44100" selected>44.1 kHz (CD)</option>
+            <option value="48000">48 kHz (video)</option>
+            <option value="88200">88.2 kHz</option>
+            <option value="96000">96 kHz</option>
+            <option value="176400">176.4 kHz</option>
+            <option value="192000">192 kHz</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="bits">Bit depth</label>
+          <select id="bits" name="bits">
+            <option value="16" selected>16-bit</option>
+            <option value="24">24-bit</option>
+            <option value="32">32-bit</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" data-show="pcmIn">
+        <label for="ch">Channels</label>
+        <select id="ch" name="ch">
+          <option value="1">Mono (1)</option>
+          <option value="2" selected>Stereo (2)</option>
+          <option value="6">5.1 surround (6)</option>
+          <option value="8">7.1 surround (8)</option>
+        </select>
+      </div>
+      <div class="field" data-show="lossyIn" hidden>
+        <label for="kbps">Bitrate</label>
+        <div class="input"><input id="kbps" name="kbps" type="number" min="1" step="1" value="256" inputmode="numeric"><span class="unit">kbps</span></div>
+        <div class="hint">Common: 128, 192, 256, 320. For variable bitrate, use the average.</div>
+      </div>
+      <div class="field">
+        <label for="files">Number of files or tracks</label>
+        <input id="files" name="files" type="number" min="1" step="1" value="1" inputmode="numeric">
+        <div class="hint">For a multitrack session, enter how many tracks you record.</div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Total size</span><b data-out="size">—</b></div>
+    <div class="result"><span>In binary units</span><b data-out="sizeBin">—</b></div>
+    <div class="result" data-show="multi" hidden><span>Each file</span><b data-out="each">—</b></div>
+    <div class="result"><span>Bitrate</span><b data-out="kbpsOut">—</b></div>
+    <div class="result"><span>Per minute (each file)</span><b data-out="perMin">—</b></div>
+    <div class="result"><span>Bytes</span><b data-out="bytes">—</b></div>
+    <div class="result"><span data-out="cmpLabel">Compare</span><b data-out="cmp">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const pcm = v.mode === "pcm";
+  out.show("pcmIn", pcm);
+  out.show("lossyIn", !pcm);
+  const secs = Math.max(0, v.min) * 60 + Math.max(0, v.sec);
+  const files = Math.max(1, Math.round(v.files) || 1);
+  out.show("multi", files > 1);
+  const dec = (b) => (b >= 1e9 ? Calc.num(b / 1e9, 2) + " GB" : b >= 1e6 ? Calc.num(b / 1e6, 2) + " MB" : Calc.num(b / 1e3, 1) + " KB");
+  const bin = (b) => (b >= 2 ** 30 ? Calc.num(b / 2 ** 30, 2) + " GiB" : b >= 2 ** 20 ? Calc.num(b / 2 ** 20, 2) + " MiB" : Calc.num(b / 1024, 1) + " KiB");
+
+  // bytes per second for one file
+  const bps = pcm ? parseFloat(v.rate) * parseFloat(v.bits) / 8 * parseFloat(v.ch) : Math.max(0, v.kbps) * 1000 / 8;
+  if (!(secs > 0) || !(bps > 0)) {
+    ["size", "sizeBin", "each", "kbpsOut", "perMin", "bytes", "cmp"].forEach((k) => out.set(k, "—"));
+    out.note("Enter a length and bitrate above zero.");
+    return;
+  }
+  const each = bps * secs, total = each * files;
+  out.set("size", dec(total));
+  out.set("sizeBin", bin(total));
+  out.set("each", dec(each));
+  out.set("kbpsOut", Calc.num(bps * 8 / 1000, 1) + " kbps");
+  out.set("perMin", dec(bps * 60));
+  out.set("bytes", Calc.num(total, 0));
+  if (pcm) {
+    out.set("cmpLabel", "Same length as 320 kbps MP3");
+    out.set("cmp", dec(40000 * secs * files));
+  } else {
+    out.set("cmpLabel", "Same length as CD-quality WAV");
+    out.set("cmp", dec(176400 * secs * files));
+  }
+  if (pcm && each > 2 ** 32) out.note("Each file is over 4 GiB, the limit for standard WAV files. Use RF64/BWF-64 or split the recording.");
+  else if (pcm) out.note("Size of the audio data; the WAV or AIFF header adds only a few dozen bytes. MB = 1,000,000 bytes, MiB = 1,048,576.");
+  else out.note("Compressed sizes are close but not exact: containers add small headers, album art can add hundreds of KB, and variable bitrate files vary.");
+}));
+</script>
+<!-- article -->
+<h2>What sets an audio file's size</h2>
+<p>Uncompressed audio such as WAV and AIFF stores every sample. Its size depends only on how many samples there are
+per second (sample rate), how many bits each sample uses (bit depth), how many channels there are, and how long it
+runs. Compressed formats like MP3, AAC and Ogg Vorbis instead target a bitrate, so their size depends only on the
+bitrate and the length.</p>
+
+<h2>The formula</h2>
+<div class="formula">uncompressed bytes = sample rate × (bit depth ÷ 8) × channels × seconds<br>
+compressed bytes = kbps × 1,000 ÷ 8 × seconds<br>
+MB = bytes ÷ 1,000,000 &nbsp; · &nbsp; MiB = bytes ÷ 1,048,576<br>
+bitrate (kbps) = sample rate × bit depth × channels ÷ 1,000</div>
+
+<h2>Example: a 3:30 song at CD quality</h2>
+<p>One stereo WAV file, 44.1 kHz, 16-bit, 3 minutes 30 seconds (210 seconds).</p>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Bytes: 44,100 × 2 × 2 × 210</td><td>37,044,000</td></tr>
+  <tr><td>Size: 37,044,000 ÷ 1,000,000</td><td><strong>37.04 MB</strong></td></tr>
+  <tr><td>Binary: 37,044,000 ÷ 1,048,576</td><td>35.33 MiB</td></tr>
+  <tr><td>Bitrate: 44,100 × 16 × 2 ÷ 1,000</td><td>1,411.2 kbps</td></tr>
+  <tr><td>Per minute</td><td>10.58 MB</td></tr>
+  <tr><td>Same length as 320 kbps MP3: 40,000 × 210</td><td>8.4 MB</td></tr>
+</table>
+
+<h2>Storage per minute of stereo audio</h2>
+<table>
+  <tr><th>Format</th><th>Per minute</th><th>Per hour</th></tr>
+  <tr><td>WAV 44.1 kHz / 16-bit</td><td>10.58 MB</td><td>635 MB</td></tr>
+  <tr><td>WAV 48 kHz / 24-bit</td><td>17.28 MB</td><td>1.04 GB</td></tr>
+  <tr><td>WAV 96 kHz / 24-bit</td><td>34.56 MB</td><td>2.07 GB</td></tr>
+  <tr><td>MP3/AAC 320 kbps</td><td>2.4 MB</td><td>144 MB</td></tr>
+  <tr><td>MP3/AAC 128 kbps</td><td>0.96 MB</td><td>57.6 MB</td></tr>
+</table>
+
+<h2>Tips</h2>
+<ul>
+  <li><strong>Plan recording sessions by track count.</strong> 16 mono tracks at 48 kHz / 24-bit use about 138 MB per minute, or about 8.3 GB an hour.</li>
+  <li><strong>Lossless compression</strong> such as FLAC or ALAC typically shrinks WAV files to roughly half to two thirds of their size with no loss in quality.</li>
+  <li><strong>Higher sample rates</strong> double the storage for 96 kHz versus 48 kHz; use them when you need the extra headroom for processing, not by default.</li>
+  <li><strong>Windows shows MiB as "MB".</strong> If a file looks smaller in Explorer than here, compare with the binary units line.</li>
+</ul>

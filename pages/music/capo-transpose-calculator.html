@@ -1,0 +1,232 @@
+---
+{
+  "title": "Chord Transposer & Capo Calculator: Change Key Instantly",
+  "description": "Transpose a chord progression up or down any number of semitones, with sharps or flats, slash chords and extensions. Or find the capo fret that lets you play a song with easy open shapes.",
+  "h1": "Chord Transposer & Capo Calculator",
+  "short": "Transpose & Capo",
+  "intro": "Paste your chords and choose how many semitones to move them. In capo mode, enter the song's chords and the open shapes you like to play; you'll get the capo fret and the chords to finger.",
+  "updated": "October 2026",
+  "related": ["note-frequency-calculator", "tap-tempo-bpm-calculator", "song-length-calculator", "bpm-delay-calculator"],
+  "faq": [
+    {"q": "How do you transpose chords?", "a": "Move every chord's root (and any bass note after a slash) up or down by the same number of semitones, and keep the rest of the chord name unchanged. G up 2 semitones is A, Em becomes F#m, and D/F# becomes E/G#. The chord types (minor, 7th, sus4 and so on) never change."},
+    {"q": "How does a capo change the key?", "a": "Each fret raises the pitch one semitone. With a capo on fret 3, a G chord shape sounds as Bb, an Em shape sounds as Gm and so on. To play a song in Bb with G shapes, you put the capo on fret 3 and play the song as if it were in G."},
+    {"q": "What capo fret do I need?", "a": "Count the semitones from the key of the shapes you want to play up to the song's key. From G up to Bb is 3 semitones, so capo 3. If the answer is above about 7, a different set of shapes usually works lower on the neck; the calculator lists every option."},
+    {"q": "Should I use sharps or flats?", "a": "It depends on the key. Keys like F, Bb, Eb, Ab and Db are written with flats; G, D, A, E, B and F# with sharps. Auto mode reads the new key from the first chord and picks the conventional spelling, but you can force sharps or flats."},
+    {"q": "Will this transpose lyrics or words like 'Bridge'?", "a": "No. Only tokens that look like chords are changed, such as Am7, Bb/D, Csus4 or F#m7b5. Words, section labels and bar lines are left as they are, and anything the transposer didn't recognize is listed under the results. Single letters A through G on their own are treated as chords."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="mode">Mode</label>
+        <select id="mode" name="mode">
+          <option value="transpose">Transpose chords</option>
+          <option value="capo">Find a capo fret</option>
+        </select>
+      </div>
+      <div class="field" data-show="tIn">
+        <label for="chords">Chords</label>
+        <textarea id="chords" name="chords" rows="4" spellcheck="false" autocapitalize="off">G D/F# Em C</textarea>
+        <div class="hint">Separate chords with spaces or new lines, e.g. Am7 F#m Bb/D Csus4.</div>
+      </div>
+      <div class="row2" data-show="tIn">
+        <div class="field">
+          <label for="shift">Semitones</label>
+          <input id="shift" name="shift" type="number" min="-11" max="11" step="1" value="2" inputmode="numeric">
+          <div class="hint">Negative moves down.</div>
+        </div>
+        <div class="field">
+          <label for="spell">Spell with</label>
+          <select id="spell" name="spell">
+            <option value="auto">Auto (by new key)</option>
+            <option value="sharp">Sharps (#)</option>
+            <option value="flat">Flats (b)</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" data-show="cIn" hidden>
+        <label for="song">Song's chords (as written)</label>
+        <textarea id="song" name="song" rows="4" spellcheck="false" autocapitalize="off">Bb F/A Gm Eb</textarea>
+      </div>
+      <div class="row2" data-show="cIn" hidden>
+        <div class="field">
+          <label for="key">Song key</label>
+          <select id="key" name="key">
+            <option value="auto">Auto (first chord)</option>
+            <option value="0">C</option><option value="1">Db</option><option value="2">D</option>
+            <option value="3">Eb</option><option value="4">E</option><option value="5">F</option>
+            <option value="6">F#</option><option value="7">G</option><option value="8">Ab</option>
+            <option value="9">A</option><option value="10">Bb</option><option value="11">B</option>
+            <option value="m0">Cm</option><option value="m1">C#m</option><option value="m2">Dm</option>
+            <option value="m3">Ebm</option><option value="m4">Em</option><option value="m5">Fm</option>
+            <option value="m6">F#m</option><option value="m7">Gm</option><option value="m8">G#m</option>
+            <option value="m9">Am</option><option value="m10">Bbm</option><option value="m11">Bm</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="shape">Shapes I want to play</label>
+          <select id="shape" name="shape">
+            <option value="0">C shapes (or Am)</option>
+            <option value="7" selected>G shapes (or Em)</option>
+            <option value="2">D shapes (or Bm)</option>
+            <option value="9">A shapes (or F#m)</option>
+            <option value="4">E shapes (or C#m)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div data-show="tOut">
+      <div class="result big"><span>Transposed chords</span></div>
+      <div class="chord-out" data-out="tChords">—</div>
+      <div class="result"><span>Change</span><b data-out="change">—</b></div>
+      <div class="result"><span>Key (from first chord)</span><b data-out="tKey">—</b></div>
+      <div class="result"><span>Or use a capo</span><b data-out="tCapo">—</b></div>
+    </div>
+    <div data-show="cOut" hidden>
+      <div class="result big"><span>Capo</span><b data-out="capo">—</b></div>
+      <div class="result"><span>Song key</span><b data-out="cKey">—</b></div>
+      <div class="result"><span>Chords to play</span></div>
+      <div class="chord-out" data-out="cChords">—</div>
+      <div class="result"><span>All options</span><b data-out="options">—</b></div>
+    </div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<style>
+.field > textarea { width: 100%; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink);
+  font: 15px/1.5 ui-monospace, Consolas, monospace; padding: 10px 12px; resize: vertical; outline: none; }
+.field > textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.chord-out { font: 700 20px/1.5 ui-monospace, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 2px 0 8px; }
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const SH = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+  const FL = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+  const BASE = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+  const PREF = "sfsfsfssfsfs";   // conventional spelling of each major key: s = sharps, f = flats
+  const SUF = "(?:maj|min|dim|aug|sus|add|alt|m|M|°|ø|o|\\+|-|[0-9]|#|b|♯|♭|\\(|\\)|,|\\^|Δ)*";
+  const RE = new RegExp(`^(\\(?)([A-G])([#b♯♭]?)(${SUF})(?:/([A-G])([#b♯♭]?))?(\\)?)$`);
+  const IGNORE = /^(\||\|\||:\|\||\|\|:|%|-|–|\/|x\d+|N\.?C\.?)$/i;
+  const mod = (n) => ((n % 12) + 12) % 12;
+  const acc = (a) => (a === "#" || a === "♯" ? 1 : a === "b" || a === "♭" ? -1 : 0);
+  const isMinor = (suf) => /^(m(?!aj)|min|-)/.test(suf);
+  const parse = (tok) => {
+    const m = tok.match(RE);
+    if (!m) return null;
+    return { pre: m[1], root: mod(BASE[m[2]] + acc(m[3])), suf: m[4],
+      bass: m[5] ? mod(BASE[m[5]] + acc(m[6])) : null, post: m[7] };
+  };
+  const prefFor = (pc, minor) => PREF[minor ? mod(pc + 3) : pc];
+  const keyName = (pc, minor) => (prefFor(pc, minor) === "f" ? FL : SH)[pc] + (minor ? "m" : "");
+
+  // Transpose a whole text; spelling "auto" follows the new key of the first chord.
+  function transpose(text, shift, spell) {
+    const tokens = text.split(/(\s+)/);
+    const first = tokens.map(parse).find(Boolean);
+    let names = spell === "flat" ? FL : SH;
+    if (spell === "auto" && first) names = prefFor(mod(first.root + shift), isMinor(first.suf)) === "f" ? FL : SH;
+    const unknown = [];
+    let count = 0;
+    const result = tokens.map((t) => {
+      if (!t.trim() || IGNORE.test(t)) return t;
+      const c = parse(t);
+      if (!c) { unknown.push(t); return t; }
+      count++;
+      return c.pre + names[mod(c.root + shift)] + c.suf + (c.bass === null ? "" : "/" + names[mod(c.bass + shift)]) + c.post;
+    }).join("").trim();
+    return { result, unknown, count, first };
+  }
+  const INTERVALS = ["no change", "half step", "whole step", "minor third", "major third", "perfect fourth", "tritone",
+    "perfect fifth", "minor sixth", "major sixth", "minor seventh", "major seventh"];
+  const unknownNote = (u) => (u.length ? `Left unchanged (not recognized as chords): ${u.slice(0, 6).join(", ")}${u.length > 6 ? "…" : ""}` : "");
+
+  const capoMode = v.mode === "capo";
+  out.show("tIn", !capoMode); out.show("tOut", !capoMode);
+  out.show("cIn", capoMode); out.show("cOut", capoMode);
+
+  if (!capoMode) {
+    const shift = Math.max(-11, Math.min(11, Math.round(v.shift)));
+    const t = transpose(v.chords, shift, v.spell);
+    if (!t.count) {
+      ["tChords", "change", "tKey", "tCapo"].forEach((k) => out.set(k, "—"));
+      out.note("Type some chords, like G D Em C." + (t.unknown.length ? " " + unknownNote(t.unknown) : ""));
+      return;
+    }
+    out.set("tChords", t.result);
+    const s = Math.abs(shift);
+    out.set("change", shift === 0 ? "No change" : `${shift > 0 ? "Up" : "Down"} ${s} semitone${s === 1 ? "" : "s"} (${INTERVALS[s]})`);
+    const m = isMinor(t.first.suf);
+    out.set("tKey", `${keyName(t.first.root, m)} → ${keyName(mod(t.first.root + shift), m)}`);
+    const up = mod(shift);
+    out.set("tCapo", up === 0 ? "No capo needed" : `Capo ${up} with the original shapes${up > 7 ? " (high)" : ""}`);
+    out.note(unknownNote(t.unknown));
+  } else {
+    const t0 = transpose(v.song, 0, "sharp");
+    let root, minor;
+    if (v.key !== "auto") { minor = v.key[0] === "m"; root = parseInt(minor ? v.key.slice(1) : v.key, 10); }
+    else if (t0.first) { root = t0.first.root; minor = isMinor(t0.first.suf); }
+    if (root === undefined) {
+      ["capo", "cKey", "cChords", "options"].forEach((k) => out.set(k, "—"));
+      out.note("Type the song's chords, like Bb F Gm Eb, or choose the key.");
+      return;
+    }
+    const major = minor ? mod(root + 3) : root;                // compare via the relative major
+    const shape = parseInt(v.shape, 10);
+    const capo = mod(major - shape);
+    out.set("capo", capo === 0 ? "No capo" : `Fret ${capo}`);
+    out.set("cKey", keyName(root, minor).replace(/m$/, "") + (minor ? " minor" : " major"));
+    const played = transpose(v.song, -capo, "sharp");
+    out.set("cChords", played.count ? played.result : "—");
+    const SHAPES = [[0, "C"], [7, "G"], [2, "D"], [9, "A"], [4, "E"]]
+      .map(([pc, n]) => [mod(major - pc), n]).sort((a, b) => a[0] - b[0]);
+    out.set("options", SHAPES.map(([c, n]) => `${n} capo ${c}`).join(" · "));
+    const best = SHAPES[0];
+    let note = capo > 7 ? `Capo ${capo} is high on the neck; ${best[1]} shapes at capo ${best[0]} sound the same key.` : "";
+    if (played.unknown.length) note += (note ? " " : "") + unknownNote(played.unknown);
+    out.note(note);
+  }
+}));
+</script>
+<!-- article -->
+<h2>How transposing works</h2>
+<p>Transposing moves every note of a song by the same distance, so the melody and harmony keep their shape but sit
+higher or lower. For chord charts that means shifting each chord's root, and the bass note of any slash chord, by
+the same number of semitones. The chord quality, like m, 7, maj7, sus4 or add9, stays exactly the same.</p>
+<p>A capo does the transposing for you on guitar: every fret raises everything by one semitone. That's why players
+use a capo to reach a singer's key while keeping familiar open chord shapes.</p>
+
+<h2>The formula</h2>
+<div class="formula">semitone numbers: C=0, C#/Db=1, D=2, D#/Eb=3, E=4, F=5, F#/Gb=6, G=7, G#/Ab=8, A=9, A#/Bb=10, B=11<br>
+new root = (old root + semitones) mod 12<br>
+capo fret = (song key − shape key) mod 12<br>
+for a minor key, use its relative major (3 semitones up)</div>
+
+<h2>Example: transposing up a whole step</h2>
+<p>The chords G D/F# Em C moved up 2 semitones, spelled with sharps because the new key, A major, uses sharps:</p>
+<table>
+  <tr><th>Original</th><th>Semitone math</th><th>Transposed</th></tr>
+  <tr><td>G</td><td>7 + 2 = 9</td><td><strong>A</strong></td></tr>
+  <tr><td>D/F#</td><td>2 + 2 = 4, bass 6 + 2 = 8</td><td><strong>E/G#</strong></td></tr>
+  <tr><td>Em</td><td>4 + 2 = 6</td><td><strong>F#m</strong></td></tr>
+  <tr><td>C</td><td>0 + 2 = 2</td><td><strong>D</strong></td></tr>
+</table>
+<p>A guitarist could instead keep the original shapes and put a capo on fret 2.</p>
+
+<h2>Example: finding a capo fret</h2>
+<p>A song written as Bb F/A Gm Eb is in Bb major (10). To play it with G shapes (7): (10 − 7) mod 12 = 3, so
+capo on fret 3 and play <strong>G D/F# Em C</strong>. The other options are A shapes at capo 1, E shapes at capo 6,
+D shapes at capo 8 and C shapes at capo 10.</p>
+
+<h2>Tips</h2>
+<ul>
+  <li><strong>Find the singer's key first.</strong> Try the chorus's highest note; if it strains, transpose down 1 or 2 semitones and try again.</li>
+  <li><strong>G and C shapes</strong> sound full and ring well with a capo; E and A shapes keep the bass deep for lower keys.</li>
+  <li><strong>Two guitars?</strong> Have one play open shapes and the other the same chords with a capo and different shapes (say G shapes open and D shapes at capo 5) for a wider sound.</li>
+  <li><strong>Put the home chord first</strong> when using auto spelling or auto key, since the first chord sets the key.</li>
+</ul>

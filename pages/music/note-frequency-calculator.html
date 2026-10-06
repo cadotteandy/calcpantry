@@ -1,0 +1,164 @@
+---
+{
+  "title": "Note Frequency Calculator: Hz, Note Names & MIDI Numbers",
+  "description": "Convert a note name and octave to its frequency in Hz and MIDI number, or find the nearest note and cents for any frequency. Set A4 to 440, 432, 442 or any pitch.",
+  "h1": "Note Frequency Calculator",
+  "short": "Note ↔ Frequency (Hz)",
+  "intro": "Pick a note and octave, type a frequency, or enter a MIDI note number. Get the other two, plus how many cents a frequency is off the nearest note and the wavelength of the sound in air.",
+  "updated": "October 2026",
+  "related": ["capo-transpose-calculator", "bpm-delay-calculator", "tap-tempo-bpm-calculator", "speaker-impedance-calculator"],
+  "faq": [
+    {"q": "What is the frequency of middle C?", "a": "With the standard tuning of A4 = 440 Hz, middle C (C4, MIDI note 60) is about 261.63 Hz. If you tune to A4 = 432 Hz, middle C drops to about 256.87 Hz."},
+    {"q": "How do you calculate a note's frequency?", "a": "In twelve-tone equal temperament, each semitone multiplies the frequency by the twelfth root of 2, about 1.0595. Using MIDI numbers, f = 440 × 2^((n − 69) ÷ 12), where n is the MIDI note number and 69 is A4. An octave up doubles the frequency."},
+    {"q": "What is a cent in music?", "a": "A cent is one hundredth of an equal-tempered semitone, so an octave has 1,200 cents. Cents off = 1,200 × log2(your frequency ÷ the note's frequency). Most listeners can't hear a difference below about 5 cents on a single note, though it can be audible as beating when two notes play together."},
+    {"q": "Is middle C called C4 or C3?", "a": "In scientific pitch notation, used here, middle C is C4 and MIDI note 60. Some DAWs and keyboard makers label MIDI note 60 as C3, and a few use C5, so the same key can show a different octave number depending on the software. The frequency and MIDI number don't change."},
+    {"q": "Should I tune to 432 Hz?", "a": "A4 = 440 Hz has been the common international standard since the mid-20th century, and many orchestras tune slightly higher, around 442 Hz. 432 Hz is a matter of taste; claims that it is more natural or healing aren't supported by evidence. Tune to whatever matches the other instruments or recordings you play with."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="mode">I know the</label>
+        <select id="mode" name="mode">
+          <option value="note">Note name and octave</option>
+          <option value="freq">Frequency (Hz)</option>
+          <option value="midi">MIDI note number</option>
+        </select>
+      </div>
+      <div class="row2" data-show="noteIn">
+        <div class="field">
+          <label for="note">Note</label>
+          <select id="note" name="note">
+            <option value="0" selected>C</option>
+            <option value="1">C♯ / D♭</option>
+            <option value="2">D</option>
+            <option value="3">D♯ / E♭</option>
+            <option value="4">E</option>
+            <option value="5">F</option>
+            <option value="6">F♯ / G♭</option>
+            <option value="7">G</option>
+            <option value="8">G♯ / A♭</option>
+            <option value="9">A</option>
+            <option value="10">A♯ / B♭</option>
+            <option value="11">B</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="octave">Octave</label>
+          <input id="octave" name="octave" type="number" min="-1" max="9" step="1" value="4" inputmode="numeric">
+        </div>
+      </div>
+      <div class="field" data-show="freqIn" hidden>
+        <label for="freq">Frequency</label>
+        <div class="input"><input id="freq" name="freq" type="number" min="1" step="0.01" value="445" inputmode="decimal"><span class="unit">Hz</span></div>
+      </div>
+      <div class="field" data-show="midiIn" hidden>
+        <label for="midi">MIDI note number</label>
+        <input id="midi" name="midi" type="number" min="0" max="127" step="1" value="60" inputmode="numeric">
+        <div class="hint">0–127. Middle C is 60, A4 is 69.</div>
+      </div>
+      <div class="field">
+        <label for="ref">Reference pitch (A4)</label>
+        <div class="input"><input id="ref" name="ref" type="number" min="380" max="500" step="0.1" value="440" inputmode="decimal"><span class="unit">Hz</span></div>
+        <div class="hint">440 is standard. Many orchestras use 442; some musicians prefer 432.</div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Frequency</span><b data-out="freq">—</b></div>
+    <div class="result"><span>Note</span><b data-out="name">—</b></div>
+    <div class="result"><span>MIDI note number</span><b data-out="midi">—</b></div>
+    <div class="result"><span>Cents from that note</span><b data-out="cents">—</b></div>
+    <div class="result" data-show="nearIn" hidden><span>Nearest note's frequency</span><b data-out="near">—</b></div>
+    <div class="result"><span>Period</span><b data-out="period">—</b></div>
+    <div class="result"><span>Wavelength in air</span><b data-out="wave">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const SHARP = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
+  const FLAT  = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"];
+  const SPEED = 343;                                        // m/s, air at about 20 °C
+  out.show("noteIn", v.mode === "note");
+  out.show("freqIn", v.mode === "freq");
+  out.show("midiIn", v.mode === "midi");
+  out.show("nearIn", v.mode === "freq");
+  const ref = v.ref > 0 ? v.ref : 440;
+  const fOf = (n) => ref * Math.pow(2, (n - 69) / 12);
+
+  let n, f, cents = 0;
+  if (v.mode === "freq") {
+    f = v.freq;
+    if (!(f > 0)) {
+      ["freq", "name", "midi", "cents", "near", "period", "wave"].forEach((k) => out.set(k, "—"));
+      out.note("Enter a frequency above 0 Hz.");
+      return;
+    }
+    const exact = 69 + 12 * Math.log2(f / ref);
+    n = Math.round(exact);
+    cents = 1200 * Math.log2(f / fOf(n));
+  } else {
+    n = v.mode === "midi" ? Math.round(v.midi) : 12 * (Math.round(v.octave) + 1) + parseInt(v.note, 10);
+    f = fOf(n);
+  }
+
+  const pc = ((n % 12) + 12) % 12, oct = Math.floor(n / 12) - 1;
+  let name = SHARP[pc] === FLAT[pc] ? SHARP[pc] + oct : `${SHARP[pc]}${oct} / ${FLAT[pc]}${oct}`;
+  if (n === 60) name += " (middle C)";
+  out.set("freq", Calc.num(f, 2) + " Hz");
+  out.set("name", name);
+  out.set("midi", (n >= 0 && n <= 127) ? String(n) : `${n} (outside MIDI's 0–127)`);
+  const c = Math.round(cents * 10) / 10;
+  out.set("cents", c === 0 ? "0 (in tune)" : `${c > 0 ? "+" : "−"}${Calc.num(Math.abs(c), 1)} (${c > 0 ? "sharp" : "flat"})`, c === 0 ? "" : (Math.abs(c) <= 5 ? "pos" : "neg"));
+  out.set("near", Calc.num(fOf(n), 2) + " Hz");
+  out.set("period", Calc.num(1000 / f, 3) + " ms");
+  const m = SPEED / f;
+  out.set("wave", m >= 1 ? `${Calc.num(m, 2)} m (${Calc.num(m * 3.28084, 2)} ft)` : `${Calc.num(m * 100, 1)} cm (${Calc.num(m * 39.3701, 1)} in)`);
+  out.note(`Equal temperament with A4 = ${Calc.num(ref, 2)} Hz. Wavelength uses the speed of sound in room-temperature air, ${SPEED} m/s.`);
+}));
+</script>
+<!-- article -->
+<h2>How note frequencies work</h2>
+<p>Modern Western music divides each octave into 12 equal semitones. An octave up doubles the frequency, so each
+semitone multiplies it by the twelfth root of 2, about 1.0595. Everything is anchored to one reference note,
+A above middle C (A4), which is 440 Hz in standard tuning. Change the reference and every other note moves with it.</p>
+<p>MIDI numbers each key from 0 to 127, with middle C as 60 and A4 as 69. That makes the math simple: count
+semitones away from 69 and apply the formula.</p>
+
+<h2>The formula</h2>
+<div class="formula">MIDI number n = 12 × (octave + 1) + semitone (C = 0, C♯ = 1 … B = 11)<br>
+frequency f = A4 × 2^((n − 69) ÷ 12)<br>
+from a frequency: n = round(69 + 12 × log2(f ÷ A4))<br>
+cents off = 1,200 × log2(f ÷ f of nearest note)<br>
+wavelength = 343 m/s ÷ f</div>
+
+<h2>Example: middle C at A4 = 440 Hz</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>MIDI number: 12 × (4 + 1) + 0</td><td>60</td></tr>
+  <tr><td>Frequency: 440 × 2^((60 − 69) ÷ 12)</td><td><strong>261.63 Hz</strong></td></tr>
+  <tr><td>Period: 1,000 ÷ 261.63</td><td>3.822 ms</td></tr>
+  <tr><td>Wavelength: 343 ÷ 261.63</td><td>1.31 m (4.3 ft)</td></tr>
+</table>
+
+<h2>Reference: the A notes</h2>
+<table>
+  <tr><th>Note</th><th>MIDI</th><th>A4 = 440</th><th>A4 = 432</th></tr>
+  <tr><td>A0 (lowest piano key)</td><td>21</td><td>27.5 Hz</td><td>27 Hz</td></tr>
+  <tr><td>A2</td><td>45</td><td>110 Hz</td><td>108 Hz</td></tr>
+  <tr><td>A3</td><td>57</td><td>220 Hz</td><td>216 Hz</td></tr>
+  <tr><td>A4</td><td>69</td><td>440 Hz</td><td>432 Hz</td></tr>
+  <tr><td>A5</td><td>81</td><td>880 Hz</td><td>864 Hz</td></tr>
+</table>
+
+<h2>Tips</h2>
+<ul>
+  <li><strong>Tuning by ear?</strong> Within about 5 cents is usually close enough for a single note; chords and unisons reveal smaller errors as slow beating.</li>
+  <li><strong>Mixing:</strong> knowing a bass note's frequency helps you place EQ cuts and set a kick drum's pitch to sit with the key.</li>
+  <li><strong>Room acoustics:</strong> low notes have long wavelengths (A1 at 55 Hz is over 6 m), which is why small rooms struggle with bass.</li>
+  <li><strong>Octave labels differ.</strong> If your DAW shows a note an octave off, check whether it calls middle C C3 instead of C4.</li>
+</ul>
