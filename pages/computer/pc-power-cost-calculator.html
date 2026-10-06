@@ -1,0 +1,109 @@
+---
+{
+  "title": "Gaming PC Electricity Cost Calculator: Cost per Hour, Month & Year",
+  "description": "Work out what your gaming PC or console costs to run from its power draw, hours of use and your electricity rate, including idle time. Per hour, month and year.",
+  "h1": "Gaming PC Electricity Cost Calculator",
+  "short": "PC Running Cost",
+  "intro": "Enter how much power your PC (or console) draws while gaming and idling, how many hours you use it and your electricity rate. See what it adds to your bill.",
+  "updated": "October 2026",
+  "related": ["psu-wattage-calculator", "electricity-cost-calculator", "battery-life-calculator", "game-cost-per-hour-calculator"],
+  "faq": [
+    {"q": "How much does it cost to run a gaming PC?", "a": "A mid-range gaming PC drawing about 400 W while gaming costs roughly 7 cents an hour at the US average of about 18 cents per kWh. Four hours a day comes to around $8.75 a month. A high-end PC at 700 W costs about twice that."},
+    {"q": "Is the PSU wattage how much my PC uses?", "a": "No. The power supply rating is the maximum it can deliver. Your PC draws only what its parts need at that moment, often half the PSU rating or less while gaming and far less at the desktop. Use a plug-in power meter for the real number."},
+    {"q": "How much power do consoles use?", "a": "A PlayStation 5 uses about 200 W while gaming and an Xbox Series X about 160 to 200 W. A Nintendo Switch uses under 20 W docked. Rest or standby modes add a few watts around the clock."},
+    {"q": "How do I find my electricity rate?", "a": "Divide the energy charges on your bill by the kWh used, or look for the price per kWh. Include delivery charges if they're billed per kWh, since they rise with use too."},
+    {"q": "Does my monitor count?", "a": "Yes, if you want the full picture. A typical 27-inch gaming monitor uses 30 to 60 W, and large or high-refresh models more. Add it to the gaming watts above."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="gameW">Power while gaming</label>
+          <div class="input"><input id="gameW" name="gameW" type="number" min="0" step="10" value="400" inputmode="numeric"><span class="unit">W</span></div>
+        </div>
+        <div class="field">
+          <label for="gameH">Gaming hours per day</label>
+          <input id="gameH" name="gameH" type="number" min="0" max="24" step="0.5" value="4" inputmode="decimal">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="idleW">Power at desktop / idle</label>
+          <div class="input"><input id="idleW" name="idleW" type="number" min="0" step="5" value="80" inputmode="numeric"><span class="unit">W</span></div>
+        </div>
+        <div class="field">
+          <label for="idleH">Idle hours per day</label>
+          <input id="idleH" name="idleH" type="number" min="0" max="24" step="0.5" value="2" inputmode="decimal">
+        </div>
+      </div>
+      <div class="field">
+        <label for="rate">Electricity rate</label>
+        <div class="input"><input id="rate" name="rate" type="number" min="0" step="0.01" value="18" inputmode="decimal"><span class="unit">¢ per kWh</span></div>
+        <div class="hint">US average is roughly 17–18¢. Check your bill for your rate.</div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Cost per month</span><b data-out="month">—</b></div>
+    <div class="result"><span>Cost per gaming hour</span><b data-out="hour">—</b></div>
+    <div class="result"><span>Cost per day</span><b data-out="day">—</b></div>
+    <div class="result"><span>Cost per year</span><b data-out="year">—</b></div>
+    <div class="result"><span>Energy per month</span><b data-out="kwh">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const price = v.rate / 100;                     // $ per kWh
+  const dayKwh = (v.gameW * v.gameH + v.idleW * v.idleH) / 1000;
+  out.set("month", Calc.money(dayKwh * price * 30.42));
+  out.set("hour", Calc.money(v.gameW / 1000 * price, 3));
+  out.set("day", Calc.money(dayKwh * price));
+  out.set("year", Calc.money(dayKwh * price * 365));
+  out.set("kwh", Calc.num(dayKwh * 30.42, 1) + " kWh");
+  if (v.gameH + v.idleH > 24) out.note("Your hours add up to more than 24 a day.");
+  else out.note("A month here is 30.4 days (365 ÷ 12). Measure real draw with a plug-in watt meter for the most accurate result.");
+}));
+</script>
+<!-- article -->
+<h2>How it's calculated</h2>
+<p>Electricity is billed by the kilowatt-hour (kWh): 1,000 watts running for one hour. To find what your PC costs,
+multiply its power draw by the hours it runs, convert to kWh and multiply by your rate. Gaming and idle time are
+counted separately because a PC sitting at the desktop draws a fraction of its gaming power.</p>
+
+<h2>The formula</h2>
+<div class="formula">kWh per day = (gaming W × gaming hours + idle W × idle hours) ÷ 1000<br>
+cost per day = kWh per day × rate ($/kWh)<br>
+cost per month = cost per day × 30.42</div>
+
+<h2>Example</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Gaming: 400 W × 4 h</td><td>1.6 kWh</td></tr>
+  <tr><td>Idle: 80 W × 2 h</td><td>0.16 kWh</td></tr>
+  <tr><td>Per day: 1.76 kWh × $0.18</td><td>$0.32</td></tr>
+  <tr><td>Per month: × 30.42</td><td><strong>$9.64</strong></td></tr>
+  <tr><td>Per year</td><td>$115.63</td></tr>
+</table>
+
+<h2>Typical power draw while gaming</h2>
+<table>
+  <tr><th>Device</th><th>Approximate watts</th></tr>
+  <tr><td>Gaming laptop</td><td>100–250</td></tr>
+  <tr><td>Mid-range gaming PC</td><td>300–450</td></tr>
+  <tr><td>High-end gaming PC</td><td>550–800</td></tr>
+  <tr><td>PlayStation 5</td><td>about 200</td></tr>
+  <tr><td>Xbox Series X</td><td>160–200</td></tr>
+  <tr><td>Nintendo Switch (docked)</td><td>under 20</td></tr>
+</table>
+
+<h2>Cutting the cost</h2>
+<ul>
+  <li><strong>Cap your frame rate.</strong> Limiting FPS to your monitor's refresh rate can cut GPU power substantially with no visible difference.</li>
+  <li><strong>Let it sleep.</strong> Set the PC to sleep after 15 to 30 minutes idle instead of leaving it at the desktop.</li>
+  <li><strong>Turn off console instant-on.</strong> Energy-saving standby uses far less power than rest modes that keep the console ready.</li>
+</ul>

@@ -1,0 +1,109 @@
+---
+{
+  "title": "Aspect Ratio Calculator: Resize Images & Video Without Stretching",
+  "description": "Find the aspect ratio of any resolution (like 1920 × 1080 = 16:9) and calculate the missing width or height to resize images, video and screens without distortion.",
+  "h1": "Aspect Ratio Calculator",
+  "short": "Aspect Ratio Calculator",
+  "intro": "Enter a width and height to get the ratio. Then type a new width or height and get the other side, so your picture or video keeps its shape.",
+  "updated": "October 2026",
+  "related": ["screen-ppi-calculator", "video-bitrate-calculator", "photo-print-size-calculator", "data-storage-converter"],
+  "faq": [
+    {"q": "How do I calculate aspect ratio?", "a": "Divide the width and height by their greatest common divisor. For 1920 × 1080 that's 120, giving 16:9. If the numbers don't simplify neatly, divide width by height to get a decimal ratio such as 1.78:1."},
+    {"q": "How do I find the height for a new width?", "a": "Multiply the new width by the original height and divide by the original width. Resizing 1920 × 1080 to 1280 wide: 1280 × 1080 ÷ 1920 = 720 pixels tall."},
+    {"q": "What aspect ratio is 21:9?", "a": "Ultrawide monitors marketed as 21:9 are really 64:27 (2560 × 1080, 2.37:1) or 43:18 (3440 × 1440, 2.39:1). Movies shot in 'scope' are 2.39:1, which is why they fill an ultrawide screen."},
+    {"q": "What size should video be for TikTok, Reels and Shorts?", "a": "Vertical 9:16 at 1080 × 1920 pixels. Instagram feed posts look best at 4:5 (1080 × 1350), and YouTube's standard is 16:9 (1920 × 1080 or 3840 × 2160)."},
+    {"q": "Why do my dimensions need to be even numbers?", "a": "Most video codecs, including H.264 and H.265, need even widths and heights because color data is stored at half resolution. This calculator flags odd results so you can round to the nearest even number."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field"><label for="w1">Original width</label><input id="w1" name="w1" type="number" min="1" step="1" value="1920" inputmode="numeric"></div>
+        <div class="field"><label for="h1">Original height</label><input id="h1" name="h1" type="number" min="1" step="1" value="1080" inputmode="numeric"></div>
+      </div>
+      <div class="field">
+        <label for="mode">Resize by</label>
+        <select id="mode" name="mode">
+          <option value="w">New width</option>
+          <option value="h">New height</option>
+        </select>
+      </div>
+      <div class="field" data-show="byW">
+        <label for="w2">New width</label>
+        <input id="w2" name="w2" type="number" min="1" step="1" value="1280" inputmode="numeric">
+      </div>
+      <div class="field" data-show="byH" hidden>
+        <label for="h2">New height</label>
+        <input id="h2" name="h2" type="number" min="1" step="1" value="1440" inputmode="numeric">
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Aspect ratio</span><b data-out="ratio">—</b></div>
+    <div class="result"><span>Decimal ratio</span><b data-out="dec">—</b></div>
+    <div class="result"><span>New size</span><b data-out="newSize">—</b></div>
+    <div class="result"><span>Nearest even size (for video)</span><b data-out="even">—</b></div>
+    <div class="result"><span>Common name</span><b data-out="name">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const byW = v.mode === "w";
+  out.show("byW", byW);
+  out.show("byH", !byW);
+  const W = Math.round(v.w1), H = Math.round(v.h1);
+  const gcd = (a, b) => (b ? gcd(b, a % b) : a);
+  const g = gcd(W, H) || 1;
+  const r = W / H;
+  out.set("ratio", `${W / g}:${H / g}`);
+  out.set("dec", `${Calc.num(r, 3)}:1`);
+  const NAMES = [[16 / 9, "16:9 widescreen (HD, 4K)"], [9 / 16, "9:16 vertical (Shorts, Reels, TikTok)"], [4 / 3, "4:3 classic TV / iPad"],
+    [3 / 2, "3:2 (35mm photo)"], [16 / 10, "16:10 (laptops)"], [1, "1:1 square"], [4 / 5, "4:5 portrait (Instagram)"],
+    [64 / 27, "≈ 21:9 ultrawide"], [43 / 18, "≈ 21:9 ultrawide"], [2.39, "2.39:1 cinemascope"], [32 / 9, "32:9 super ultrawide"]];
+  const hit = NAMES.find(([x]) => Math.abs(x - r) / x < 0.01);
+  out.set("name", hit ? hit[1] : "Custom");
+  let nw, nh;
+  if (byW) { nw = v.w2; nh = v.w2 * H / W; } else { nh = v.h2; nw = v.h2 * W / H; }
+  out.set("newSize", `${Calc.num(nw, 2)} × ${Calc.num(nh, 2)}`);
+  const ev = (x) => Math.max(2, Math.round(x / 2) * 2);
+  out.set("even", `${ev(nw)} × ${ev(nh)}`);
+  if (!Number.isInteger(Math.round(nw * 100) / 100) || !Number.isInteger(Math.round(nh * 100) / 100))
+    out.note("The exact size isn't a whole number of pixels, so round it; a tiny bit of cropping or padding keeps the ratio.");
+  else out.note("Width ÷ height stays the same, so the image keeps its shape.");
+}));
+</script>
+<!-- article -->
+<h2>How aspect ratio works</h2>
+<p>Aspect ratio is the shape of a picture: its width compared to its height. Two images with the same ratio can be
+scaled up or down into each other without stretching. Resizing means keeping width ÷ height constant, so once you
+fix one side, the other follows.</p>
+
+<h2>The formula</h2>
+<div class="formula">ratio = (width ÷ gcd) : (height ÷ gcd)<br>
+new height = new width × original height ÷ original width<br>
+new width = new height × original width ÷ original height</div>
+
+<h2>Example: 1920 × 1080 resized to 1280 wide</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Greatest common divisor of 1920 and 1080</td><td>120</td></tr>
+  <tr><td>Ratio: 1920 ÷ 120 : 1080 ÷ 120</td><td><strong>16:9</strong></td></tr>
+  <tr><td>New height: 1280 × 1080 ÷ 1920</td><td>720</td></tr>
+</table>
+
+<h2>Common aspect ratios</h2>
+<table>
+  <tr><th>Ratio</th><th>Typical sizes</th><th>Used for</th></tr>
+  <tr><td>16:9</td><td>1280 × 720, 1920 × 1080, 3840 × 2160</td><td>TVs, monitors, YouTube</td></tr>
+  <tr><td>9:16</td><td>1080 × 1920</td><td>TikTok, Reels, Shorts, Stories</td></tr>
+  <tr><td>4:5</td><td>1080 × 1350</td><td>Instagram portrait posts</td></tr>
+  <tr><td>1:1</td><td>1080 × 1080</td><td>Square posts, album art</td></tr>
+  <tr><td>4:3</td><td>1024 × 768, 1440 × 1080</td><td>Older TVs, iPads, many phone photos</td></tr>
+  <tr><td>3:2</td><td>6000 × 4000</td><td>DSLR and mirrorless photos</td></tr>
+  <tr><td>16:10</td><td>1920 × 1200, 2560 × 1600</td><td>Laptops, productivity monitors</td></tr>
+  <tr><td>21:9 (≈ 64:27 or 43:18)</td><td>2560 × 1080, 3440 × 1440</td><td>Ultrawide monitors</td></tr>
+</table>

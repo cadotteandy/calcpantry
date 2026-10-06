@@ -1,0 +1,147 @@
+---
+{
+  "title": "PSU Wattage Calculator: What Size Power Supply Do I Need?",
+  "description": "Estimate your gaming PC's power draw from the CPU, graphics card, drives and fans, and get a recommended power supply size with headroom for GPU power spikes.",
+  "h1": "PSU Wattage Calculator",
+  "short": "PSU Wattage Calculator",
+  "intro": "Choose your CPU and graphics card (or type their power), add drives and fans, and get the estimated load plus the power supply size to buy.",
+  "updated": "October 2026",
+  "related": ["pc-power-cost-calculator", "battery-life-calculator", "download-time-calculator", "fps-frame-time-calculator"],
+  "faq": [
+    {"q": "How many watts does my gaming PC need?", "a": "Add the CPU's maximum package power and the graphics card's total board power, then about 75 to 100 watts for the motherboard, memory, drives, fans and USB devices. Buy a power supply rated about 40% above that total so it runs efficiently and handles brief spikes."},
+    {"q": "Is a bigger power supply bad?", "a": "No. A PC only draws the power it needs, so an 850 W unit in a 400 W system is fine. Oversized units cost more and can be slightly less efficient at very low loads, but they run cooler and quieter and leave room for upgrades."},
+    {"q": "What are GPU power spikes?", "a": "Modern graphics cards can briefly pull well above their rated power for a few milliseconds. Cheap or undersized power supplies can shut off when that happens. ATX 3.0 and 3.1 power supplies are designed to handle these spikes, which is why they're recommended for current high-end cards."},
+    {"q": "Should I trust the GPU maker's recommended PSU?", "a": "It's a safe starting point. NVIDIA and AMD list a recommended system power for each card, set high to cover any CPU paired with it. This calculator gives a figure for your specific parts, which is often a little lower; when the two differ, go with the larger one."},
+    {"q": "What efficiency rating should I get?", "a": "80 Plus Gold is the sweet spot for most gaming PCs. Efficiency affects your electricity bill and heat, not how many watts the PSU can deliver: a 750 W Bronze and a 750 W Gold unit both supply 750 W to your parts."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="cpu">Processor (max package power)</label>
+        <select id="cpu" name="cpu">
+          <option value="88">Ryzen 5 7600 / 9600 (≈ 88 W)</option>
+          <option value="142">Ryzen 7 7700X (≈ 142 W)</option>
+          <option value="162" selected>Ryzen 7 7800X3D / 9800X3D (≈ 162 W)</option>
+          <option value="230">Ryzen 9 7950X / 9950X (≈ 230 W)</option>
+          <option value="148">Intel Core i5-14400 / non-K i5 (≈ 148 W)</option>
+          <option value="181">Intel Core i5-14600K (≈ 181 W)</option>
+          <option value="253">Intel Core i7/i9-14700K / 14900K (≈ 253 W)</option>
+          <option value="250">Intel Core Ultra 9 285K (≈ 250 W)</option>
+          <option value="custom">Custom…</option>
+        </select>
+      </div>
+      <div class="field" data-show="cpuCustom" hidden>
+        <label for="cpuW">CPU watts</label>
+        <div class="input"><input id="cpuW" name="cpuW" type="number" min="0" step="5" value="125" inputmode="numeric"><span class="unit">W</span></div>
+      </div>
+      <div class="field">
+        <label for="gpu">Graphics card (total board power)</label>
+        <select id="gpu" name="gpu">
+          <option value="0">Integrated graphics only</option>
+          <option value="145">RTX 5060 (145 W)</option>
+          <option value="180">RTX 5060 Ti (180 W)</option>
+          <option value="250">RTX 5070 (250 W)</option>
+          <option value="300">RTX 5070 Ti (300 W)</option>
+          <option value="360">RTX 5080 (360 W)</option>
+          <option value="575">RTX 5090 (575 W)</option>
+          <option value="115">RTX 4060 (115 W)</option>
+          <option value="200" selected>RTX 4070 (200 W)</option>
+          <option value="320">RTX 4080 / 4080 Super (320 W)</option>
+          <option value="450">RTX 4090 (450 W)</option>
+          <option value="165">RX 7600 (165 W)</option>
+          <option value="263">RX 7800 XT (263 W)</option>
+          <option value="220">RX 9070 (220 W)</option>
+          <option value="304">RX 9070 XT (304 W)</option>
+          <option value="355">RX 7900 XTX (355 W)</option>
+          <option value="custom">Custom…</option>
+        </select>
+      </div>
+      <div class="field" data-show="gpuCustom" hidden>
+        <label for="gpuW">GPU watts</label>
+        <div class="input"><input id="gpuW" name="gpuW" type="number" min="0" step="5" value="250" inputmode="numeric"><span class="unit">W</span></div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="ssd">SSDs</label>
+          <input id="ssd" name="ssd" type="number" min="0" step="1" value="1" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="hdd">Hard drives</label>
+          <input id="hdd" name="hdd" type="number" min="0" step="1" value="0" inputmode="numeric">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="fans">Case fans</label>
+          <input id="fans" name="fans" type="number" min="0" step="1" value="4" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="ram">RAM sticks</label>
+          <input id="ram" name="ram" type="number" min="0" step="1" value="2" inputmode="numeric">
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" name="aio" checked> Liquid cooler pump or lots of RGB</label>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Recommended power supply</span><b data-out="psu">—</b></div>
+    <div class="result"><span>Estimated peak load</span><b data-out="load">—</b></div>
+    <div class="result"><span>CPU + GPU</span><b data-out="main">—</b></div>
+    <div class="result"><span>Everything else</span><b data-out="rest">—</b></div>
+    <div class="result"><span>Load on that PSU at peak</span><b data-out="pctLoad">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  out.show("cpuCustom", v.cpu === "custom");
+  out.show("gpuCustom", v.gpu === "custom");
+  const cpu = v.cpu === "custom" ? v.cpuW : parseFloat(v.cpu);
+  const gpu = v.gpu === "custom" ? v.gpuW : parseFloat(v.gpu);
+  // Motherboard + chipset 50 W, USB/peripherals 15 W, per-part estimates below.
+  const rest = 50 + 15 + v.ram * 5 + v.ssd * 7 + v.hdd * 9 + v.fans * 3 + (v.aio ? 15 : 0);
+  const load = cpu + gpu + rest;
+  // Aim for peak load at about 70% of the rating, then round up to a common size.
+  const SIZES = [450, 550, 650, 750, 850, 1000, 1200, 1300, 1500, 1600];
+  const want = load / 0.7;
+  const psu = SIZES.find((s) => s >= want) || Math.ceil(want / 100) * 100;
+  out.set("psu", `${psu} W`);
+  out.set("load", `${Calc.num(load, 0)} W`);
+  out.set("main", `${Calc.num(cpu + gpu, 0)} W`);
+  out.set("rest", `${Calc.num(rest, 0)} W`);
+  out.set("pctLoad", Calc.pct(load / psu, 0));
+  out.note(gpu >= 300 ? "For a card this powerful, choose an ATX 3.0/3.1 power supply with a native 12V-2x6 cable, and check the GPU maker's recommended system power." : "Recommendation keeps peak load near 70% of the rating, leaving room for GPU power spikes and future upgrades.");
+}));
+</script>
+<!-- article -->
+<h2>How the estimate works</h2>
+<p>The two parts that matter most are the processor and the graphics card. Together they usually make up 80% or
+more of a gaming PC's power draw. This calculator uses each CPU's maximum package power (what it can sustain under
+heavy load) and each graphics card's official total board power, then adds typical figures for everything else.</p>
+<p>It then recommends a power supply rated so your peak load sits around 70% of its capacity. That leaves headroom
+for brief GPU spikes, keeps the PSU in its efficient range and lets you upgrade later.</p>
+
+<h2>The formula</h2>
+<div class="formula">load = CPU + GPU + 50 (motherboard) + 15 (USB) + 5 × RAM sticks + 7 × SSDs + 9 × HDDs + 3 × fans (+ 15 for pump/RGB)<br>
+recommended PSU = load ÷ 0.7, rounded up to a standard size</div>
+
+<h2>Example: Ryzen 7 9800X3D + RTX 4070</h2>
+<table>
+  <tr><th>Part</th><th>Watts</th></tr>
+  <tr><td>CPU (max package power)</td><td>162</td></tr>
+  <tr><td>GPU (total board power)</td><td>200</td></tr>
+  <tr><td>Motherboard, USB, 2 RAM sticks, 1 SSD, 4 fans, pump</td><td>109</td></tr>
+  <tr><td>Estimated peak load</td><td>471</td></tr>
+  <tr><td>471 ÷ 0.7 = 673 → next size up</td><td><strong>750 W</strong></td></tr>
+</table>
+
+<h2>Buying tips</h2>
+<ul>
+  <li><strong>Quality over watts.</strong> A good 750 W unit from a reputable maker beats a no-name 1000 W one. Look at independent reviews.</li>
+  <li><strong>ATX 3.x for new GPUs.</strong> Current high-end NVIDIA cards use the 12V-2x6 connector; a native cable avoids bulky adapters.</li>
+  <li><strong>Gaming draw is lower than peak.</strong> Games rarely max the CPU and GPU at the same moment, so typical draw is often well under the peak shown.</li>
+</ul>

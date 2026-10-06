@@ -1,0 +1,122 @@
+---
+{
+  "title": "Video File Size & Bitrate Calculator: Recording, Streaming & Exports",
+  "description": "Calculate video file size from bitrate and length, or the bitrate needed to hit a target file size. Includes typical bitrates for 1080p, 1440p and 4K recording and streaming.",
+  "h1": "Video Bitrate & File Size Calculator",
+  "short": "Video Bitrate Calculator",
+  "intro": "Work out how big a recording or export will be from its bitrate and length, or find the bitrate that fits a file size limit, like a Discord upload or a USB stick.",
+  "updated": "October 2026",
+  "related": ["data-storage-converter", "download-time-calculator", "aspect-ratio-calculator", "screen-ppi-calculator"],
+  "faq": [
+    {"q": "How do you calculate video file size?", "a": "Add the video and audio bitrates, multiply by the length in seconds and divide by 8 to turn bits into bytes. 10 minutes at 8 Mbps video plus 160 kbps audio is (8 + 0.16) × 600 ÷ 8 = 612 MB."},
+    {"q": "What bitrate should I record gameplay at?", "a": "For local recordings in OBS with a hardware encoder, about 20 to 50 Mbps for 1080p60 and 50 to 100 Mbps or more for 4K60 keeps quality high for editing. Files get big fast, so many people use quality-based modes (CQP/CRF) instead of a fixed bitrate."},
+    {"q": "What bitrate should I stream at?", "a": "Twitch's general guidance for 1080p60 is around 6,000 kbps, and YouTube recommends higher bitrates for 1440p and 4K. Your upload speed should be comfortably above the stream bitrate, ideally with 25 to 50% to spare."},
+    {"q": "How do I fit a video under a file size limit?", "a": "Use the target size mode: it divides the size in bits by the duration and subtracts the audio bitrate. Encode at that video bitrate (or a little under, to leave room for the container) with two-pass encoding for the best quality."},
+    {"q": "Why is my file a bit bigger than calculated?", "a": "Container overhead (MP4, MKV) adds about 1 to 2%, and variable bitrate encodes can overshoot their average. Aim about 3 to 5% under a hard limit."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="mode">I want to find</label>
+        <select id="mode" name="mode">
+          <option value="size">File size from bitrate</option>
+          <option value="rate">Bitrate for a target file size</option>
+        </select>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="mins">Length (minutes)</label>
+          <input id="mins" name="mins" type="number" min="0" step="any" value="10" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="secs">+ seconds</label>
+          <input id="secs" name="secs" type="number" min="0" step="1" value="0" inputmode="numeric">
+        </div>
+      </div>
+      <div class="field" data-show="bySize">
+        <label for="vrate">Video bitrate</label>
+        <div class="input"><input id="vrate" name="vrate" type="number" min="0" step="any" value="8" inputmode="decimal"><span class="unit">Mbps</span></div>
+      </div>
+      <div class="row2" data-show="byRate" hidden>
+        <div class="field">
+          <label for="target">Target file size</label>
+          <input id="target" name="target" type="number" min="0" step="any" value="500" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="tunit">Unit</label>
+          <select id="tunit" name="tunit">
+            <option value="1e6" selected>MB</option>
+            <option value="1e9">GB</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="arate">Audio bitrate</label>
+        <div class="input"><input id="arate" name="arate" type="number" min="0" step="1" value="160" inputmode="numeric"><span class="unit">kbps</span></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="bigLabel">File size</span><b data-out="big">—</b></div>
+    <div class="result"><span>Total bitrate</span><b data-out="total">—</b></div>
+    <div class="result"><span>Size per minute</span><b data-out="perMin">—</b></div>
+    <div class="result"><span>Size per hour</span><b data-out="perHour">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const bySize = v.mode === "size";
+  out.show("bySize", bySize);
+  out.show("byRate", !bySize);
+  const secs = v.mins * 60 + v.secs;
+  const audio = v.arate * 1e3;            // bits per second
+  let video;
+  if (bySize) video = v.vrate * 1e6;
+  else video = secs > 0 ? v.target * parseFloat(v.tunit) * 8 / secs - audio : NaN;
+  const total = video + audio;
+  const bytes = total * secs / 8;
+  const size = (b) => (b >= 1e9 ? `${Calc.num(b / 1e9, 2)} GB` : `${Calc.num(b / 1e6, 1)} MB`);
+  if (bySize) { out.set("bigLabel", "File size"); out.set("big", size(bytes)); }
+  else { out.set("bigLabel", "Video bitrate to use"); out.set("big", video > 0 ? `${Calc.num(video / 1e6, 2)} Mbps (${Calc.num(video / 1e3, 0)} kbps)` : "—"); }
+  out.set("total", isFinite(total) ? `${Calc.num(total / 1e6, 2)} Mbps` : "—");
+  out.set("perMin", isFinite(total) ? size(total * 60 / 8) : "—");
+  out.set("perHour", isFinite(total) ? size(total * 3600 / 8) : "—");
+  if (!bySize && video <= 0) out.note("The audio alone fills that size. Lower the audio bitrate or allow a bigger file.");
+  else if (!bySize) out.note("Aim 3–5% below this to allow for container overhead and bitrate swings.");
+  else out.note("Sizes use decimal MB and GB (1 MB = 1,000,000 bytes).");
+}));
+</script>
+<!-- article -->
+<h2>How video file size works</h2>
+<p>Bitrate is how much data a video uses each second. Multiply it by the length and you have the file size. The
+resolution and frame rate don't appear in the formula directly; they affect how much bitrate you need for the video
+to look good.</p>
+
+<h2>The formula</h2>
+<div class="formula">file size (bytes) = (video bitrate + audio bitrate) × seconds ÷ 8<br>
+video bitrate for a target = target size × 8 ÷ seconds − audio bitrate</div>
+
+<h2>Example: 10 minutes at 8 Mbps</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Total bitrate: 8 Mbps + 0.16 Mbps</td><td>8.16 Mbps</td></tr>
+  <tr><td>Bits: 8.16 × 10⁶ × 600 s</td><td>4.896 billion</td></tr>
+  <tr><td>Bytes: ÷ 8</td><td><strong>612 MB</strong></td></tr>
+</table>
+
+<h2>Typical bitrates (H.264)</h2>
+<table>
+  <tr><th>Use</th><th>Resolution / FPS</th><th>Typical video bitrate</th></tr>
+  <tr><td>Live stream</td><td>720p60</td><td>4–5 Mbps</td></tr>
+  <tr><td>Live stream</td><td>1080p60</td><td>6–8 Mbps</td></tr>
+  <tr><td>Upload / export</td><td>1080p30</td><td>8–12 Mbps</td></tr>
+  <tr><td>Upload / export</td><td>4K30</td><td>35–45 Mbps</td></tr>
+  <tr><td>Local gameplay recording</td><td>1080p60</td><td>20–50 Mbps</td></tr>
+  <tr><td>Local gameplay recording</td><td>4K60</td><td>50–100+ Mbps</td></tr>
+</table>
+<p>Newer codecs like H.265 (HEVC) and AV1 reach similar quality at roughly 30 to 50% lower bitrates.</p>

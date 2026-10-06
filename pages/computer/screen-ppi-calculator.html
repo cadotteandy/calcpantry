@@ -1,0 +1,112 @@
+---
+{
+  "title": "PPI Calculator: Pixels per Inch for Monitors, TVs & Phones",
+  "description": "Calculate pixel density (PPI) from screen resolution and diagonal size, plus the screen's width, height, aspect ratio, dot pitch and the distance where pixels disappear.",
+  "h1": "Screen PPI Calculator",
+  "short": "Screen PPI Calculator",
+  "intro": "Pick a resolution and enter the diagonal screen size. Get pixel density, physical width and height, and how far away you need to sit before individual pixels blend together.",
+  "updated": "October 2026",
+  "related": ["aspect-ratio-calculator", "fps-frame-time-calculator", "video-bitrate-calculator", "data-storage-converter"],
+  "faq": [
+    {"q": "How do you calculate PPI?", "a": "Find the diagonal resolution in pixels with Pythagoras, √(width² + height²), then divide by the diagonal size in inches. A 27-inch 2560 × 1440 monitor has a diagonal of about 2,937 pixels, so 2,937 ÷ 27 ≈ 109 PPI."},
+    {"q": "What is a good PPI for a monitor?", "a": "Around 90 to 110 PPI looks sharp at normal desk distance without scaling, which is why 24-inch 1080p and 27-inch 1440p are popular. 140 PPI and up (like 27-inch 4K at 163 PPI) looks very crisp but usually needs 125–150% scaling in Windows."},
+    {"q": "Is 1080p on a 27-inch monitor blurry?", "a": "It's about 82 PPI, so text looks softer and some people can see the pixel grid at typical desk distance. For 27 inches, 1440p is the common recommendation for sharpness."},
+    {"q": "What does the 'pixels blend' distance mean?", "a": "It's the distance beyond which a person with normal 20/20 vision can no longer pick out individual pixels, based on the eye resolving about 1 arcminute. Sitting closer than that, you may notice pixels or jagged edges; farther away, more resolution adds little."},
+    {"q": "Why is my phone's PPI so much higher?", "a": "Phones are held 10 to 12 inches from your eyes, so they need 400+ PPI to look as sharp as a monitor does at arm's length. The blend distance shown here explains the difference."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="res">Resolution</label>
+        <select id="res" name="res">
+          <option value="1920x1080">1920 × 1080 (1080p / Full HD)</option>
+          <option value="2560x1440" selected>2560 × 1440 (1440p / QHD)</option>
+          <option value="3840x2160">3840 × 2160 (4K UHD)</option>
+          <option value="3440x1440">3440 × 1440 (ultrawide QHD)</option>
+          <option value="2560x1080">2560 × 1080 (ultrawide FHD)</option>
+          <option value="5120x1440">5120 × 1440 (super ultrawide)</option>
+          <option value="1366x768">1366 × 768</option>
+          <option value="7680x4320">7680 × 4320 (8K)</option>
+          <option value="custom">Custom…</option>
+        </select>
+      </div>
+      <div class="row2" data-show="custom" hidden>
+        <div class="field"><label for="w">Width (px)</label><input id="w" name="w" type="number" min="1" step="1" value="2560" inputmode="numeric"></div>
+        <div class="field"><label for="h">Height (px)</label><input id="h" name="h" type="number" min="1" step="1" value="1600" inputmode="numeric"></div>
+      </div>
+      <div class="field">
+        <label for="diag">Diagonal size</label>
+        <div class="input"><input id="diag" name="diag" type="number" min="1" step="0.1" value="27" inputmode="decimal"><span class="unit">inches</span></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Pixel density</span><b data-out="ppi">—</b></div>
+    <div class="result"><span>Screen width × height</span><b data-out="dims">—</b></div>
+    <div class="result"><span>Aspect ratio</span><b data-out="ratio">—</b></div>
+    <div class="result"><span>Dot pitch (pixel size)</span><b data-out="pitch">—</b></div>
+    <div class="result"><span>Pixels blend from about</span><b data-out="blend">—</b></div>
+    <div class="result"><span>Total pixels</span><b data-out="total">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const custom = v.res === "custom";
+  out.show("custom", custom);
+  const [W, H] = custom ? [v.w, v.h] : v.res.split("x").map(Number);
+  const dpx = Math.hypot(W, H);
+  const ppi = dpx / v.diag;
+  const wIn = v.diag * W / dpx, hIn = v.diag * H / dpx;
+  const gcd = (a, b) => (b ? gcd(b, a % b) : a);
+  const g = gcd(Math.round(W), Math.round(H)) || 1;
+  let ratio = `${W / g}:${H / g}`;
+  const r = W / H;
+  if (Math.abs(r - 64 / 27) < 0.03 && ratio !== "21:9") ratio += " (sold as 21:9)";
+  // 1 arcminute ≈ 1/3438 radian: distance where one pixel subtends 1'
+  const blendIn = 3438 / ppi;
+  out.set("ppi", Calc.num(ppi, 1) + " PPI");
+  out.set("dims", `${Calc.num(wIn, 1)} × ${Calc.num(hIn, 1)} in (${Calc.num(wIn * 2.54, 1)} × ${Calc.num(hIn * 2.54, 1)} cm)`);
+  out.set("ratio", ratio);
+  out.set("pitch", Calc.num(25.4 / ppi, 3) + " mm");
+  out.set("blend", `${Calc.num(blendIn, 0)} in (${Calc.num(blendIn * 2.54, 0)} cm)`);
+  out.set("total", `${Calc.num(W * H / 1e6, 2)} million`);
+  out.note(ppi < 90 ? "Below 90 PPI, text can look soft at desk distance." : ppi > 140 ? "Above 140 PPI, you'll likely want display scaling (125–150%) for comfortable text." : "A comfortable density for a desktop monitor at 100% scaling.");
+}));
+</script>
+<!-- article -->
+<h2>What PPI means</h2>
+<p>Pixels per inch measures how tightly pixels are packed on a screen. The same resolution looks sharper on a
+smaller screen because the pixels are smaller and closer together. That's why a 24-inch 1080p monitor looks
+crisper than a 32-inch one at the same distance.</p>
+
+<h2>The formula</h2>
+<div class="formula">diagonal pixels = √(width² + height²)<br>
+PPI = diagonal pixels ÷ diagonal inches<br>
+width (in) = diagonal × width ÷ diagonal pixels<br>
+blend distance (in) ≈ 3438 ÷ PPI</div>
+
+<h2>Example: 27-inch 1440p monitor</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Diagonal pixels: √(2560² + 1440²)</td><td>2,937.2</td></tr>
+  <tr><td>PPI: 2,937.2 ÷ 27</td><td><strong>108.8 PPI</strong></td></tr>
+  <tr><td>Size</td><td>23.5 × 13.2 in</td></tr>
+  <tr><td>Pixels blend from</td><td>about 32 in</td></tr>
+</table>
+
+<h2>Popular monitor sizes</h2>
+<table>
+  <tr><th>Size and resolution</th><th>PPI</th></tr>
+  <tr><td>24-inch 1080p</td><td>91.8</td></tr>
+  <tr><td>27-inch 1080p</td><td>81.6</td></tr>
+  <tr><td>27-inch 1440p</td><td>108.8</td></tr>
+  <tr><td>32-inch 1440p</td><td>91.8</td></tr>
+  <tr><td>27-inch 4K</td><td>163.2</td></tr>
+  <tr><td>32-inch 4K</td><td>137.7</td></tr>
+  <tr><td>34-inch 3440 × 1440 ultrawide</td><td>109.7</td></tr>
+</table>

@@ -1,0 +1,124 @@
+---
+{
+  "title": "Download Time Calculator: How Long Will It Take?",
+  "description": "Find how long a download or upload takes from the file size (MB, GB, TB) and your internet speed in Mbps or Gbps, with real-world overhead. Great for game downloads and backups.",
+  "h1": "Download Time Calculator",
+  "short": "Download Time Calculator",
+  "intro": "Enter the file size and your connection speed. See how long it takes in theory and in practice, since real downloads rarely hit the full advertised speed.",
+  "updated": "October 2026",
+  "related": ["data-storage-converter", "video-bitrate-calculator", "fps-frame-time-calculator", "subnet-calculator"],
+  "faq": [
+    {"q": "Why is my download in MB/s slower than my Mbps speed?", "a": "Internet speeds are sold in megabits per second (Mbps), while download apps show megabytes per second (MB/s). There are 8 bits in a byte, so a 300 Mbps plan downloads at most about 37.5 MB/s. That's normal, not a fault."},
+    {"q": "How long does a 100 GB game take to download?", "a": "At 100 Mbps, about 2 hours 13 minutes in theory and around 2.5 hours in practice. At 300 Mbps, about 45 minutes in theory; at 1 Gbps, about 13 minutes, though game servers and your storage drive can limit it."},
+    {"q": "What does the efficiency setting mean?", "a": "Real downloads lose some speed to network protocol overhead, Wi-Fi signal, other devices sharing the connection and the server's own limits. 85 to 90% of the plan speed is typical on a good wired connection; Wi-Fi is often lower."},
+    {"q": "Is a GB 1,000 MB or 1,024 MB?", "a": "Network speeds and download stores almost always use decimal units, so this calculator treats 1 GB as 1,000 MB. Windows reports file sizes in binary units (1 GB = 1,024 MB), which is why a file can look slightly bigger in a store than in File Explorer."},
+    {"q": "How do I check my real internet speed?", "a": "Run a speed test from a computer connected by Ethernet, with other devices paused. Use the download result for downloads and the upload result for backups and uploads, which are usually much slower on cable and DSL plans."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="size">File size</label>
+          <input id="size" name="size" type="number" min="0" step="any" value="100" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="sizeUnit">Unit</label>
+          <select id="sizeUnit" name="sizeUnit">
+            <option value="1e6">MB</option>
+            <option value="1e9" selected>GB</option>
+            <option value="1e12">TB</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="speed">Connection speed</label>
+          <input id="speed" name="speed" type="number" min="0" step="any" value="300" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="speedUnit">Unit</label>
+          <select id="speedUnit" name="speedUnit">
+            <option value="1e6" selected>Mbps (megabits/s)</option>
+            <option value="1e9">Gbps (gigabits/s)</option>
+            <option value="8e6">MB/s (megabytes/s)</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="eff">Real-world efficiency</label>
+        <select id="eff" name="eff">
+          <option value="1">100% (theoretical)</option>
+          <option value="0.9" selected>90% (good wired connection)</option>
+          <option value="0.75">75% (typical Wi-Fi)</option>
+          <option value="0.5">50% (busy network or weak Wi-Fi)</option>
+        </select>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Estimated time</span><b data-out="time">—</b></div>
+    <div class="result"><span>Theoretical best</span><b data-out="best">—</b></div>
+    <div class="result"><span>Download speed in MB/s</span><b data-out="mbs">—</b></div>
+    <div class="result"><span>Data per hour</span><b data-out="perHour">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const bits = v.size * parseFloat(v.sizeUnit) * 8;
+  const bps = v.speed * parseFloat(v.speedUnit);
+  const eff = parseFloat(v.eff);
+  const fmt = (s) => {
+    if (!isFinite(s)) return "—";
+    if (s < 60) return `${Calc.num(s, 1)} seconds`;
+    const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), sec = Math.round(s % 60);
+    if (d) return `${d} d ${h} h ${m} min`;
+    if (h) return `${h} h ${m} min`;
+    return `${m} min ${sec} s`;
+  };
+  out.set("time", fmt(bits / (bps * eff)));
+  out.set("best", fmt(bits / bps));
+  out.set("mbs", Calc.num(bps * eff / 8e6, 1) + " MB/s");
+  out.set("perHour", Calc.num(bps * eff * 3600 / 8e9, 1) + " GB");
+  out.note("Speeds in Mbps are bits; file sizes are bytes. 8 bits = 1 byte, so divide Mbps by 8 for MB/s.");
+}));
+</script>
+<!-- article -->
+<h2>How download time is calculated</h2>
+<p>Download time is just size divided by speed, once both are in the same units. The catch is that file sizes are
+measured in bytes and internet speeds in bits. A byte is 8 bits, so a "300 meg" plan moves at most 37.5 megabytes
+each second.</p>
+
+<h2>The formula</h2>
+<div class="formula">time (s) = file size (bytes) × 8 ÷ (speed (bits/s) × efficiency)<br>
+MB/s = Mbps ÷ 8</div>
+
+<h2>Example: a 100 GB game on 300 Mbps</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Size in bits: 100 × 10⁹ × 8</td><td>800 billion bits</td></tr>
+  <tr><td>Theoretical: 800 × 10⁹ ÷ 300 × 10⁶</td><td>44 min 27 s</td></tr>
+  <tr><td>At 90% efficiency</td><td><strong>49 min 23 s</strong></td></tr>
+  <tr><td>Speed in MB/s: 300 × 0.9 ÷ 8</td><td>33.8 MB/s</td></tr>
+</table>
+
+<h2>Typical download times for 100 GB</h2>
+<table>
+  <tr><th>Speed</th><th>Theoretical</th></tr>
+  <tr><td>25 Mbps</td><td>8 h 53 min</td></tr>
+  <tr><td>100 Mbps</td><td>2 h 13 min</td></tr>
+  <tr><td>300 Mbps</td><td>44 min</td></tr>
+  <tr><td>500 Mbps</td><td>27 min</td></tr>
+  <tr><td>1 Gbps</td><td>13 min</td></tr>
+</table>
+
+<h2>Speeding up big downloads</h2>
+<ul>
+  <li><strong>Use Ethernet.</strong> A cable is almost always faster and steadier than Wi-Fi, especially for consoles.</li>
+  <li><strong>Pause other traffic.</strong> Streaming and cloud backups on other devices share the same connection.</li>
+  <li><strong>Check your drive.</strong> On fast fiber, an old hard drive can be slower than the connection while a game installs.</li>
+</ul>

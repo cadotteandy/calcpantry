@@ -1,0 +1,110 @@
+---
+{
+  "title": "RAID Calculator: Usable Capacity for RAID 0, 1, 5, 6 & 10",
+  "description": "Work out usable storage, fault tolerance and space efficiency for RAID 0, 1, 5, 6 and 10 from the number and size of drives. Shows what your NAS will really give you.",
+  "h1": "RAID Calculator",
+  "short": "RAID Calculator",
+  "intro": "Enter how many drives you have, their size and the RAID level. See the usable space, how many drives can fail without losing data, and how it shows up in your operating system.",
+  "updated": "October 2026",
+  "related": ["data-storage-converter", "download-time-calculator", "psu-wattage-calculator", "subnet-calculator"],
+  "faq": [
+    {"q": "How much usable space does RAID 5 give?", "a": "RAID 5 uses one drive's worth of space for parity, so usable capacity is (number of drives − 1) × the smallest drive size. Four 8 TB drives give 24 TB usable, and the array survives one drive failure."},
+    {"q": "What's the difference between RAID 5 and RAID 6?", "a": "RAID 6 stores two sets of parity, using two drives' worth of space, and survives any two drive failures. With large drives, rebuilding a failed disk takes many hours, so RAID 6 protects you if a second drive fails during the rebuild."},
+    {"q": "Is RAID a backup?", "a": "No. RAID protects against a drive failing, not against deleting files, ransomware, theft, fire or the controller corrupting the array. Keep a separate backup, ideally following the 3-2-1 rule: three copies, two kinds of media, one offsite."},
+    {"q": "What happens if my drives are different sizes?", "a": "Standard RAID treats every drive as the size of the smallest one, wasting the extra space on larger drives. Some NAS systems (Synology SHR, Unraid) can use mixed sizes more efficiently; this calculator shows standard RAID."},
+    {"q": "Why does my NAS show less space than this?", "a": "Drive makers use decimal terabytes; operating systems often show binary tebibytes, about 9% smaller. File system overhead and reserved space take a little more. The 'shown as' figure accounts for the TB to TiB difference."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="level">RAID level</label>
+        <select id="level" name="level">
+          <option value="0">RAID 0 (striping, no protection)</option>
+          <option value="1">RAID 1 (mirror)</option>
+          <option value="5" selected>RAID 5 (single parity)</option>
+          <option value="6">RAID 6 (double parity)</option>
+          <option value="10">RAID 10 (striped mirrors)</option>
+        </select>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="n">Number of drives</label>
+          <input id="n" name="n" type="number" min="1" step="1" value="4" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="size">Size of each drive</label>
+          <div class="input"><input id="size" name="size" type="number" min="0" step="any" value="8" inputmode="decimal"><span class="unit">TB</span></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Usable capacity</span><b data-out="usable">—</b></div>
+    <div class="result"><span>Shown in Windows / NAS as about</span><b data-out="tib">—</b></div>
+    <div class="result"><span>Raw capacity</span><b data-out="raw">—</b></div>
+    <div class="result"><span>Space efficiency</span><b data-out="eff">—</b></div>
+    <div class="result"><span>Drive failures it survives</span><b data-out="fail">—</b></div>
+    <div class="result"><span>Read / write speed (vs one drive)</span><b data-out="speed">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const n = Math.max(1, Math.floor(v.n)), s = v.size, lvl = v.level;
+  const MIN = { "0": 2, "1": 2, "5": 3, "6": 4, "10": 4 };
+  let usable = NaN, fail = "—", speed = "—";
+  const bad = n < MIN[lvl] || (lvl === "10" && n % 2);
+  if (!bad) {
+    if (lvl === "0") { usable = n * s; fail = "None: any failure loses everything"; speed = `≈ ${n}× read, ≈ ${n}× write`; }
+    if (lvl === "1") { usable = s; fail = `${n - 1} (all but one drive)`; speed = `up to ${n}× read, 1× write`; }
+    if (lvl === "5") { usable = (n - 1) * s; fail = "1 drive"; speed = `≈ ${n - 1}× read, slower writes`; }
+    if (lvl === "6") { usable = (n - 2) * s; fail = "Any 2 drives"; speed = `≈ ${n - 2}× read, slowest writes`; }
+    if (lvl === "10") { usable = n / 2 * s; fail = "1 guaranteed (up to 1 per mirror pair)"; speed = `≈ ${n}× read, ≈ ${n / 2}× write`; }
+  }
+  out.set("usable", isFinite(usable) ? `${Calc.num(usable, 2)} TB` : "—");
+  out.set("tib", isFinite(usable) ? `${Calc.num(usable * 1e12 / 1024 ** 4, 2)} TB (TiB)` : "—");
+  out.set("raw", `${Calc.num(n * s, 2)} TB`);
+  out.set("eff", isFinite(usable) ? Calc.pct(usable / (n * s), 0) : "—");
+  out.set("fail", fail, lvl === "0" ? "neg" : "");
+  out.set("speed", speed);
+  if (bad) out.note(lvl === "10" ? "RAID 10 needs an even number of drives, at least 4." : `RAID ${lvl} needs at least ${MIN[lvl]} drives.`);
+  else if (lvl === "5" && s >= 8) out.note("With drives of 8 TB or more, many admins prefer RAID 6: a long rebuild leaves RAID 5 unprotected if a second drive fails.");
+  else out.note("Speeds are rough multiples of a single drive; real results depend on the controller and workload. RAID is not a backup.");
+}));
+</script>
+<!-- article -->
+<h2>How RAID capacity works</h2>
+<p>RAID combines several drives into one volume. Some levels split data across drives for speed, some copy it for
+safety, and some store parity: extra data that lets the array rebuild a failed drive. That protection costs space,
+so usable capacity is always less than the total of the drives (except RAID 0, which has no protection at all).</p>
+
+<h2>The formulas (n drives of size s)</h2>
+<div class="formula">RAID 0: n × s<br>
+RAID 1: s<br>
+RAID 5: (n − 1) × s<br>
+RAID 6: (n − 2) × s<br>
+RAID 10: (n ÷ 2) × s</div>
+
+<h2>Example: four 8 TB drives in RAID 5</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Raw: 4 × 8 TB</td><td>32 TB</td></tr>
+  <tr><td>Usable: (4 − 1) × 8 TB</td><td><strong>24 TB</strong></td></tr>
+  <tr><td>Shown in the OS: 24 × 10¹² ÷ 1,024⁴</td><td>21.83 TB</td></tr>
+  <tr><td>Efficiency</td><td>75%</td></tr>
+  <tr><td>Survives</td><td>1 drive failure</td></tr>
+</table>
+
+<h2>Choosing a RAID level</h2>
+<table>
+  <tr><th>Level</th><th>Min drives</th><th>Best for</th></tr>
+  <tr><td>RAID 0</td><td>2</td><td>Scratch space and speed where losing the data doesn't matter</td></tr>
+  <tr><td>RAID 1</td><td>2</td><td>Simple two-drive NAS or boot drives</td></tr>
+  <tr><td>RAID 5</td><td>3</td><td>Home NAS with smaller drives; good space efficiency</td></tr>
+  <tr><td>RAID 6</td><td>4</td><td>Large drives and bigger arrays where rebuilds take a long time</td></tr>
+  <tr><td>RAID 10</td><td>4 (even)</td><td>Databases and VMs that need fast writes plus redundancy</td></tr>
+</table>

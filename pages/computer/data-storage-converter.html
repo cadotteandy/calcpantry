@@ -1,0 +1,106 @@
+---
+{
+  "title": "Data Storage Converter: KB, MB, GB, TB, Bits & Bytes (GB vs GiB)",
+  "description": "Convert between bits, bytes, KB, MB, GB, TB and PB in both decimal (1000) and binary (1024) units, and see why a 1 TB drive shows up as 931 GB in Windows.",
+  "h1": "Data Storage Converter",
+  "short": "Data Storage Converter",
+  "intro": "Enter an amount and unit to see it in every other unit, in both decimal (what drive makers and internet speeds use) and binary (what Windows shows).",
+  "updated": "October 2026",
+  "related": ["download-time-calculator", "raid-calculator", "video-bitrate-calculator", "audio-file-size-calculator"],
+  "faq": [
+    {"q": "Why does my 1 TB drive only show 931 GB?", "a": "Drive makers use decimal units, so 1 TB is 1,000,000,000,000 bytes. Windows divides by 1,024 at each step and labels the result GB, though it's really gibibytes (GiB). 10¹² ÷ 1,024³ = 931.3 GiB. No space is missing; it's two ways of counting."},
+    {"q": "Is 1 GB 1,000 MB or 1,024 MB?", "a": "Officially, 1 GB (gigabyte) is 1,000 MB, and 1 GiB (gibibyte) is 1,024 MiB. In practice Windows and some apps still write GB when they mean GiB, while macOS, drive packaging and internet speeds use true decimal units."},
+    {"q": "What is the difference between bits and bytes?", "a": "A byte is 8 bits. Storage and file sizes are measured in bytes (capital B, as in MB), while network speeds are measured in bits (lowercase b, as in Mbps). Divide Mbps by 8 for MB/s."},
+    {"q": "How many photos or songs fit in 1 GB?", "a": "Roughly 250 to 400 phone photos at 3 to 4 MB each, or about 250 songs as 4 MB MP3 files. A minute of 1080p phone video is around 100 to 200 MB."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="amt">Amount</label>
+          <input id="amt" name="amt" type="number" min="0" step="any" value="1" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="unit">Unit</label>
+          <select id="unit" name="unit">
+            <option value="b">bits (b)</option>
+            <option value="B">bytes (B)</option>
+            <option value="KB">KB (1,000 B)</option>
+            <option value="MB">MB (10⁶ B)</option>
+            <option value="GB">GB (10⁹ B)</option>
+            <option value="TB" selected>TB (10¹² B)</option>
+            <option value="PB">PB (10¹⁵ B)</option>
+            <option value="KiB">KiB (1,024 B)</option>
+            <option value="MiB">MiB (1,024² B)</option>
+            <option value="GiB">GiB (1,024³ B)</option>
+            <option value="TiB">TiB (1,024⁴ B)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Windows shows it as</span><b data-out="windows">—</b></div>
+    <div class="result"><span>Bytes</span><b data-out="B">—</b></div>
+    <div class="result"><span>Bits</span><b data-out="b">—</b></div>
+    <div class="result"><span>KB / KiB</span><b data-out="K">—</b></div>
+    <div class="result"><span>MB / MiB</span><b data-out="M">—</b></div>
+    <div class="result"><span>GB / GiB</span><b data-out="G">—</b></div>
+    <div class="result"><span>TB / TiB</span><b data-out="T">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const F = { b: 1 / 8, B: 1, KB: 1e3, MB: 1e6, GB: 1e9, TB: 1e12, PB: 1e15,
+              KiB: 1024, MiB: 1024 ** 2, GiB: 1024 ** 3, TiB: 1024 ** 4 };
+  const bytes = v.amt * F[v.unit];
+  const n = (x) => x >= 1e15 || (x > 0 && x < 1e-4) ? x.toExponential(4) : Calc.num(x, x < 10 ? 4 : 2);
+  out.set("B", n(bytes));
+  out.set("b", n(bytes * 8));
+  out.set("K", `${n(bytes / 1e3)} KB / ${n(bytes / 1024)} KiB`);
+  out.set("M", `${n(bytes / 1e6)} MB / ${n(bytes / 1024 ** 2)} MiB`);
+  out.set("G", `${n(bytes / 1e9)} GB / ${n(bytes / 1024 ** 3)} GiB`);
+  out.set("T", `${n(bytes / 1e12)} TB / ${n(bytes / 1024 ** 4)} TiB`);
+  // Windows picks the largest binary unit that keeps the number ≥ 1 and labels it KB/MB/GB/TB.
+  const units = [["TB", 1024 ** 4], ["GB", 1024 ** 3], ["MB", 1024 ** 2], ["KB", 1024]];
+  const pick = units.find(([, f]) => bytes >= f);
+  out.set("windows", pick ? `${Calc.num(bytes / pick[1], 1)} ${pick[0]}` : `${Calc.num(bytes, 0)} bytes`);
+  out.note("Windows labels binary units as KB, MB, GB and TB. macOS and drive makers use true decimal units.");
+}));
+</script>
+<!-- article -->
+<h2>Decimal vs binary units</h2>
+<p>There are two ways to count storage. The decimal (SI) system goes up in steps of 1,000, just like kilometers and
+kilograms. The binary system goes up in steps of 1,024 (2¹⁰), which is how computer memory is addressed. Since 1998
+the binary units have their own names (kibibyte, mebibyte, gibibyte) but Windows still shows them with the decimal
+labels, which causes endless confusion.</p>
+
+<h2>The formula</h2>
+<div class="formula">bytes = amount × unit size<br>
+decimal: 1 KB = 1,000 B, 1 MB = 10⁶ B, 1 GB = 10⁹ B, 1 TB = 10¹² B<br>
+binary: 1 KiB = 1,024 B, 1 MiB = 1,024² B, 1 GiB = 1,024³ B, 1 TiB = 1,024⁴ B<br>
+bits = bytes × 8</div>
+
+<h2>Example: a 1 TB drive</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Bytes: 1 × 10¹²</td><td>1,000,000,000,000</td></tr>
+  <tr><td>In GiB: 10¹² ÷ 1,024³</td><td>931.32</td></tr>
+  <tr><td>What Windows shows</td><td><strong>931.3 GB</strong></td></tr>
+</table>
+
+<h2>Advertised vs shown in Windows</h2>
+<table>
+  <tr><th>Drive sold as</th><th>Windows shows about</th></tr>
+  <tr><td>256 GB</td><td>238 GB</td></tr>
+  <tr><td>512 GB</td><td>477 GB</td></tr>
+  <tr><td>1 TB</td><td>931 GB</td></tr>
+  <tr><td>2 TB</td><td>1.82 TB</td></tr>
+  <tr><td>4 TB</td><td>3.64 TB</td></tr>
+</table>
+<p>Your usable space will be a little lower still, after the operating system, recovery partition and formatting.</p>

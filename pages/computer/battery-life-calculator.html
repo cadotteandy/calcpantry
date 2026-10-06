@@ -1,0 +1,127 @@
+---
+{
+  "title": "Battery Life Calculator: mAh, Wh & How Long a Battery Lasts",
+  "description": "Estimate how long a battery or power bank will run a device from its capacity (mAh or Wh), voltage and the device's power draw, and how many phone charges a power bank gives.",
+  "h1": "Battery Life Calculator",
+  "short": "Battery Life Calculator",
+  "intro": "Enter the battery capacity and what your device draws. See how long it runs, or how many times a power bank can recharge your phone, tablet or handheld console.",
+  "updated": "October 2026",
+  "related": ["pc-power-cost-calculator", "psu-wattage-calculator", "data-storage-converter", "download-time-calculator"],
+  "faq": [
+    {"q": "How do I convert mAh to Wh?", "a": "Multiply mAh by the battery voltage and divide by 1,000. A 10,000 mAh power bank uses 3.7 V lithium cells, so it holds 10,000 × 3.7 ÷ 1,000 = 37 Wh. Watt-hours let you compare batteries with different voltages fairly."},
+    {"q": "How many phone charges will my power bank give?", "a": "Divide the power bank's watt-hours by your phone battery's watt-hours, then multiply by about 0.6 to 0.7 for conversion losses. A 37 Wh (10,000 mAh) bank charges a 15 Wh phone battery about 1.5 to 1.7 times."},
+    {"q": "Why does my power bank give fewer charges than its mAh suggests?", "a": "Power bank mAh is rated at the internal 3.7 V cells, but USB charging happens at 5 V or higher, and both the bank and phone lose energy as heat. Typical real-world efficiency is 60 to 75%."},
+    {"q": "How long will a battery last at a given wattage?", "a": "Divide usable watt-hours by the device's power draw in watts. A 50 Wh laptop battery powering a 10 W load lasts about 5 hours, minus a little for conversion losses and the reserve the battery keeps to protect itself."},
+    {"q": "Can I take a power bank on a plane?", "a": "Most airlines follow the FAA and IATA rules: power banks must go in carry-on bags, those up to 100 Wh are allowed, 100 to 160 Wh need airline approval and over 160 Wh are not allowed. Check your airline before flying."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="cap">Battery capacity</label>
+          <input id="cap" name="cap" type="number" min="0" step="any" value="10000" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="capUnit">Unit</label>
+          <select id="capUnit" name="capUnit">
+            <option value="mah" selected>mAh</option>
+            <option value="wh">Wh</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" data-show="mah">
+        <label for="volt">Battery voltage</label>
+        <div class="input"><input id="volt" name="volt" type="number" min="0" step="0.1" value="3.7" inputmode="decimal"><span class="unit">V</span></div>
+        <div class="hint">Phones and power banks: 3.7 V (some newer cells 3.85 V). Use the voltage printed on the battery if you have it.</div>
+      </div>
+      <div class="field">
+        <label for="mode">Use it to</label>
+        <select id="mode" name="mode">
+          <option value="run">Run a device</option>
+          <option value="charge">Charge another battery (power bank)</option>
+        </select>
+      </div>
+      <div class="field" data-show="run">
+        <label for="draw">Device power draw</label>
+        <div class="input"><input id="draw" name="draw" type="number" min="0" step="any" value="5" inputmode="decimal"><span class="unit">W</span></div>
+      </div>
+      <div class="field" data-show="charge" hidden>
+        <label for="target">Device battery (mAh at 3.85 V)</label>
+        <input id="target" name="target" type="number" min="0" step="any" value="4000" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label for="eff">Efficiency</label>
+        <select id="eff" name="eff">
+          <option value="0.85">85% (powering a device directly)</option>
+          <option value="0.65" selected>65% (typical power bank charging)</option>
+          <option value="1">100% (theoretical)</option>
+        </select>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="bigLabel">Run time</span><b data-out="big">—</b></div>
+    <div class="result"><span>Energy stored</span><b data-out="wh">—</b></div>
+    <div class="result"><span>Usable energy</span><b data-out="usable">—</b></div>
+    <div class="result"><span>Air travel</span><b data-out="flight">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const isMah = v.capUnit === "mah";
+  out.show("mah", isMah);
+  const run = v.mode === "run";
+  out.show("run", run);
+  out.show("charge", !run);
+  const wh = isMah ? v.cap * v.volt / 1000 : v.cap;
+  const usable = wh * parseFloat(v.eff);
+  out.set("wh", Calc.num(wh, 1) + " Wh");
+  out.set("usable", Calc.num(usable, 1) + " Wh");
+  if (run) {
+    const h = v.draw > 0 ? usable / v.draw : NaN;
+    out.set("bigLabel", "Run time");
+    out.set("big", isFinite(h) ? `${Math.floor(h)} h ${Math.round((h % 1) * 60)} min` : "—");
+  } else {
+    const targetWh = v.target * 3.85 / 1000;
+    out.set("bigLabel", "Full charges");
+    out.set("big", targetWh > 0 ? Calc.num(usable / targetWh, 1) + " charges" : "—");
+  }
+  out.set("flight", wh <= 100 ? "Carry-on OK (≤ 100 Wh)" : wh <= 160 ? "Needs airline approval (100–160 Wh)" : "Not allowed (> 160 Wh)", wh > 160 ? "neg" : "");
+  out.note(run ? "Real run time varies with brightness, temperature and battery age." : "Phone battery capacity is listed in mAh at about 3.85 V on most current phones.");
+}));
+</script>
+<!-- article -->
+<h2>How battery life is worked out</h2>
+<p>A battery's real energy content is measured in watt-hours (Wh). Milliamp-hours (mAh) only tell half the story
+because they depend on voltage: a 3.7 V and a 7.4 V battery with the same mAh hold very different amounts of energy.
+Convert to watt-hours first, take off conversion losses, then divide by how fast the device uses power.</p>
+
+<h2>The formula</h2>
+<div class="formula">Wh = mAh × V ÷ 1000<br>
+usable Wh = Wh × efficiency<br>
+run time (h) = usable Wh ÷ device watts<br>
+charges = usable Wh ÷ device battery Wh</div>
+
+<h2>Example: 10,000 mAh power bank running a 5 W device</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Energy: 10,000 × 3.7 ÷ 1000</td><td>37 Wh</td></tr>
+  <tr><td>Usable at 65%</td><td>24.1 Wh</td></tr>
+  <tr><td>Run time: 24.05 ÷ 5</td><td><strong>4 h 49 min</strong></td></tr>
+</table>
+
+<h2>Typical power draw</h2>
+<table>
+  <tr><th>Device</th><th>Approximate watts</th></tr>
+  <tr><td>Phone, light use</td><td>1–3</td></tr>
+  <tr><td>Phone, gaming or GPS navigation</td><td>4–8</td></tr>
+  <tr><td>Tablet</td><td>5–10</td></tr>
+  <tr><td>Handheld gaming PC (Steam Deck class)</td><td>10–25</td></tr>
+  <tr><td>Thin laptop, web and office</td><td>8–15</td></tr>
+  <tr><td>Gaming laptop on battery</td><td>40–100+</td></tr>
+</table>
