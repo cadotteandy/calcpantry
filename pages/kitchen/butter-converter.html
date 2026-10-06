@@ -1,0 +1,129 @@
+---
+{
+  "title": "Butter Converter: Sticks to Cups, Tablespoons, Grams & Ounces",
+  "description": "Convert butter between US sticks, tablespoons, teaspoons, cups, grams, ounces and pounds, plus how much of a European 250 g block you need.",
+  "h1": "Butter Converter",
+  "short": "Butter Converter",
+  "intro": "Enter an amount of butter in any unit. See it in sticks, tablespoons, cups, grams, ounces and pounds, and as a share of a 250 g European block.",
+  "updated": "October 2026",
+  "related": ["cups-to-grams-calculator", "cooking-measurement-converter", "recipe-scaler-calculator", "bakers-percentage-calculator"],
+  "faq": [
+    {"q": "How much is a stick of butter?", "a": "A standard US stick of butter is 1/2 cup, 8 tablespoons, 4 ounces, or about 113 grams. A 1 pound box holds 4 sticks."},
+    {"q": "How many sticks of butter are in a cup?", "a": "Two. One cup of butter is 2 sticks, 16 tablespoons, 8 ounces or about 227 grams."},
+    {"q": "How many grams is a tablespoon of butter?", "a": "About 14 grams (14.2 g). That comes from dividing a 113 gram stick by its 8 tablespoon markings."},
+    {"q": "How do I convert a recipe that uses a 250 g block of butter?", "a": "A 250 gram block is about 2.2 US sticks, or 1 cup plus about 1 1/2 tablespoons. If a European recipe calls for a whole block, use 2 sticks plus 1 1/2 tablespoons, or simply weigh 250 grams."},
+    {"q": "Can I use salted butter instead of unsalted?", "a": "Yes, the amounts are the same by weight. Salted butter contains roughly 1/4 teaspoon of salt per stick, though brands vary, so cut the recipe's added salt by about that much."},
+    {"q": "Why are some sticks of butter short and fat?", "a": "West of the Rockies, butter is often packed in short, stubby 'Western' sticks; elsewhere you'll usually see long, thin 'Elgin' sticks. Both weigh 4 ounces and hold 1/2 cup, so they convert the same."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="amount">Amount</label>
+          <input id="amount" name="amount" type="number" min="0" step="any" value="1" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="unit">Unit</label>
+          <select id="unit" name="unit">
+            <option value="cup">Cups</option>
+            <option value="stick">Sticks (US)</option>
+            <option value="tbsp">Tablespoons</option>
+            <option value="tsp">Teaspoons</option>
+            <option value="g">Grams</option>
+            <option value="oz">Ounces</option>
+            <option value="lb">Pounds</option>
+            <option value="block">250 g blocks</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><div class="hint">1 US stick = 1/2 cup = 8 tbsp = 4 oz ≈ 113 g.</div></div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Grams</span><b data-out="g">—</b></div>
+    <div class="result"><span>US sticks</span><b data-out="stick">—</b></div>
+    <div class="result"><span>Cups</span><b data-out="cup">—</b></div>
+    <div class="result"><span>Tablespoons</span><b data-out="tbsp">—</b></div>
+    <div class="result"><span>Teaspoons</span><b data-out="tsp">—</b></div>
+    <div class="result"><span>Ounces</span><b data-out="oz">—</b></div>
+    <div class="result"><span>Pounds</span><b data-out="lb">—</b></div>
+    <div class="result"><span>250 g European blocks</span><b data-out="block">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const G_PER_OZ = 28.349523125;
+  // Size of each unit in ounces of butter.
+  const OZ = { stick: 4, cup: 8, tbsp: 0.5, tsp: 1 / 6, oz: 1, lb: 16, g: 1 / G_PER_OZ, block: 250 / G_PER_OZ };
+  const oz = Math.max(0, v.amount) * OZ[v.unit];
+  const g = oz * G_PER_OZ;
+  out.set("g", Calc.num(g, g < 10 ? 1 : 0) + " g");
+  out.set("stick", Calc.num(oz / 4, 2));
+  out.set("cup", Calc.num(oz / 8, 2));
+  out.set("tbsp", Calc.num(oz / 0.5, 1));
+  out.set("tsp", Calc.num(oz * 6, 1));
+  out.set("oz", Calc.num(oz, 2) + " oz");
+  out.set("lb", Calc.num(oz / 16, 3) + " lb");
+  out.set("block", Calc.num(g / 250, 2));
+  const tbsp = oz * 2;
+  if (tbsp > 0 && tbsp < 8) out.note(`Cut ${Calc.num(tbsp, 1)} tablespoons using the markings on the stick wrapper.`);
+  else if (tbsp >= 8) {
+    const sticks = Math.floor(tbsp / 8 + 1e-9), rest = Math.round((tbsp - sticks * 8) * 2) / 2;
+    out.note(`Measure it as ${sticks} stick${sticks === 1 ? "" : "s"}${rest ? ` + ${Calc.num(rest, 1)} tbsp` : ""}.`);
+  }
+}));
+</script>
+<!-- article -->
+<h2>How butter is measured</h2>
+<p>In the US, butter is sold in 1 pound boxes of four sticks, and each stick's wrapper is marked in
+tablespoons. That makes volume and weight easy to swap: a stick is 1/2 cup, 8 tablespoons, 4 ounces and about
+113 grams. In most of Europe, the UK and elsewhere, butter comes in 250 gram blocks and recipes call for it by
+weight, so you'll often need to go between the two.</p>
+
+<h2>The formula</h2>
+<div class="formula">1 stick = 1/2 cup = 8 tbsp = 24 tsp = 4 oz<br>
+1 oz = 28.35 g → 1 stick ≈ 113.4 g · 1 tbsp ≈ 14.2 g<br>
+1 lb = 4 sticks = 2 cups ≈ 453.6 g<br>
+250 g block ≈ 2.2 sticks</div>
+
+<h2>Example: 1 cup of butter</h2>
+<table>
+  <tr><th>Unit</th><th>1 cup equals</th></tr>
+  <tr><td>Grams: 8 oz × 28.35</td><td><strong>227 g</strong></td></tr>
+  <tr><td>US sticks</td><td>2</td></tr>
+  <tr><td>Tablespoons</td><td>16</td></tr>
+  <tr><td>Teaspoons</td><td>48</td></tr>
+  <tr><td>Ounces</td><td>8 oz</td></tr>
+  <tr><td>Pounds</td><td>0.5 lb</td></tr>
+  <tr><td>250 g blocks: 227 ÷ 250</td><td>0.91</td></tr>
+</table>
+
+<h2>Quick butter chart</h2>
+<table>
+  <tr><th>Sticks</th><th>Cups</th><th>Tablespoons</th><th>Ounces</th><th>Grams</th></tr>
+  <tr><td>1/4</td><td>1/8</td><td>2</td><td>1</td><td>28</td></tr>
+  <tr><td>1/2</td><td>1/4</td><td>4</td><td>2</td><td>57</td></tr>
+  <tr><td>1</td><td>1/2</td><td>8</td><td>4</td><td>113</td></tr>
+  <tr><td>1 1/2</td><td>3/4</td><td>12</td><td>6</td><td>170</td></tr>
+  <tr><td>2</td><td>1</td><td>16</td><td>8</td><td>227</td></tr>
+  <tr><td>4</td><td>2</td><td>32</td><td>16 (1 lb)</td><td>454</td></tr>
+</table>
+
+<h2>European butter and 250 g blocks</h2>
+<p>A 250 gram block is a little more than two US sticks (2.2 sticks, or about 1 cup plus 1 1/2 tablespoons).
+European-style butter also tends to have slightly more fat: US butter must be at least 80% butterfat, while
+many European and European-style butters are 82% or higher. You can swap them one-for-one by weight in almost
+any recipe; the higher-fat kind can make flakier pastry.</p>
+
+<h2>Tips</h2>
+<ul>
+  <li><strong>Use the wrapper.</strong> Slice straight through the tablespoon lines printed on the paper.</li>
+  <li><strong>Soft butter by volume is messy.</strong> Pressing soft butter into a measuring cup traps air. Use sticks or a scale.</li>
+  <li><strong>Melted butter measures the same.</strong> 8 tablespoons of solid butter makes about 1/2 cup melted.</li>
+  <li><strong>Salted vs. unsalted:</strong> swap freely, but reduce added salt by about 1/4 teaspoon per stick of salted butter.</li>
+</ul>

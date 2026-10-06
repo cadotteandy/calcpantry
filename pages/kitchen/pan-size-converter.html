@@ -1,0 +1,192 @@
+---
+{
+  "title": "Pan Size Converter: Scale Recipes Between Baking Pans",
+  "description": "Switch a recipe from one baking pan to another, like 8x8 to 9x13 or round to square. Get the scale factor by pan area plus baking time tips.",
+  "h1": "Pan Size Converter",
+  "short": "Pan Size Converter",
+  "intro": "Choose the pan your recipe was written for and the pan you want to use. Get the multiplier for the ingredients so the batter ends up the same depth.",
+  "updated": "October 2026",
+  "related": ["recipe-scaler-calculator", "oven-temperature-converter", "cups-to-grams-calculator", "bakers-percentage-calculator"],
+  "faq": [
+    {"q": "How do I convert an 8x8 recipe to a 9x13 pan?", "a": "A 9x13 pan has 117 square inches against 64 for an 8x8, so multiply the recipe by about 1.83. In practice, 1 3/4 times the recipe works well, or simply double it and accept slightly thicker brownies or bars, adding a few minutes of baking time."},
+    {"q": "Can I use a 9-inch round pan instead of an 8-inch square?", "a": "Yes. A 9-inch round is about 64 square inches, almost exactly the same as an 8-inch square, so you can swap them without changing the recipe or baking time much."},
+    {"q": "How many 9-inch rounds equal a 9x13 pan?", "a": "Two 9-inch rounds total about 127 square inches, a little more than a 9x13's 117. Batter for a two-layer 9-inch cake will fill a 9x13 slightly deeper than the rounds; bake it a bit longer and test with a toothpick."},
+    {"q": "Do I need to change the baking time for a different pan?", "a": "If you scale the batter so it's the same depth, the time stays close to the original. If the batter ends up deeper, bake longer, sometimes at 25 °F lower so the edges don't overbake; if it's shallower, start checking early. Always test for doneness rather than trusting the clock."},
+    {"q": "How full should I fill a cake pan?", "a": "About half to two-thirds full for most cake batters, leaving room to rise. Overfilled pans can overflow or sink in the middle."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="fromPan">Recipe's pan</label>
+          <select id="fromPan" name="fromPan">
+            <option value="r8">8" round</option>
+            <option value="r9">9" round</option>
+            <option value="r10">10" round</option>
+            <option value="s8" selected>8x8" square</option>
+            <option value="s9">9x9" square</option>
+            <option value="p117">11x7" baking dish</option>
+            <option value="p913">9x13" pan</option>
+            <option value="loaf">9x5" loaf</option>
+            <option value="half">Half sheet (18x13")</option>
+            <option value="cround">Custom round</option>
+            <option value="crect">Custom rectangle</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="fromCount">How many</label>
+          <input id="fromCount" name="fromCount" type="number" min="1" step="1" value="1" inputmode="numeric">
+        </div>
+      </div>
+      <div class="field" data-show="fromRound" hidden>
+        <label for="fromD">Diameter</label>
+        <div class="input"><input id="fromD" name="fromD" type="number" min="0" step="0.5" value="9" inputmode="decimal"><span class="unit">in</span></div>
+      </div>
+      <div class="row2" data-show="fromRect" hidden>
+        <div class="field">
+          <label for="fromL">Length</label>
+          <div class="input"><input id="fromL" name="fromL" type="number" min="0" step="0.5" value="13" inputmode="decimal"><span class="unit">in</span></div>
+        </div>
+        <div class="field">
+          <label for="fromW">Width</label>
+          <div class="input"><input id="fromW" name="fromW" type="number" min="0" step="0.5" value="9" inputmode="decimal"><span class="unit">in</span></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="toPan">Pan you'll use</label>
+          <select id="toPan" name="toPan">
+            <option value="r8">8" round</option>
+            <option value="r9">9" round</option>
+            <option value="r10">10" round</option>
+            <option value="s8">8x8" square</option>
+            <option value="s9">9x9" square</option>
+            <option value="p117">11x7" baking dish</option>
+            <option value="p913" selected>9x13" pan</option>
+            <option value="loaf">9x5" loaf</option>
+            <option value="half">Half sheet (18x13")</option>
+            <option value="cround">Custom round</option>
+            <option value="crect">Custom rectangle</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="toCount">How many</label>
+          <input id="toCount" name="toCount" type="number" min="1" step="1" value="1" inputmode="numeric">
+        </div>
+      </div>
+      <div class="field" data-show="toRound" hidden>
+        <label for="toD">Diameter</label>
+        <div class="input"><input id="toD" name="toD" type="number" min="0" step="0.5" value="9" inputmode="decimal"><span class="unit">in</span></div>
+      </div>
+      <div class="row2" data-show="toRect" hidden>
+        <div class="field">
+          <label for="toL">Length</label>
+          <div class="input"><input id="toL" name="toL" type="number" min="0" step="0.5" value="13" inputmode="decimal"><span class="unit">in</span></div>
+        </div>
+        <div class="field">
+          <label for="toW">Width</label>
+          <div class="input"><input id="toW" name="toW" type="number" min="0" step="0.5" value="9" inputmode="decimal"><span class="unit">in</span></div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Multiply the recipe by</span><b data-out="factor">—</b></div>
+    <div class="result"><span>Easy multiplier</span><b data-out="easy">—</b></div>
+    <div class="result"><span>Recipe's pan area</span><b data-out="fromArea">—</b></div>
+    <div class="result"><span>New pan area</span><b data-out="toArea">—</b></div>
+    <div class="result"><span>Batter needed</span><b data-out="diff">—</b></div>
+    <div class="result"><span>Unscaled batter depth</span><b data-out="depth">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const round = (d) => Math.PI * (d / 2) ** 2;
+  const P = { r8: round(8), r9: round(9), r10: round(10), s8: 64, s9: 81, p117: 77, p913: 117, loaf: 45, half: 234 };
+  const area = (pan, d, l, w) => (pan === "cround" ? round(Math.max(0, d)) : pan === "crect" ? Math.max(0, l) * Math.max(0, w) : P[pan]);
+  out.show("fromRound", v.fromPan === "cround");
+  out.show("fromRect", v.fromPan === "crect");
+  out.show("toRound", v.toPan === "cround");
+  out.show("toRect", v.toPan === "crect");
+
+  const nFrom = Math.max(1, Math.round(v.fromCount) || 1), nTo = Math.max(1, Math.round(v.toCount) || 1);
+  const a1 = area(v.fromPan, v.fromD, v.fromL, v.fromW) * nFrom;
+  const a2 = area(v.toPan, v.toD, v.toL, v.toW) * nTo;
+  const k = a1 > 0 ? a2 / a1 : NaN;
+
+  const FR = [[0, ""], [1 / 4, "1/4"], [1 / 3, "1/3"], [1 / 2, "1/2"], [2 / 3, "2/3"], [3 / 4, "3/4"], [1, ""]];
+  const friendly = (x) => {
+    let whole = Math.floor(x), best = FR[0], bd = Infinity;
+    for (const c of FR) { const d = Math.abs(x - whole - c[0]); if (d < bd - 1e-9) { bd = d; best = c; } }
+    if (best[0] === 1) whole += 1;
+    if (!best[1]) return String(whole);
+    return whole ? `${whole} ${best[1]}` : best[1];
+  };
+  const sq = (a) => `${Calc.num(a, 0)} sq in (${Calc.num(a * 6.4516, 0)} cm²)`;
+
+  out.set("factor", isFinite(k) && k > 0 ? "× " + Calc.num(k, 2) : "—");
+  out.set("easy", isFinite(k) && k >= 0.125 ? "about " + friendly(k) + "×" : "—");
+  out.set("fromArea", sq(a1));
+  out.set("toArea", sq(a2));
+  if (isFinite(k) && k > 0) {
+    out.set("diff", Math.abs(k - 1) < 0.005 ? "Same amount" : `${Calc.pct(Math.abs(k - 1), 0)} ${k > 1 ? "more" : "less"}`);
+    out.set("depth", `${Calc.pct(1 / k, 0)} of original`);
+  } else { out.set("diff", "—"); out.set("depth", "—"); }
+
+  if (v.toPan === "half") out.note("Half sheet pans are only about 1 inch deep. Use them for sheet cakes and bars, and don't fill past about halfway.");
+  else if (v.toPan === "loaf" && v.fromPan !== "loaf") out.note("Loaf pans are much deeper than cake pans. Expect a longer bake; lowering the oven 25 °F keeps the crust from overbrowning.");
+  else out.note("Scaling by area keeps the batter the same depth, so baking time stays close to the original. Start checking a few minutes early.");
+}));
+</script>
+<!-- article -->
+<h2>How pan conversion works</h2>
+<p>What matters when you switch pans is the floor area. If the new pan has more area, the same batter spreads
+thinner and bakes faster; if it has less, the batter sits deeper and takes longer, or overflows. Multiplying
+the recipe by the ratio of the two areas keeps the batter at its original depth, so it bakes in roughly the
+original time.</p>
+
+<h2>The formula</h2>
+<div class="formula">round pan area = π × (diameter ÷ 2)²<br>
+square or rectangular area = length × width<br>
+scale factor = new pan area ÷ recipe's pan area<br>
+unscaled depth = recipe's pan area ÷ new pan area</div>
+
+<h2>Example: 8x8 recipe in a 9x13 pan</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>8x8 area: 8 × 8</td><td>64 sq in (413 cm²)</td></tr>
+  <tr><td>9x13 area: 9 × 13</td><td>117 sq in (755 cm²)</td></tr>
+  <tr><td>Scale factor: 117 ÷ 64</td><td><strong>× 1.83</strong></td></tr>
+  <tr><td>Easy multiplier</td><td>about 1 3/4×</td></tr>
+  <tr><td>Batter needed</td><td>83% more</td></tr>
+  <tr><td>Without scaling: 64 ÷ 117</td><td>55% of the original depth</td></tr>
+</table>
+
+<h2>Common pan areas</h2>
+<table>
+  <tr><th>Pan</th><th>Area (sq in)</th><th>Typical depth</th></tr>
+  <tr><td>9x5" loaf</td><td>45</td><td>2 1/2–3"</td></tr>
+  <tr><td>8" round</td><td>50</td><td>2"</td></tr>
+  <tr><td>9" round</td><td>64</td><td>2"</td></tr>
+  <tr><td>8x8" square</td><td>64</td><td>2"</td></tr>
+  <tr><td>11x7" baking dish</td><td>77</td><td>1 1/2–2"</td></tr>
+  <tr><td>10" round</td><td>79</td><td>2"</td></tr>
+  <tr><td>9x9" square</td><td>81</td><td>2"</td></tr>
+  <tr><td>9x13" pan</td><td>117</td><td>2"</td></tr>
+  <tr><td>Half sheet, 18x13"</td><td>234</td><td>1"</td></tr>
+</table>
+<p>Measure across the top inside edges if you're unsure of a pan's size. Sloped sides make the bottom a little
+smaller, which this simple area math ignores.</p>
+
+<h2>Pan swapping tips</h2>
+<ul>
+  <li><strong>Equal-area swaps are free.</strong> A 9" round and an 8x8 square hold the same, as do a 10" round, an 11x7 and a 9x9 within a few percent.</li>
+  <li><strong>Deeper means slower.</strong> Batter that ends up deeper needs more time and sometimes 25 °F less heat.</li>
+  <li><strong>Glass and dark pans run hot.</strong> Many bakers lower the oven 25 °F for glass or dark metal.</li>
+  <li><strong>Use the recipe scaler.</strong> Plug the factor into our recipe scaler to rewrite every ingredient.</li>
+</ul>

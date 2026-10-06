@@ -1,0 +1,147 @@
+---
+{
+  "title": "Cooking Measurement Converter: Cups, Tbsp, Tsp, Ounces & ml",
+  "description": "Convert kitchen volume measurements between teaspoons, tablespoons, fluid ounces, cups, pints, quarts, gallons, milliliters and liters, all at once.",
+  "h1": "Cooking Measurement Converter",
+  "short": "Measurement Converter",
+  "intro": "Enter an amount and pick its unit. See it in every common kitchen volume unit at once, from teaspoons to gallons and milliliters.",
+  "updated": "October 2026",
+  "related": ["cups-to-grams-calculator", "butter-converter", "recipe-scaler-calculator", "oven-temperature-converter"],
+  "faq": [
+    {"q": "How many tablespoons are in a cup?", "a": "There are 16 tablespoons in a US cup. That makes 1/2 cup 8 tablespoons, 1/3 cup 5 tablespoons plus 1 teaspoon, and 1/4 cup 4 tablespoons."},
+    {"q": "How many teaspoons are in a tablespoon?", "a": "3 teaspoons make 1 tablespoon, so a cup holds 48 teaspoons."},
+    {"q": "How many ml are in a cup?", "a": "A US customary cup is about 236.6 milliliters. Many recipes round it to 240 ml. Metric cups used in Australia, New Zealand and Canada are 250 ml, so the difference is about 5%, which rarely matters outside of baking."},
+    {"q": "Are fluid ounces the same as ounces?", "a": "No. Fluid ounces measure volume and ounces measure weight. A cup is always 8 fluid ounces, but a cup of flour weighs only about 4 1/4 ounces, while a cup of honey weighs about 12. For weights, use a cups to grams converter."},
+    {"q": "How many cups are in a quart and a gallon?", "a": "2 cups make a pint, 2 pints (4 cups) make a quart, and 4 quarts (16 cups) make a gallon. A gallon is 128 fluid ounces, about 3.79 liters."},
+    {"q": "Is a UK pint the same as a US pint?", "a": "No. A US pint is 16 US fluid ounces (about 473 ml); an imperial pint is 20 imperial fluid ounces (about 568 ml). This converter uses US customary units."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="amount">Amount</label>
+          <input id="amount" name="amount" type="number" min="0" step="any" value="1" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="unit">Unit</label>
+          <select id="unit" name="unit">
+            <option value="cup">Cups</option>
+            <option value="tsp">Teaspoons (tsp)</option>
+            <option value="tbsp">Tablespoons (tbsp)</option>
+            <option value="floz">Fluid ounces (fl oz)</option>
+            <option value="pint">Pints</option>
+            <option value="quart">Quarts</option>
+            <option value="gallon">Gallons</option>
+            <option value="ml">Milliliters (ml)</option>
+            <option value="l">Liters</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="target">Highlight result in</label>
+        <select id="target" name="target">
+          <option value="ml">Milliliters</option>
+          <option value="tsp">Teaspoons</option>
+          <option value="tbsp">Tablespoons</option>
+          <option value="floz">Fluid ounces</option>
+          <option value="cup">Cups</option>
+          <option value="pint">Pints</option>
+          <option value="quart">Quarts</option>
+          <option value="gallon">Gallons</option>
+          <option value="l">Liters</option>
+        </select>
+        <div class="hint">US customary units: 1 cup = 16 tbsp = 48 tsp = 8 fl oz.</div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="bigLabel">Milliliters</span><b data-out="big">—</b></div>
+    <div class="result"><span>Teaspoons</span><b data-out="tsp">—</b></div>
+    <div class="result"><span>Tablespoons</span><b data-out="tbsp">—</b></div>
+    <div class="result"><span>Fluid ounces</span><b data-out="floz">—</b></div>
+    <div class="result"><span>Cups</span><b data-out="cup">—</b></div>
+    <div class="result"><span>Pints</span><b data-out="pint">—</b></div>
+    <div class="result"><span>Quarts</span><b data-out="quart">—</b></div>
+    <div class="result"><span>Gallons</span><b data-out="gallon">—</b></div>
+    <div class="result"><span>Milliliters</span><b data-out="ml">—</b></div>
+    <div class="result"><span>Liters</span><b data-out="l">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const ML_PER_TSP = 4.92892159375;   // US teaspoon (1 cup = 236.5882365 ml)
+  // Size of each unit in teaspoons.
+  const U = {
+    tsp:    { tsp: 1,                  sym: "tsp",    name: "Teaspoons" },
+    tbsp:   { tsp: 3,                  sym: "tbsp",   name: "Tablespoons" },
+    floz:   { tsp: 6,                  sym: "fl oz",  name: "Fluid ounces" },
+    cup:    { tsp: 48,                 sym: "cups",   one: "cup",   name: "Cups" },
+    pint:   { tsp: 96,                 sym: "pints",  one: "pint",  name: "Pints" },
+    quart:  { tsp: 192,                sym: "quarts", one: "quart", name: "Quarts" },
+    gallon: { tsp: 768,                sym: "gal",    name: "Gallons" },
+    ml:     { tsp: 1 / ML_PER_TSP,     sym: "ml",     name: "Milliliters" },
+    l:      { tsp: 1000 / ML_PER_TSP,  sym: "L",      name: "Liters" },
+  };
+  const tsp = Math.max(0, v.amount) * U[v.unit].tsp;
+  const fmt = (x) => Calc.num(x, x >= 100 ? 1 : x >= 1 ? 2 : 4);
+  const show = (key) => {
+    const x = tsp / U[key].tsp, s = fmt(x);
+    return `${s} ${s === "1" && U[key].one ? U[key].one : U[key].sym}`;
+  };
+  for (const key of Object.keys(U)) out.set(key, show(key));
+  out.set("bigLabel", U[v.target].name);
+  out.set("big", show(v.target));
+  if (v.unit === "ml" || v.unit === "l" || v.target === "ml" || v.target === "l")
+    out.note("Metric cups (Australia, Canada, NZ) are 250 ml, about 5% larger than the US cup used here.");
+}));
+</script>
+<!-- article -->
+<h2>How kitchen volume units fit together</h2>
+<p>US recipes measure by volume in a chain of units that each double or triple the last: 3 teaspoons make a
+tablespoon, 2 tablespoons make a fluid ounce, 8 fluid ounces make a cup, 2 cups make a pint, 2 pints make a
+quart, and 4 quarts make a gallon. Metric is simpler: 1,000 milliliters in a liter. The
+converter links the two systems through the exact size of the US teaspoon.</p>
+
+<h2>The formula</h2>
+<div class="formula">1 tbsp = 3 tsp · 1 fl oz = 2 tbsp · 1 cup = 8 fl oz = 16 tbsp = 48 tsp<br>
+1 pint = 2 cups · 1 quart = 4 cups · 1 gallon = 16 cups<br>
+1 cup = 236.588 ml · 1 tsp = 4.929 ml · 1 tbsp = 14.787 ml<br>
+result = amount × (size of from-unit ÷ size of to-unit)</div>
+
+<h2>Example: 1 cup</h2>
+<table>
+  <tr><th>Unit</th><th>1 cup equals</th></tr>
+  <tr><td>Teaspoons</td><td>48 tsp</td></tr>
+  <tr><td>Tablespoons</td><td>16 tbsp</td></tr>
+  <tr><td>Fluid ounces</td><td>8 fl oz</td></tr>
+  <tr><td>Pints</td><td>0.5 pints</td></tr>
+  <tr><td>Quarts</td><td>0.25 quarts</td></tr>
+  <tr><td>Gallons</td><td>0.0625 gal</td></tr>
+  <tr><td>Milliliters</td><td><strong>236.6 ml</strong></td></tr>
+  <tr><td>Liters</td><td>0.2366 L</td></tr>
+</table>
+
+<h2>Handy cup fractions</h2>
+<table>
+  <tr><th>Cups</th><th>Tablespoons</th><th>Fluid ounces</th><th>Milliliters</th></tr>
+  <tr><td>1/8 cup</td><td>2 tbsp</td><td>1 fl oz</td><td>30 ml</td></tr>
+  <tr><td>1/4 cup</td><td>4 tbsp</td><td>2 fl oz</td><td>59 ml</td></tr>
+  <tr><td>1/3 cup</td><td>5 tbsp + 1 tsp</td><td>2.67 fl oz</td><td>79 ml</td></tr>
+  <tr><td>1/2 cup</td><td>8 tbsp</td><td>4 fl oz</td><td>118 ml</td></tr>
+  <tr><td>2/3 cup</td><td>10 tbsp + 2 tsp</td><td>5.33 fl oz</td><td>158 ml</td></tr>
+  <tr><td>3/4 cup</td><td>12 tbsp</td><td>6 fl oz</td><td>177 ml</td></tr>
+  <tr><td>1 cup</td><td>16 tbsp</td><td>8 fl oz</td><td>237 ml</td></tr>
+</table>
+
+<h2>Measuring tips</h2>
+<ul>
+  <li><strong>Use the right cup.</strong> Liquid measuring cups have a spout and headroom; read them at eye level. Dry cups are meant to be filled and leveled.</li>
+  <li><strong>Volume isn't weight.</strong> 8 fl oz of water weighs about 8 oz, but 8 fl oz of flour weighs about half that. Convert dry ingredients with a cups to grams chart.</li>
+  <li><strong>Check where a recipe is from.</strong> UK and Australian recipes may use 250 ml cups, 20 ml tablespoons (Australia) or imperial pints.</li>
+  <li><strong>Round sensibly.</strong> For cooking, 240 ml per cup is close enough. For baking, use the exact figure or, better, weigh.</li>
+</ul>

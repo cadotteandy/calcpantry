@@ -1,0 +1,172 @@
+---
+{
+  "title": "Recipe Scaler: Resize Any Recipe by Servings or Factor",
+  "description": "Paste your ingredient list and scale it up or down by servings or a multiplier. Handles fractions like 1 1/2 and ½, and rounds to friendly kitchen measures.",
+  "h1": "Recipe Scaler Calculator",
+  "short": "Recipe Scaler",
+  "intro": "Paste your ingredients, one per line, and enter how many servings the recipe makes and how many you need. Get the whole list rescaled with measuring-cup friendly fractions.",
+  "updated": "October 2026",
+  "related": ["cooking-measurement-converter", "cups-to-grams-calculator", "pan-size-converter", "butter-converter"],
+  "faq": [
+    {"q": "How do I scale a recipe?", "a": "Divide the servings you want by the servings the recipe makes to get a scale factor, then multiply every ingredient by it. A recipe for 4 that you want to serve 6 has a factor of 6 ÷ 4 = 1.5, so 2 cups of flour becomes 3 cups."},
+    {"q": "What fractions does the scaler understand?", "a": "Whole numbers (3), decimals (1.5), simple fractions (3/4), mixed numbers (1 1/2), Unicode fractions (½, ¼, ¾, ⅓, ⅔, ⅛) and ranges (2-3). The number has to be at the start of the line. Lines without a leading number, like 'salt to taste', are copied over unchanged."},
+    {"q": "How do I scale eggs?", "a": "Round to the nearest whole egg for most recipes. If you need half an egg, beat one egg and use about half of it, roughly 2 tablespoons, since a large egg is about 3 1/2 tablespoons out of the shell. In baking, a scale is the most accurate way: a large egg without its shell weighs about 50 grams."},
+    {"q": "Can I just double the baking time when I double a recipe?", "a": "No. Baking time depends mostly on how deep the food is, not how much there is. If you double a cake recipe and bake it in two pans of the original size, the time stays about the same. If you use one bigger, deeper pan, it takes longer, so start checking at the original time and keep going in 5 minute steps."},
+    {"q": "Do spices and leavening scale the same way?", "a": "Usually close enough for small changes like 1.5x or 2x. For big jumps (4x and up), many cooks scale salt, strong spices and baking soda a little less, then taste and adjust. Weighing ingredients in grams makes large batches much more predictable."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="mode">Scale by</label>
+        <select id="mode" name="mode">
+          <option value="servings">Servings</option>
+          <option value="factor">Multiplier (e.g. 2x, 0.5x)</option>
+        </select>
+      </div>
+      <div class="row2" data-show="servings">
+        <div class="field">
+          <label for="from">Recipe makes</label>
+          <input id="from" name="from" type="number" min="0" step="1" value="4" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label for="to">I need</label>
+          <input id="to" name="to" type="number" min="0" step="1" value="6" inputmode="decimal">
+        </div>
+      </div>
+      <div class="field" data-show="factor" hidden>
+        <label for="factor">Multiplier</label>
+        <div class="input"><span class="unit pre">×</span><input id="factor" name="factor" type="number" min="0" step="0.25" value="2" inputmode="decimal"></div>
+      </div>
+      <div class="field">
+        <label for="recipe">Ingredients (one per line)</label>
+        <textarea id="recipe" name="recipe" rows="9" spellcheck="false">2 cups all-purpose flour
+1 1/2 tsp baking powder
+½ tsp salt
+⅔ cup sugar
+2 eggs
+1 1/4 cups milk
+3 tbsp melted butter
+Pinch of nutmeg</textarea>
+        <div class="hint">Put the amount first: "1 1/2 cups", "½ tsp", "3 eggs".</div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Scale factor</span><b data-out="factor">—</b></div>
+    <div class="result"><span>Lines scaled</span><b data-out="count">—</b></div>
+    <div class="scaled-list" data-out="list"></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<style>
+.field > textarea { width: 100%; border: 1px solid var(--line); border-radius: 10px; background: var(--bg);
+  color: var(--ink); font: inherit; padding: 10px 12px; resize: vertical; outline: none; }
+.field > textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.scaled-list { white-space: pre-line; margin-top: 10px; padding: 12px 14px; background: var(--bg);
+  border: 1px solid var(--line); border-radius: 10px; font-size: 15px; line-height: 1.7; overflow-wrap: anywhere; }
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const byServings = v.mode === "servings";
+  out.show("servings", byServings);
+  out.show("factor", !byServings);
+  const k = byServings ? (v.from > 0 ? v.to / v.from : NaN) : v.factor;
+
+  const U = { "½": 1 / 2, "¼": 1 / 4, "¾": 3 / 4, "⅓": 1 / 3, "⅔": 2 / 3, "⅛": 1 / 8, "⅜": 3 / 8, "⅝": 5 / 8, "⅞": 7 / 8 };
+  const UC = "[½¼¾⅓⅔⅛⅜⅝⅞]";
+  const Q = `(\\d+\\s+\\d+\\/\\d+|\\d+\\s*${UC}|\\d+\\/\\d+|${UC}|\\d*\\.\\d+|\\d+)`;
+  const LINE = new RegExp(`^(\\s*(?:[-*•]\\s*)?)${Q}(?:\\s*(?:-|–|to)\\s*${Q})?`);
+
+  const value = (s) => {
+    s = s.trim();
+    let m;
+    if ((m = s.match(/^(\d+)\s+(\d+)\/(\d+)$/))) return +m[1] + m[2] / m[3];
+    if ((m = s.match(new RegExp(`^(\\d+)\\s*(${UC})$`)))) return +m[1] + U[m[2]];
+    if ((m = s.match(/^(\d+)\/(\d+)$/))) return m[1] / m[2];
+    if (U[s] !== undefined) return U[s];
+    return parseFloat(s);
+  };
+
+  // Nearest 1/8 or 1/3, written the way recipes do: "1 7/8", "2/3", "3".
+  const FR = [[0, ""], [1 / 8, "1/8"], [1 / 4, "1/4"], [1 / 3, "1/3"], [3 / 8, "3/8"], [1 / 2, "1/2"],
+              [5 / 8, "5/8"], [2 / 3, "2/3"], [3 / 4, "3/4"], [7 / 8, "7/8"], [1, ""]];
+  const friendly = (x) => {
+    if (x < 1 / 16) return Calc.num(x, 2);
+    let whole = Math.floor(x), best = FR[0], bd = Infinity;
+    for (const c of FR) { const d = Math.abs(x - whole - c[0]); if (d < bd - 1e-9) { bd = d; best = c; } }
+    if (best[0] === 1) whole += 1;
+    if (!best[1]) return String(whole);
+    return whole ? `${whole} ${best[1]}` : best[1];
+  };
+  const fmt = (raw, x) => {
+    if (/[\/½¼¾⅓⅔⅛⅜⅝⅞]/.test(raw)) return friendly(x);
+    if (raw.includes(".")) return Calc.num(x, 2);
+    return x < 10 ? friendly(x) : Calc.num(x, 1);
+  };
+
+  const lines = String(v.recipe || "").replace(/⁄/g, "/").split(/\r?\n/);
+  let scaled = 0, total = 0, oddEggs = false;
+  const result = lines.map((line) => {
+    if (!line.trim()) return "";
+    total++;
+    const m = line.match(LINE);
+    if (!m || !(k > 0)) return line.trim();
+    const a = value(m[2]) * k;
+    const b = m[3] !== undefined ? value(m[3]) * k : null;
+    if (!isFinite(a) || (b !== null && !isFinite(b))) return line.trim();
+    scaled++;
+    const rest = line.slice(m[0].length);
+    if (/\begg/i.test(rest) && Math.abs(a - Math.round(a)) > 0.01) oddEggs = true;
+    const qty = fmt(m[2], a) + (b !== null ? "–" + fmt(m[3], b) : "");
+    return (m[1].trim() ? m[1] : "") + qty + rest;
+  }).filter((l, i, arr) => l || (i > 0 && arr[i - 1]));
+
+  out.set("factor", k > 0 ? "× " + Calc.num(k, 3) : "—");
+  out.set("count", `${scaled} of ${total}`);
+  out.set("list", total ? result.join("\n").trim() : "Paste some ingredients to scale them.");
+  if (!(k > 0)) out.note("Enter servings (or a multiplier) greater than zero.");
+  else if (oddEggs) out.note("Some eggs came out fractional. Round to a whole egg, or beat one and use part of it (about 2 tbsp per half egg).");
+  else out.note("Amounts are rounded to the nearest 1/8 or 1/3. Lines that don't start with a number are copied as-is.");
+}));
+</script>
+<!-- article -->
+<h2>How recipe scaling works</h2>
+<p>Every ingredient in a recipe is a proportion of the whole. To make more or less, you multiply each amount by
+the same number, called the scale factor. Get the factor by dividing the servings you want by the servings the
+recipe makes. The scaler reads the number at the start of each line, multiplies it, and rounds the result to a
+fraction you can actually measure.</p>
+
+<h2>The formula</h2>
+<div class="formula">scale factor = servings needed ÷ servings the recipe makes<br>
+new amount = original amount × scale factor<br>
+1 1/2 = 1 + 1 ÷ 2 = 1.5</div>
+<p>Results under 10 are shown to the nearest 1/8 or 1/3. Larger whole-number amounts, like 250 g of butter,
+are shown as plain numbers, and amounts you typed as decimals stay as decimals.</p>
+
+<h2>Example: a recipe for 4, made for 6</h2>
+<p>The factor is 6 ÷ 4 = 1.5. Here is the default ingredient list scaled:</p>
+<table>
+  <tr><th>Original</th><th>× 1.5</th><th>Scaled</th></tr>
+  <tr><td>2 cups all-purpose flour</td><td>3</td><td><strong>3 cups</strong></td></tr>
+  <tr><td>1 1/2 tsp baking powder</td><td>2.25</td><td><strong>2 1/4 tsp</strong></td></tr>
+  <tr><td>½ tsp salt</td><td>0.75</td><td><strong>3/4 tsp</strong></td></tr>
+  <tr><td>⅔ cup sugar</td><td>1</td><td><strong>1 cup</strong></td></tr>
+  <tr><td>2 eggs</td><td>3</td><td><strong>3 eggs</strong></td></tr>
+  <tr><td>1 1/4 cups milk</td><td>1.875</td><td><strong>1 7/8 cups</strong></td></tr>
+  <tr><td>3 tbsp melted butter</td><td>4.5</td><td><strong>4 1/2 tbsp</strong></td></tr>
+  <tr><td>Pinch of nutmeg</td><td>—</td><td>Pinch of nutmeg (unchanged)</td></tr>
+</table>
+<p>1 7/8 cups is 1 3/4 cups plus 2 tablespoons, and 4 1/2 tablespoons is 1/4 cup plus 1/2 tablespoon.</p>
+
+<h2>Tips for scaling recipes</h2>
+<ul>
+  <li><strong>Convert awkward amounts.</strong> 16 tablespoons = 1 cup and 3 teaspoons = 1 tablespoon, so 6 tbsp is easier to measure as 1/4 cup + 2 tbsp.</li>
+  <li><strong>Weigh for big batches.</strong> Cup measures drift as quantities grow. Converting to grams first keeps 3x and 4x batches accurate.</li>
+  <li><strong>Rethink the pan.</strong> A scaled cake needs a pan with the matching area. Our pan size converter does that math.</li>
+  <li><strong>Season to taste.</strong> Salt, chili and strong spices are worth adding gradually when you scale up a lot.</li>
+  <li><strong>Watch the clock, not the math.</strong> Cooking time doesn't scale with the factor. Check doneness rather than multiplying the time.</li>
+</ul>

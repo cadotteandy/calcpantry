@@ -1,0 +1,170 @@
+---
+{
+  "title": "Turkey Calculator: Size per Person, Thawing & Roasting Time",
+  "description": "How big a turkey to buy for your guests, how long it takes to thaw in the fridge or cold water, and USDA roasting times at 325 °F, stuffed or unstuffed.",
+  "h1": "Turkey Calculator",
+  "short": "Turkey Calculator",
+  "intro": "Enter your guest count to see what size turkey to buy, then how many days to thaw it and roughly how long it will roast at 325 °F, using USDA guidelines.",
+  "updated": "October 2026",
+  "related": ["meat-temperature-calculator", "oven-temperature-converter", "recipe-scaler-calculator", "cooking-measurement-converter"],
+  "faq": [
+    {"q": "How much turkey do I need per person?", "a": "Plan on about 1 pound of whole turkey per person, or 1 1/2 pounds if you want leftovers. The bones and carcass make up a good part of the weight, so a 15 pound bird yields far less than 15 pounds of meat. For a boneless turkey breast, about 1/2 pound per person is enough, or 3/4 pound for leftovers."},
+    {"q": "How long does it take to thaw a turkey in the fridge?", "a": "The USDA says to allow about 24 hours for every 4 to 5 pounds in a refrigerator at 40 °F or below. A 15 pound turkey needs about 3 to 4 days. A thawed turkey keeps another 1 to 2 days in the fridge before cooking."},
+    {"q": "How do I thaw a turkey quickly?", "a": "Use the cold-water method: keep the turkey in its leak-proof wrapping, submerge it in cold tap water, and change the water every 30 minutes. Allow about 30 minutes per pound, then cook it right away. Never thaw a turkey on the counter or in warm water."},
+    {"q": "How long do I cook a turkey at 325 °F?", "a": "For an unstuffed whole turkey, roughly 3 to 3 3/4 hours for 12 to 14 pounds, 3 3/4 to 4 1/4 hours for 14 to 18 pounds, and 4 1/2 to 5 hours for 20 to 24 pounds, per the USDA. Stuffed birds take a little longer. These are estimates; the turkey is done when a thermometer reads 165 °F."},
+    {"q": "What temperature is turkey done?", "a": "165 °F, measured with a food thermometer in the innermost part of the thigh, the innermost part of the wing, and the thickest part of the breast. If the bird is stuffed, the center of the stuffing must also reach 165 °F."},
+    {"q": "Can I cook a turkey from frozen?", "a": "Yes. The USDA says it's safe, but it takes about 50% longer than a thawed turkey, and you remove the giblet packet partway through with tongs once it loosens."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="row2">
+        <div class="field">
+          <label for="guests">Guests</label>
+          <input id="guests" name="guests" type="number" min="0" step="1" value="10" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="kind">Type</label>
+          <select id="kind" name="kind">
+            <option value="whole">Whole turkey</option>
+            <option value="boneless">Boneless breast</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="appetite">How much</label>
+        <select id="appetite" name="appetite">
+          <option value="1">Just enough for the meal</option>
+          <option value="1.5" selected>Some leftovers</option>
+          <option value="2">Plenty of leftovers</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="have">Already have a turkey? Its weight</label>
+        <div class="input"><input id="have" name="have" type="number" min="0" step="0.5" value="" placeholder="use recommended size" inputmode="decimal"><span class="unit">lb</span></div>
+        <div class="hint">Thawing and roasting times use this weight if you enter one.</div>
+      </div>
+      <label class="check"><input type="checkbox" name="stuffed"> Roasting it stuffed</label>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Turkey to buy</span><b data-out="buy">—</b></div>
+    <div class="result"><span>Times based on</span><b data-out="basis">—</b></div>
+    <div class="result"><span>Thaw in the fridge</span><b data-out="fridge">—</b></div>
+    <div class="result"><span>Or thaw in cold water</span><b data-out="water">—</b></div>
+    <div class="result"><span data-out="roastLabel">Roast at 325 °F (unstuffed)</span><b data-out="roast">—</b></div>
+    <div class="result"><span>Done when it reads</span><b>165 °F</b></div>
+    <div class="result"><span>Rest before carving</span><b>20 min</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const whole = v.kind === "whole";
+  const perPerson = parseFloat(v.appetite) * (whole ? 1 : 0.5);   // lb per guest
+  const rec = Math.max(0, v.guests) * perPerson;
+  const w = v.have > 0 ? v.have : rec;
+
+  const hm = (h) => {
+    const m = Math.round(h * 60), H = Math.floor(m / 60), M = m % 60;
+    return M ? (H ? `${H} h ${M} min` : `${M} min`) : `${H} h`;
+  };
+  const halfUp = (x) => Math.ceil(x * 2) / 2;
+
+  out.set("buy", rec > 0 ? `${Calc.num(rec, 1)} lb` : "—");
+  out.set("basis", w > 0 ? `${Calc.num(w, 1)} lb ${whole ? "turkey" : "breast"}` : "—");
+
+  if (w > 0) {
+    const lo = halfUp(w / 5), hi = halfUp(w / 4);          // 24 h per 4–5 lb
+    const days = lo === hi ? Calc.num(lo, 1) : `${Calc.num(lo, 1)}–${Calc.num(hi, 1)}`;
+    out.set("fridge", `${days} day${hi > 1 ? "s" : ""}`);
+    out.set("water", hm(w * 0.5));                           // 30 min per lb
+  } else { out.set("fridge", "—"); out.set("water", "—"); }
+
+  // USDA roasting times at 325 °F, in hours: [max weight, unstuffed, stuffed]
+  const T = [
+    [8,  [1.5, 3.25],  null],          // 4–8 lb (breast)
+    [12, [2.75, 3],    [3, 3.5]],
+    [14, [3, 3.75],    [3.5, 4]],
+    [18, [3.75, 4.25], [4, 4.25]],
+    [20, [4.25, 4.5],  [4.25, 4.75]],
+    [24, [4.5, 5],     [4.75, 5.25]],
+  ];
+  out.set("roastLabel", `Roast at 325 °F (${v.stuffed ? "stuffed" : "unstuffed"})`);
+  let note = "";
+  if (!whole) {
+    out.set("roast", "See package");
+    note = "USDA's roasting table covers whole birds and bone-in breasts. For a boneless breast roast, follow the package and cook to 165 °F.";
+  } else if (!(w > 0)) {
+    out.set("roast", "—");
+  } else if (w < 4) {
+    out.set("roast", "Not in USDA table");
+    note = "Birds under 4 lb aren't covered by the USDA table. Start checking the temperature after about an hour.";
+  } else if (w > 24) {
+    out.set("roast", "5 h or more");
+    note = "Turkeys over 24 lb are beyond the USDA table. Plan on at least 5 hours and go by the thermometer.";
+  } else {
+    const row = T.find((r) => w < r[0] || (r[0] !== 8 && w <= r[0]));
+    const range = v.stuffed ? row[2] : row[1];
+    if (!range) {
+      out.set("roast", "Not listed stuffed");
+      note = "The USDA doesn't list stuffed times for birds this small. Bake the stuffing separately in a dish.";
+    } else {
+      out.set("roast", `${hm(range[0])} – ${hm(range[1])}`);
+      note = v.stuffed
+        ? "Stuff loosely just before roasting. The center of the stuffing must also reach 165 °F."
+        : "Times are estimates. Start checking with a thermometer about 30 minutes before the low end.";
+    }
+  }
+  out.note(note);
+}));
+</script>
+<!-- article -->
+<h2>How the turkey calculator works</h2>
+<p>It does three things. First it sizes the bird: about 1 pound of whole turkey per guest covers the meal,
+since bones make up a large share of the weight, and 1 1/2 to 2 pounds leaves leftovers. Then it estimates
+thawing time using the USDA's rules for the refrigerator and cold-water methods. Finally it looks up the
+USDA's roasting time range for a turkey of that weight in a 325 °F oven.</p>
+
+<h2>The formula</h2>
+<div class="formula">turkey size = guests × 1 lb (meal) · 1.5 lb (leftovers) · 2 lb (plenty)<br>
+boneless breast = guests × 0.5 · 0.75 · 1 lb<br>
+fridge thawing ≈ weight ÷ 5 to weight ÷ 4 days (24 h per 4–5 lb)<br>
+cold-water thawing ≈ weight × 30 minutes<br>
+roasting time = USDA range for the weight class, at 325 °F</div>
+
+<h2>Example: 10 guests with leftovers</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Size: 10 × 1.5 lb</td><td><strong>15 lb</strong></td></tr>
+  <tr><td>Fridge thaw: 15 ÷ 5 to 15 ÷ 4 = 3 to 3.75, rounded up to the half day</td><td>3–4 days</td></tr>
+  <tr><td>Cold water: 15 × 30 min</td><td>7 h 30 min</td></tr>
+  <tr><td>Roasting, unstuffed (14–18 lb row)</td><td>3 h 45 min – 4 h 15 min</td></tr>
+  <tr><td>Done at</td><td>165 °F, then rest 20 min</td></tr>
+</table>
+
+<h2>USDA roasting times at 325 °F</h2>
+<table>
+  <tr><th>Weight</th><th>Unstuffed</th><th>Stuffed</th></tr>
+  <tr><td>4 to 8 lb (breast)</td><td>1 1/2 to 3 1/4 hours</td><td>Not listed</td></tr>
+  <tr><td>8 to 12 lb</td><td>2 3/4 to 3 hours</td><td>3 to 3 1/2 hours</td></tr>
+  <tr><td>12 to 14 lb</td><td>3 to 3 3/4 hours</td><td>3 1/2 to 4 hours</td></tr>
+  <tr><td>14 to 18 lb</td><td>3 3/4 to 4 1/4 hours</td><td>4 to 4 1/4 hours</td></tr>
+  <tr><td>18 to 20 lb</td><td>4 1/4 to 4 1/2 hours</td><td>4 1/4 to 4 3/4 hours</td></tr>
+  <tr><td>20 to 24 lb</td><td>4 1/2 to 5 hours</td><td>4 3/4 to 5 1/4 hours</td></tr>
+</table>
+<p>Source: USDA Food Safety and Inspection Service roasting guidelines for a fully thawed turkey in a 325 °F
+oven. Oven accuracy, how cold the bird starts, the pan and how often you open the door all shift the actual
+time, which is why the thermometer, not the clock, decides when it's done.</p>
+
+<h2>Turkey tips</h2>
+<ul>
+  <li><strong>Count back from dinner.</strong> Add the thaw days, plus a day of slack, and move the turkey to the fridge that morning.</li>
+  <li><strong>Check three spots.</strong> 165 °F in the innermost thigh, innermost wing and thickest part of the breast.</li>
+  <li><strong>Don't forget the giblets.</strong> Pull the neck and giblet bag out of both cavities before roasting.</li>
+  <li><strong>Let it rest.</strong> 20 minutes before carving keeps the juices in the meat and gives you time to make gravy.</li>
+  <li><strong>Bigger party?</strong> Two smaller turkeys cook faster and more evenly than one 24 pound giant.</li>
+</ul>

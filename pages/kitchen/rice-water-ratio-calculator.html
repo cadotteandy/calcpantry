@@ -1,0 +1,136 @@
+---
+{
+  "title": "Rice to Water Ratio Calculator: White, Jasmine, Basmati, Brown",
+  "description": "How much water to use for long-grain white, jasmine, basmati, short-grain, brown or wild rice on the stovetop, plus how much cooked rice you'll get.",
+  "h1": "Rice to Water Ratio Calculator",
+  "short": "Rice Water Ratio",
+  "intro": "Pick your rice and how much you're cooking. Get the water to add for the stovetop, how much cooked rice it makes, and roughly how long it simmers.",
+  "updated": "October 2026",
+  "related": ["recipe-scaler-calculator", "cooking-measurement-converter", "cups-to-grams-calculator", "meat-temperature-calculator"],
+  "faq": [
+    {"q": "What is the water ratio for white rice?", "a": "For American long-grain white rice, most package directions use 1 cup of rice to 2 cups of water. Many cooks who rinse their rice prefer a little less, around 1 3/4 cups. Fragrant jasmine and basmati usually do best with less water, about 1 1/2 cups per cup of rice."},
+    {"q": "How much water for brown rice?", "a": "Brown rice keeps its bran layer, so it needs more water and more time: typically 2 to 2 1/2 cups of water per cup of rice, simmered 40 to 45 minutes. This calculator starts at 2 1/4 cups."},
+    {"q": "How much cooked rice does 1 cup of dry rice make?", "a": "About 3 cups for long-grain white, jasmine, basmati and brown rice. Short-grain rice cooked with less water makes a bit less, around 2 1/2 cups. Wild rice expands more, to roughly 3 to 4 cups."},
+    {"q": "How much rice should I make per person?", "a": "About 1/4 cup of dry rice per person for a side dish, which cooks up to roughly 3/4 cup. For rice as the base of a main course, like a stir-fry or curry, plan on 1/3 to 1/2 cup dry per person."},
+    {"q": "Should I rinse rice before cooking?", "a": "Rinsing removes surface starch, which gives fluffier, more separate grains, and it's traditional for jasmine, basmati and sushi rice. Enriched American long-grain rice is coated with vitamins that rinsing washes off, so package directions often say not to rinse it."},
+    {"q": "Does the ratio change for a rice cooker?", "a": "Usually. Rice cookers lose less water to evaporation, so they often need slightly less. Use the lines inside your cooker's bowl with its own measuring cup, which is about 180 ml, smaller than a US cup."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="type">Rice type</label>
+        <select id="type" name="type">
+          <option value="white">Long-grain white (1 : 2)</option>
+          <option value="jasmine">Jasmine (1 : 1.5)</option>
+          <option value="basmati">Basmati (1 : 1.5)</option>
+          <option value="short">Short-grain / sushi (1 : 1.2)</option>
+          <option value="brown">Brown, long-grain (1 : 2.25)</option>
+          <option value="wild">Wild rice (1 : 3)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="rice">Dry rice</label>
+        <div class="input"><input id="rice" name="rice" type="number" min="0" step="0.25" value="1.5" inputmode="decimal"><span class="unit">cups</span></div>
+        <div class="hint">About 1/4 cup dry per person for a side.</div>
+      </div>
+      <div class="field">
+        <label for="ratio">Ratio override (1 : …)</label>
+        <div class="input"><span class="unit pre">1 :</span><input id="ratio" name="ratio" type="number" min="0" step="0.05" value="" placeholder="rice type default" inputmode="decimal"></div>
+        <div class="hint">Leave blank for the default. Your package directions win.</div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Water</span><b data-out="water">—</b></div>
+    <div class="result"><span>Water in milliliters</span><b data-out="ml">—</b></div>
+    <div class="result"><span>Cooked rice (approx.)</span><b data-out="yield">—</b></div>
+    <div class="result"><span>Side servings (3/4 cup)</span><b data-out="servings">—</b></div>
+    <div class="result"><span>Simmer, covered</span><b data-out="time">—</b></div>
+    <div class="result"><span>Ratio used</span><b data-out="ratioUsed">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const R = {
+    white:   { r: 2,    y: 3,   time: "15–20 min" },
+    jasmine: { r: 1.5,  y: 3,   time: "15–20 min" },
+    basmati: { r: 1.5,  y: 3,   time: "15–20 min" },
+    short:   { r: 1.2,  y: 2.5, time: "15–20 min" },
+    brown:   { r: 2.25, y: 3,   time: "40–45 min" },
+    wild:    { r: 3,    y: 3.5, time: "45–60 min" },
+  }[v.type];
+  const ML_PER_CUP = 236.588;
+  const r = v.ratio > 0 ? v.ratio : R.r;
+  const rice = Math.max(0, v.rice);
+  const water = rice * r, cooked = rice * R.y;
+
+  const FR = [[0, ""], [1 / 8, "1/8"], [1 / 4, "1/4"], [1 / 3, "1/3"], [3 / 8, "3/8"], [1 / 2, "1/2"],
+              [5 / 8, "5/8"], [2 / 3, "2/3"], [3 / 4, "3/4"], [7 / 8, "7/8"], [1, ""]];
+  const friendly = (x) => {
+    let whole = Math.floor(x), best = FR[0], bd = Infinity;
+    for (const c of FR) { const d = Math.abs(x - whole - c[0]); if (d < bd - 1e-9) { bd = d; best = c; } }
+    if (best[0] === 1) whole += 1;
+    if (!best[1]) return String(whole);
+    return whole ? `${whole} ${best[1]}` : best[1];
+  };
+  const cups = (x) => `${friendly(x)} cup${x > 1.06 ? "s" : ""}`;
+
+  out.set("water", rice > 0 ? cups(water) : "—");
+  out.set("ml", Calc.num(water * ML_PER_CUP, 0) + " ml");
+  out.set("yield", rice > 0 ? "about " + cups(cooked) : "—");
+  out.set("servings", Calc.num(Math.floor(cooked / 0.75 + 1e-9), 0));
+  out.set("time", R.time);
+  out.set("ratioUsed", "1 : " + Calc.num(r, 2));
+  if (v.type === "wild") out.note("Wild rice is done when most grains have split open. Drain any water left in the pot.");
+  else out.note("Bring to a boil, cover, simmer on low, then rest off the heat 10 minutes before fluffing. These are starting points; adjust to your pot and taste.");
+}));
+</script>
+<!-- article -->
+<h2>How rice to water ratios work</h2>
+<p>Rice cooked by the absorption method soaks up all the water in the pot, so the ratio of water to rice
+decides the texture: too little and the grains are hard in the center, too much and they turn soft and
+sticky. Different rices absorb different amounts. Brown rice, with its bran intact, needs more water and
+time, while aromatic jasmine and basmati are usually cooked with less water than standard long-grain rice.</p>
+
+<h2>The formula</h2>
+<div class="formula">water = dry rice × ratio<br>
+cooked rice ≈ dry rice × yield (about 3 for most rice)<br>
+side servings = cooked rice ÷ 3/4 cup</div>
+
+<h2>Example: 1 1/2 cups of long-grain white rice</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Water: 1.5 × 2</td><td><strong>3 cups</strong></td></tr>
+  <tr><td>In milliliters: 3 × 236.6</td><td>710 ml</td></tr>
+  <tr><td>Cooked rice: 1.5 × 3</td><td>about 4 1/2 cups</td></tr>
+  <tr><td>Side servings: 4.5 ÷ 0.75</td><td>6</td></tr>
+  <tr><td>Simmer, covered</td><td>15–20 min, then rest 10 min</td></tr>
+</table>
+
+<h2>Starting ratios by rice type</h2>
+<table>
+  <tr><th>Rice</th><th>Water per cup of rice</th><th>Cooked yield</th><th>Simmer</th></tr>
+  <tr><td>Long-grain white</td><td>2 cups (1 3/4 if rinsed)</td><td>~3 cups</td><td>15–20 min</td></tr>
+  <tr><td>Jasmine</td><td>1 1/4 to 1 1/2 cups</td><td>~3 cups</td><td>15–20 min</td></tr>
+  <tr><td>Basmati</td><td>1 1/2 cups</td><td>~3 cups</td><td>15–20 min</td></tr>
+  <tr><td>Short-grain / sushi</td><td>1 1/8 to 1 1/4 cups</td><td>~2 1/2 cups</td><td>15–20 min</td></tr>
+  <tr><td>Brown, long-grain</td><td>2 to 2 1/2 cups</td><td>~3 cups</td><td>40–45 min</td></tr>
+  <tr><td>Wild rice</td><td>3 to 4 cups</td><td>3 to 4 cups</td><td>45–60 min</td></tr>
+</table>
+<p>These are common starting points, not rules. Package directions vary by brand, and pot size, lid fit and
+how hard your stove simmers all change how much water boils off. If your rice comes out wet, use a little less
+water next time; if it's firm, add a couple of tablespoons more.</p>
+
+<h2>Tips for better rice</h2>
+<ul>
+  <li><strong>Keep the lid on.</strong> Lifting it lets steam escape and throws off the ratio.</li>
+  <li><strong>Lowest heat.</strong> After it boils, turn the heat as low as it will go so the bottom doesn't scorch.</li>
+  <li><strong>Rest before fluffing.</strong> 10 minutes off the heat, still covered, finishes the grains evenly.</li>
+  <li><strong>Big batches need a wide pot.</strong> A shallow, wide layer cooks more evenly than a deep one.</li>
+  <li><strong>Cool leftovers quickly</strong> and refrigerate within 2 hours.</li>
+</ul>

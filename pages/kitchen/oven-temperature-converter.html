@@ -1,0 +1,149 @@
+---
+{
+  "title": "Oven Temperature Converter: °F to °C, Gas Mark & Convection",
+  "description": "Convert oven temperatures between Fahrenheit, Celsius and gas mark, see the rounded value recipes use, and get the convection (fan) oven setting.",
+  "h1": "Oven Temperature Converter",
+  "short": "Oven Temperature Converter",
+  "intro": "Enter an oven temperature in Fahrenheit, Celsius or gas mark. Get the other two, the rounded number a recipe would print, and the setting for a convection or fan oven.",
+  "updated": "October 2026",
+  "related": ["turkey-calculator", "cooking-measurement-converter", "pan-size-converter", "meat-temperature-calculator"],
+  "faq": [
+    {"q": "What is 350 °F in Celsius?", "a": "350 °F is 176.7 °C. Recipes almost always round it to 180 °C, which is also gas mark 4. For a fan oven, use about 160 °C."},
+    {"q": "How do I convert Fahrenheit to Celsius?", "a": "Subtract 32, then multiply by 5/9. For 400 °F: (400 − 32) × 5 ÷ 9 = 204.4 °C, which recipes round to 200 °C. To go the other way, multiply Celsius by 9/5 and add 32."},
+    {"q": "How much lower should I set a convection oven?", "a": "The usual rule is 25 °F lower than the recipe says, or start checking for doneness earlier. UK recipes typically say about 20 °C lower for a fan oven. Many newer US ovens apply this reduction automatically in convection mode, so check your manual before subtracting twice."},
+    {"q": "What does gas mark mean?", "a": "Gas mark is the temperature scale printed on gas oven dials in the UK and Ireland. Gas mark 1 is 275 °F (140 °C), and each step above that adds 25 °F, up to gas mark 9 at 475 °F (240 °C). Gas marks 1/4 and 1/2 cover the very low temperatures used for meringues and slow cooking."},
+    {"q": "Why do recipes use 180 °C instead of 177 °C?", "a": "Home ovens swing by 10 to 25 degrees as they cycle on and off, and most dials are marked in steps of 10 °C or 25 °F. So recipe writers round: 350 °F becomes 180 °C, 375 °F becomes 190 °C, and 400 °F becomes 200 °C."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="unit">Convert from</label>
+        <select id="unit" name="unit">
+          <option value="f">Fahrenheit (°F)</option>
+          <option value="c">Celsius (°C)</option>
+          <option value="gas">Gas mark</option>
+        </select>
+      </div>
+      <div class="field" data-show="deg">
+        <label for="temp">Oven temperature</label>
+        <div class="input"><input id="temp" name="temp" type="number" step="5" value="350" inputmode="decimal"><span class="unit" data-out="sym">°F</span></div>
+      </div>
+      <div class="field" data-show="gas" hidden>
+        <label for="gas">Gas mark</label>
+        <select id="gas" name="gas">
+          <option value="0.25">1/4</option>
+          <option value="0.5">1/2</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4" selected>4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+        </select>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="bigLabel">Celsius</span><b data-out="big">—</b></div>
+    <div class="result"><span>Fahrenheit</span><b data-out="f">—</b></div>
+    <div class="result"><span>Celsius</span><b data-out="c">—</b></div>
+    <div class="result"><span>As recipes write it</span><b data-out="recipe">—</b></div>
+    <div class="result"><span>Gas mark</span><b data-out="gasOut">—</b></div>
+    <div class="result"><span>Convection / fan oven</span><b data-out="fan">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  const isGas = v.unit === "gas";
+  out.show("gas", isGas);
+  out.show("deg", !isGas);
+  out.set("sym", v.unit === "c" ? "°C" : "°F");
+  const gasToF = (g) => (g === 0.25 ? 225 : g === 0.5 ? 250 : 250 + 25 * g);
+  const toC = (f) => (f - 32) * 5 / 9;
+
+  let f;
+  if (isGas) f = gasToF(parseFloat(v.gas));
+  else if (v.unit === "c") f = v.temp * 9 / 5 + 32;
+  else f = v.temp;
+  const c = toC(f);
+
+  const MARKS = [0.25, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const label = (g) => (g === 0.25 ? "1/4" : g === 0.5 ? "1/2" : String(g));
+  let gas;
+  if (f < 212.5) gas = "Below 1/4";
+  else if (f > 512.5) gas = "Above 10";
+  else {
+    let best = MARKS[0];
+    for (const g of MARKS) if (Math.abs(gasToF(g) - f) < Math.abs(gasToF(best) - f)) best = g;
+    gas = label(best);
+  }
+
+  const fanF = f - 25;
+  out.set("f", Calc.num(f, 0) + " °F");
+  out.set("c", Calc.num(c, 1) + " °C");
+  out.set("recipe", `${Calc.num(Math.round(f / 25) * 25, 0)} °F · ${Calc.num(Math.round(c / 10) * 10, 0)} °C`);
+  out.set("gasOut", gas);
+  out.set("fan", `${Calc.num(fanF, 0)} °F · ${Calc.num(toC(fanF), 0)} °C`);
+  if (v.unit === "f") { out.set("bigLabel", "Celsius"); out.set("big", Calc.num(c, 0) + " °C"); }
+  else { out.set("bigLabel", "Fahrenheit"); out.set("big", Calc.num(f, 0) + " °F"); }
+
+  if (f > 0 && f < 200) out.note("That's below the range most home ovens can hold. Check the number and unit.");
+  else if (f > 550) out.note("Most home ovens top out around 500–550 °F (260–290 °C).");
+  else out.note("Convection setting is 25 °F lower. Many ovens subtract this automatically in convection mode; check your manual.");
+}));
+</script>
+<!-- article -->
+<h2>How oven temperature conversion works</h2>
+<p>Fahrenheit and Celsius are linear scales with different starting points and step sizes, so converting is a
+subtract-and-multiply job. Gas marks, used on UK oven dials, are an older scale where each mark from 1 to 9 is
+25 °F apart. The converter also shows the rounded figure a recipe would print, since nobody sets an oven to
+176.7 °C.</p>
+
+<h2>The formula</h2>
+<div class="formula">°C = (°F − 32) × 5 ÷ 9<br>
+°F = °C × 9 ÷ 5 + 32<br>
+gas mark n (1–10) = 250 + 25 × n °F · gas 1/2 = 250 °F · gas 1/4 = 225 °F<br>
+convection ≈ recipe temperature − 25 °F (about 14 °C)</div>
+
+<h2>Example: 350 °F</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Celsius: (350 − 32) × 5 ÷ 9</td><td><strong>176.7 °C</strong> (shown as 177 °C)</td></tr>
+  <tr><td>Recipe-style rounding</td><td>350 °F · 180 °C</td></tr>
+  <tr><td>Gas mark: (350 − 250) ÷ 25</td><td>4</td></tr>
+  <tr><td>Convection: 350 − 25</td><td>325 °F · 163 °C</td></tr>
+</table>
+
+<h2>Common oven temperatures</h2>
+<table>
+  <tr><th>°F</th><th>°C (recipe)</th><th>Gas mark</th><th>Description / typical use</th></tr>
+  <tr><td>225</td><td>110</td><td>1/4</td><td>Very low: meringues, drying</td></tr>
+  <tr><td>250</td><td>120</td><td>1/2</td><td>Very low: slow roasting</td></tr>
+  <tr><td>275</td><td>140</td><td>1</td><td>Low: braises, custards</td></tr>
+  <tr><td>300</td><td>150</td><td>2</td><td>Low: cheesecake</td></tr>
+  <tr><td>325</td><td>160–170</td><td>3</td><td>Moderately low: turkey, pound cake</td></tr>
+  <tr><td>350</td><td>180</td><td>4</td><td>Moderate: cakes, cookies, casseroles</td></tr>
+  <tr><td>375</td><td>190</td><td>5</td><td>Moderately hot: muffins, pies</td></tr>
+  <tr><td>400</td><td>200</td><td>6</td><td>Hot: roast vegetables, bread</td></tr>
+  <tr><td>425</td><td>220</td><td>7</td><td>Hot: crisping, puff pastry</td></tr>
+  <tr><td>450</td><td>230</td><td>8</td><td>Very hot: pizza, quick roasting</td></tr>
+  <tr><td>475</td><td>240</td><td>9</td><td>Very hot: artisan bread, pizza</td></tr>
+  <tr><td>500</td><td>260</td><td>10</td><td>Maximum on many ovens</td></tr>
+</table>
+
+<h2>Tips</h2>
+<ul>
+  <li><strong>Get an oven thermometer.</strong> Many ovens run 10 to 25 °F off their dial. A cheap thermometer tells you which way yours leans.</li>
+  <li><strong>Convection: lower the heat or the time.</strong> Drop 25 °F, or keep the temperature and start checking about a quarter of the way early.</li>
+  <li><strong>Preheat fully.</strong> Give the oven 15 to 20 minutes, longer with a baking stone, even after the beep.</li>
+  <li><strong>Watch for "fan" in UK recipes.</strong> A recipe that says 160 °C fan means about 180 °C in a conventional oven.</li>
+</ul>

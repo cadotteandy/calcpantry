@@ -1,0 +1,161 @@
+---
+{
+  "title": "Cups to Grams Calculator for Flour, Sugar, Butter & More",
+  "description": "Convert cups to grams (or grams to cups) for flour, sugar, brown sugar, butter, oats, cocoa, honey, milk, oil, rice and other common baking ingredients.",
+  "h1": "Cups to Grams Calculator",
+  "short": "Cups to Grams",
+  "intro": "Pick an ingredient and enter cups or grams. Because a cup of flour and a cup of sugar weigh very different amounts, the conversion depends on what you're measuring.",
+  "updated": "October 2026",
+  "related": ["cooking-measurement-converter", "butter-converter", "bakers-percentage-calculator", "recipe-scaler-calculator"],
+  "faq": [
+    {"q": "How many grams is 1 cup of flour?", "a": "About 120 grams for all-purpose flour that is spooned into the cup and leveled, which is the figure King Arthur Baking uses. If you scoop the cup straight into the bag, you can pack in 140 grams or more, which is a common reason for dry cakes and cookies."},
+    {"q": "How many grams is 1 cup of sugar?", "a": "About 198 grams for granulated white sugar, 213 grams for firmly packed brown sugar, and 113 grams for unsifted powdered (confectioners') sugar."},
+    {"q": "How many grams is 1 cup of butter?", "a": "1 cup of butter is 2 US sticks, 8 ounces, or about 227 grams."},
+    {"q": "Why don't all ingredients weigh the same per cup?", "a": "Cups measure volume, and ingredients have different densities. Light, airy flour weighs far less per cup than syrupy honey. That's why a single cups-to-grams number doesn't exist; you need one per ingredient."},
+    {"q": "Is a cup of water 240 grams?", "a": "A US cup is 236.6 ml, and 1 ml of water weighs about 1 gram, so a cup of water weighs about 237 grams. Many recipes round to 240. Some baking charts list 227 grams (8 ounces), which is a convenient rounding rather than the exact weight."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="ing">Ingredient</label>
+        <select id="ing" name="ing">
+          <option value="ap">All-purpose flour</option>
+          <option value="bread">Bread flour</option>
+          <option value="ww">Whole wheat flour</option>
+          <option value="sugar">Granulated sugar</option>
+          <option value="brown">Brown sugar, packed</option>
+          <option value="powdered">Powdered sugar, unsifted</option>
+          <option value="butter">Butter</option>
+          <option value="oats">Rolled oats</option>
+          <option value="cocoa">Cocoa powder, unsweetened</option>
+          <option value="chips">Chocolate chips</option>
+          <option value="honey">Honey</option>
+          <option value="water">Water</option>
+          <option value="milk">Whole milk</option>
+          <option value="oil">Vegetable oil</option>
+          <option value="rice">White rice, long-grain, uncooked</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="dir">Convert</label>
+        <select id="dir" name="dir">
+          <option value="c2g">Cups → grams</option>
+          <option value="g2c">Grams → cups</option>
+        </select>
+      </div>
+      <div class="field" data-show="c2g">
+        <label for="cups">Cups</label>
+        <div class="input"><input id="cups" name="cups" type="number" min="0" step="0.25" value="2.5" inputmode="decimal"><span class="unit">cups</span></div>
+      </div>
+      <div class="field" data-show="g2c" hidden>
+        <label for="grams">Grams</label>
+        <div class="input"><input id="grams" name="grams" type="number" min="0" step="1" value="300" inputmode="decimal"><span class="unit">g</span></div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span data-out="bigLabel">Grams</span><b data-out="big">—</b></div>
+    <div class="result" data-show="g2c" hidden><span>Nearest measure</span><b data-out="measure">—</b></div>
+    <div class="result"><span>Ounces (weight)</span><b data-out="oz">—</b></div>
+    <div class="result"><span>Grams per cup</span><b data-out="perCup">—</b></div>
+    <div class="result"><span>Grams per tablespoon</span><b data-out="perTbsp">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  // Grams per US cup. Dry ingredients: spooned and leveled (King Arthur Baking chart).
+  // Liquids and rice: measured weights (about 1 g per ml for water).
+  const G = { ap: 120, bread: 120, ww: 113, sugar: 198, brown: 213, powdered: 113, butter: 227,
+              oats: 89, cocoa: 84, chips: 170, honey: 336, water: 237, milk: 244, oil: 218, rice: 185 };
+  const OZ = 28.349523125;
+  const per = G[v.ing];
+  const c2g = v.dir === "c2g";
+  out.show("c2g", c2g);
+  out.show("g2c", !c2g);
+  const grams = c2g ? Math.max(0, v.cups) * per : Math.max(0, v.grams);
+  const cups = grams / per;
+
+  const FR = [[0, ""], [1 / 8, "1/8"], [1 / 4, "1/4"], [1 / 3, "1/3"], [3 / 8, "3/8"], [1 / 2, "1/2"],
+              [5 / 8, "5/8"], [2 / 3, "2/3"], [3 / 4, "3/4"], [7 / 8, "7/8"], [1, ""]];
+  const friendly = (x) => {
+    let whole = Math.floor(x), best = FR[0], bd = Infinity;
+    for (const c of FR) { const d = Math.abs(x - whole - c[0]); if (d < bd - 1e-9) { bd = d; best = c; } }
+    if (best[0] === 1) whole += 1;
+    if (!best[1]) return String(whole);
+    return whole ? `${whole} ${best[1]}` : best[1];
+  };
+
+  if (c2g) {
+    out.set("bigLabel", "Grams");
+    out.set("big", Calc.num(grams, grams < 10 ? 1 : 0) + " g");
+  } else {
+    out.set("bigLabel", "Cups");
+    out.set("big", Calc.num(cups, 2) + " cups");
+    const tbsp = cups * 16;
+    out.set("measure", cups >= 0.125 ? `about ${friendly(cups)} cup${cups > 1.06 ? "s" : ""}` : `about ${Calc.num(tbsp, 1)} tbsp`);
+  }
+  out.set("oz", Calc.num(grams / OZ, 1) + " oz");
+  out.set("perCup", per + " g");
+  out.set("perTbsp", Calc.num(per / 16, 1) + " g");
+  if (["ap", "bread", "ww", "powdered", "cocoa", "oats"].includes(v.ing))
+    out.note("Assumes the cup is spooned full and leveled, not scooped. Scooping packs in up to 20% more.");
+  else if (v.ing === "brown") out.note("Assumes brown sugar pressed firmly into the cup, the way most recipes mean it.");
+  else out.note("Weights are typical averages; brands and measuring style vary a little.");
+}));
+</script>
+<!-- article -->
+<h2>Why cups and grams don't convert directly</h2>
+<p>A cup is a measure of volume, a gram is a measure of weight, and every ingredient packs a different weight
+into the same space. A cup of all-purpose flour weighs about 120 grams; a cup of granulated sugar, 198 grams;
+a cup of honey, 336 grams. That's why serious bakers weigh: a scale removes the guesswork of how firmly a cup
+was filled.</p>
+
+<h2>The formula</h2>
+<div class="formula">grams = cups × grams per cup (for that ingredient)<br>
+cups = grams ÷ grams per cup<br>
+ounces = grams ÷ 28.35</div>
+
+<h2>Example: 2 1/2 cups of all-purpose flour</h2>
+<table>
+  <tr><th>Step</th><th>Result</th></tr>
+  <tr><td>Grams: 2.5 × 120</td><td><strong>300 g</strong></td></tr>
+  <tr><td>Ounces: 300 ÷ 28.35</td><td>10.6 oz</td></tr>
+  <tr><td>Per tablespoon: 120 ÷ 16</td><td>7.5 g</td></tr>
+</table>
+
+<h2>Grams per cup chart</h2>
+<table>
+  <tr><th>Ingredient</th><th>1 cup</th><th>1/2 cup</th><th>1 tbsp</th></tr>
+  <tr><td>All-purpose flour</td><td>120 g</td><td>60 g</td><td>7.5 g</td></tr>
+  <tr><td>Bread flour</td><td>120 g</td><td>60 g</td><td>7.5 g</td></tr>
+  <tr><td>Whole wheat flour</td><td>113 g</td><td>57 g</td><td>7.1 g</td></tr>
+  <tr><td>Granulated sugar</td><td>198 g</td><td>99 g</td><td>12.4 g</td></tr>
+  <tr><td>Brown sugar, packed</td><td>213 g</td><td>107 g</td><td>13.3 g</td></tr>
+  <tr><td>Powdered sugar, unsifted</td><td>113 g</td><td>57 g</td><td>7.1 g</td></tr>
+  <tr><td>Butter</td><td>227 g</td><td>113 g</td><td>14.2 g</td></tr>
+  <tr><td>Rolled oats</td><td>89 g</td><td>45 g</td><td>5.6 g</td></tr>
+  <tr><td>Cocoa powder, unsweetened</td><td>84 g</td><td>42 g</td><td>5.3 g</td></tr>
+  <tr><td>Chocolate chips</td><td>170 g</td><td>85 g</td><td>10.6 g</td></tr>
+  <tr><td>Honey</td><td>336 g</td><td>168 g</td><td>21 g</td></tr>
+  <tr><td>Water</td><td>237 g</td><td>118 g</td><td>14.8 g</td></tr>
+  <tr><td>Whole milk</td><td>244 g</td><td>122 g</td><td>15.3 g</td></tr>
+  <tr><td>Vegetable oil</td><td>218 g</td><td>109 g</td><td>13.6 g</td></tr>
+  <tr><td>White rice, long-grain, uncooked</td><td>185 g</td><td>93 g</td><td>11.6 g</td></tr>
+</table>
+<p>These are averages. Flours, sugars, oats, cocoa, chips, butter and honey follow the widely used King Arthur
+Baking ingredient weight chart, which assumes dry ingredients are spooned into the cup and leveled off with a
+knife. Water, milk, oil and rice are typical measured weights (water is about 1 gram per milliliter). Your own
+cup can differ by 5 to 10% depending on how you fill it.</p>
+
+<h2>Tips for accurate conversions</h2>
+<ul>
+  <li><strong>Spoon and level flour.</strong> Fluff it, spoon it into the cup, and sweep off the excess. Scooping compacts it.</li>
+  <li><strong>Tare as you go.</strong> Put the bowl on the scale, zero it, and add each ingredient in turn. Fewer dishes, too.</li>
+  <li><strong>Trust the recipe's own weights.</strong> If a recipe lists both cups and grams, the grams are what the author actually used.</li>
+  <li><strong>Sticky stuff is easier by weight.</strong> Weighing honey or peanut butter straight into the bowl beats scraping out a measuring cup.</li>
+</ul>

@@ -1,0 +1,151 @@
+---
+{
+  "title": "Meat Temperature Calculator: Safe Internal Temps & Rest Times",
+  "description": "Look up the USDA safe minimum internal temperature and rest time for beef, pork, lamb, ground meat, chicken, turkey, fish, ham and leftovers, in °F and °C.",
+  "h1": "Meat Temperature Calculator",
+  "short": "Meat Temperature Calculator",
+  "intro": "Choose what you're cooking to see the USDA safe minimum internal temperature, how long to rest it, and where to put the thermometer. For steaks and roasts, you can also pick a doneness.",
+  "updated": "October 2026",
+  "related": ["turkey-calculator", "oven-temperature-converter", "recipe-scaler-calculator", "cooking-measurement-converter"],
+  "faq": [
+    {"q": "What temperature should chicken be cooked to?", "a": "165 °F (74 °C) for all poultry, whether it's whole, breasts, thighs, wings or ground. Check the thickest part without touching bone."},
+    {"q": "What temperature is pork done?", "a": "The USDA's safe minimum for pork chops, tenderloin and roasts is 145 °F (63 °C) followed by a 3 minute rest. Pork cooked this way may still look slightly pink inside, which is fine. Ground pork needs 160 °F (71 °C)."},
+    {"q": "Why does ground beef need a higher temperature than steak?", "a": "Bacteria live mostly on the surface of whole cuts, so searing the outside of a steak deals with them. Grinding spreads surface bacteria throughout the meat, so the whole patty has to reach 160 °F (71 °C)."},
+    {"q": "What is the rest time for and does it count?", "a": "After you take meat off the heat, its temperature stays steady or keeps climbing for a few minutes, which continues to kill harmful bacteria. The USDA's 145 °F guidance for whole cuts of beef, pork, veal and lamb includes a 3 minute rest for that reason. Resting also lets juices settle, so less ends up on the cutting board."},
+    {"q": "Is medium-rare steak safe?", "a": "Medium-rare (about 130 to 135 °F) is below the USDA's 145 °F minimum, so it isn't the official recommendation. Many people eat whole-muscle steaks this way because contamination is mainly on the surface, but people who are pregnant, elderly, very young or immunocompromised should stick to the USDA temperatures."},
+    {"q": "Where do I put the meat thermometer?", "a": "In the thickest part of the food, away from bone, fat and gristle, which can give false readings. For thin items like burgers or chicken breasts, insert the probe sideways into the center."}
+  ]
+}
+---
+<div class="calc-card">
+  <form class="calc">
+    <div class="fields">
+      <div class="field">
+        <label for="meat">What are you cooking?</label>
+        <select id="meat" name="meat">
+          <option value="beef">Beef, lamb or veal: steaks, chops, roasts</option>
+          <option value="pork">Pork: chops, tenderloin, roasts</option>
+          <option value="ground">Ground beef, pork, lamb or veal</option>
+          <option value="poultry">Chicken or turkey (whole or pieces)</option>
+          <option value="gpoultry">Ground chicken or turkey</option>
+          <option value="fish">Fish and shellfish</option>
+          <option value="hamraw">Ham, fresh or smoked (uncooked)</option>
+          <option value="hamcooked">Ham, fully cooked (reheating)</option>
+          <option value="eggs">Egg dishes (quiche, frittata)</option>
+          <option value="leftovers">Leftovers and casseroles</option>
+        </select>
+      </div>
+      <div class="field" data-show="doneness">
+        <label for="done">Doneness</label>
+        <select id="done" name="done">
+          <option value="usda">USDA safe minimum (145 °F)</option>
+          <option value="rare">Rare</option>
+          <option value="mr">Medium-rare</option>
+          <option value="med">Medium</option>
+          <option value="mw">Medium-well</option>
+          <option value="well">Well done</option>
+        </select>
+        <div class="hint">Final temperatures after resting. Only USDA minimum and above meet USDA guidance.</div>
+      </div>
+    </div>
+  </form>
+  <div class="results" aria-live="polite">
+    <h2>Your results</h2>
+    <div class="result big"><span>Cook to at least</span><b data-out="f">—</b></div>
+    <div class="result"><span>In Celsius</span><b data-out="c">—</b></div>
+    <div class="result"><span>Rest time</span><b data-out="rest">—</b></div>
+    <div class="result"><span>Meets USDA minimum</span><b data-out="ok">—</b></div>
+    <p class="note" data-note hidden></p>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
+  // USDA FSIS safe minimum internal temperatures (°F).
+  const M = {
+    beef:      { f: 145, rest: "3 minutes", how: "Thickest part, away from bone, fat and gristle." },
+    pork:      { f: 145, rest: "3 minutes", how: "Thickest part, away from bone. A little pink inside is fine at 145 °F." },
+    ground:    { f: 160, rest: "None required", how: "Center of the patty or loaf; for burgers, insert the probe from the side." },
+    poultry:   { f: 165, rest: "None required", how: "Thickest part of the breast and innermost thigh and wing, not touching bone." },
+    gpoultry:  { f: 165, rest: "None required", how: "Center of the patty or loaf, inserted from the side for thin burgers." },
+    fish:      { f: 145, rest: "None required", how: "Thickest part. Fish is done when opaque and it flakes with a fork; shrimp and lobster turn pearly and opaque; clams, mussels and oysters open." },
+    hamraw:    { f: 145, rest: "3 minutes", how: "Thickest part, away from bone." },
+    hamcooked: { f: 140, rest: "None required", how: "Thickest part. Use 165 °F for cooked ham not packaged in a USDA-inspected plant, and for leftover ham." },
+    eggs:      { f: 160, rest: "None required", how: "Center of the dish." },
+    leftovers: { f: 165, rest: "None required", how: "Center of the dish; stir soups and sauces and bring them to a boil." },
+  }[v.meat];
+  // Common cook's doneness targets for whole cuts of beef and lamb (°F, after resting).
+  const D = {
+    usda: { lo: 145, hi: 145, name: "USDA minimum" },
+    rare: { lo: 120, hi: 125, name: "Rare" },
+    mr:   { lo: 130, hi: 135, name: "Medium-rare" },
+    med:  { lo: 140, hi: 145, name: "Medium" },
+    mw:   { lo: 150, hi: 155, name: "Medium-well" },
+    well: { lo: 160, hi: 160, name: "Well done" },
+  };
+  const hasDone = v.meat === "beef";
+  out.show("doneness", hasDone);
+  const toC = (f) => Math.round((f - 32) * 5 / 9);
+  const d = hasDone ? D[v.done] : { lo: M.f, hi: M.f };
+  const range = (a, b, u) => (a === b ? `${a} ${u}` : `${a}–${b} ${u}`);
+  out.set("f", range(d.lo, d.hi, "°F"));
+  out.set("c", range(toC(d.lo), toC(d.hi), "°C"));
+  out.set("rest", M.rest);
+  const ok = d.lo >= M.f, partly = !ok && d.hi >= M.f;
+  out.set("ok", ok ? "Yes" : partly ? `At ${M.f} °F` : "No", ok ? "pos" : partly ? "" : "neg");
+  if (ok) out.note(M.how);
+  else if (partly) out.note(`Cook to the top of the range (${M.f} °F) and rest 3 minutes to meet USDA guidance. ${M.how}`);
+  else out.note(`${D[v.done].name} is below USDA's ${M.f} °F minimum for whole cuts. ${M.how}`);
+}));
+</script>
+<!-- article -->
+<h2>Why internal temperature matters</h2>
+<p>Color and cooking time are unreliable signs of doneness. A burger can turn brown inside before it's safe,
+and a properly cooked pork chop can still be a little pink. The only dependable check is a food thermometer
+in the thickest part of the food. This calculator looks up the safe minimum internal temperatures published by
+the USDA Food Safety and Inspection Service, along with the rest time where one applies.</p>
+
+<h2>The formula</h2>
+<div class="formula">safe when: internal temperature ≥ USDA minimum (then rest, if listed)<br>
+°C = (°F − 32) × 5 ÷ 9, rounded to the nearest degree</div>
+
+<h2>Example: a beef roast at the USDA minimum</h2>
+<table>
+  <tr><th>Item</th><th>Result</th></tr>
+  <tr><td>Cook to at least</td><td><strong>145 °F</strong></td></tr>
+  <tr><td>In Celsius: (145 − 32) × 5 ÷ 9</td><td>63 °C</td></tr>
+  <tr><td>Rest time</td><td>3 minutes</td></tr>
+  <tr><td>Meets USDA minimum</td><td>Yes</td></tr>
+</table>
+
+<h2>USDA safe minimum internal temperatures</h2>
+<table>
+  <tr><th>Food</th><th>°F</th><th>°C</th><th>Rest</th></tr>
+  <tr><td>Beef, pork, veal and lamb steaks, chops and roasts</td><td>145</td><td>63</td><td>3 min</td></tr>
+  <tr><td>Ground beef, pork, veal and lamb</td><td>160</td><td>71</td><td>—</td></tr>
+  <tr><td>All poultry, including ground chicken and turkey</td><td>165</td><td>74</td><td>—</td></tr>
+  <tr><td>Fish and shellfish</td><td>145</td><td>63</td><td>—</td></tr>
+  <tr><td>Ham, fresh or smoked (uncooked)</td><td>145</td><td>63</td><td>3 min</td></tr>
+  <tr><td>Ham, fully cooked, to reheat</td><td>140</td><td>60</td><td>—</td></tr>
+  <tr><td>Egg dishes</td><td>160</td><td>71</td><td>—</td></tr>
+  <tr><td>Leftovers and casseroles</td><td>165</td><td>74</td><td>—</td></tr>
+</table>
+
+<h2>Steak and roast doneness</h2>
+<table>
+  <tr><th>Doneness</th><th>Final temperature</th><th>Looks like</th></tr>
+  <tr><td>Rare</td><td>120–125 °F</td><td>Cool to warm red center</td></tr>
+  <tr><td>Medium-rare</td><td>130–135 °F</td><td>Warm red-pink center</td></tr>
+  <tr><td>Medium</td><td>140–145 °F</td><td>Pink center</td></tr>
+  <tr><td>Medium-well</td><td>150–155 °F</td><td>Slight pink</td></tr>
+  <tr><td>Well done</td><td>160 °F and up</td><td>No pink</td></tr>
+</table>
+<p>These are common cook's targets for whole cuts of beef and lamb, not USDA figures. Only 145 °F and above
+meet the USDA guideline.</p>
+
+<h2>Thermometer tips</h2>
+<ul>
+  <li><strong>Pull it a little early.</strong> Large roasts keep rising 5 to 10 °F as they rest (carryover cooking), steaks a few degrees. Take them off just before your target.</li>
+  <li><strong>Check more than one spot.</strong> Especially on poultry and irregular roasts.</li>
+  <li><strong>Test your thermometer.</strong> In a glass of ice water it should read 32 °F (0 °C).</li>
+  <li><strong>Clean the probe</strong> between readings when going from raw to cooked food.</li>
+</ul>
