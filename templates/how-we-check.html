@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}How We Check Our Calculators | {{ site.name }}{% endblock %}
+{% block description %}How {{ site.name }} calculators are built, tested against worked examples, sourced from official figures and kept up to date.{% endblock %}
+{% block content %}
+<div class="prose">
+<h1>How we check our calculators</h1>
+<p>A calculator is only useful if you can trust the number it gives you. These are the steps every page on
+{{ site.name }} goes through before it's published, and how it's kept accurate afterwards.</p>
+
+<h2>1. Start from the published figure</h2>
+<p>Where a calculator depends on a rate, a limit or a constant set by someone else, it uses that organization's own
+figure. Examples:</p>
+<ul>
+  <li>Selling fees from each marketplace's published fee schedule (eBay, Etsy, Poshmark, Mercari and others).</li>
+  <li>Tax brackets, the Social Security wage base and mileage rates from the IRS and the Social Security Administration.</li>
+  <li>Safe cooking temperatures and turkey roasting and thawing times from the USDA Food Safety and Inspection Service.</li>
+  <li>Atomic weights from IUPAC and physical constants from NIST.</li>
+</ul>
+<p>Those calculators list their sources at the bottom of the page. When a figure isn't published officially (for
+example, average music streaming payouts or the soft-pity curve in gacha games), the page says it's an estimate and
+explains where the estimate comes from.</p>
+
+<h2>2. Show the formula and a worked example</h2>
+<p>Every calculator explains the formula it uses in plain language and includes a worked example with real numbers.
+The example's numbers are produced by the calculator itself, so the explanation and the tool can't drift apart.</p>
+
+<h2>3. Test it</h2>
+<p>Before a page goes live, its default inputs are run and checked against the worked example, unusual inputs (zero,
+blanks, very large numbers) are tried to make sure the page handles them sensibly, and the page is checked on a phone-sized
+screen.</p>
+
+<h2>4. Keep it current</h2>
+<p>Fees and rates change, so every calculator shows the month its figures were last checked. Pages that depend on
+yearly figures, like tax brackets and mileage rates, are reviewed when the new figures are announced. Reports from
+readers are fixed as soon as possible.</p>
+
+<h2>What these calculators are, and aren't</h2>
+<p>The calculators give estimates for planning. They're not a substitute for professional advice on taxes, finances,
+health or safety. Always check product labels, official notices and your own circumstances before acting on a result.</p>
+
+<h2>Spotted a mistake?</h2>
+<p>Email <a href="mailto:{{ site.contact_email }}">{{ site.contact_email }}</a> with the page and what looks wrong.
+Thank you for helping keep {{ site.name }} accurate.</p>
+</div>
+{% endblock %}

@@ -37,15 +37,15 @@ SITE = {
 
 CATEGORIES = {
     "reselling": {"name": "Reselling & Marketplace Fees", "short": "Reselling", "icon": "🏷️",
-                  "blurb": "Know exactly what you'll take home before you list. Fee and profit calculators for eBay, Poshmark, Mercari and Etsy."},
+                  "blurb": "Know exactly what you'll take home before you list. Fee and profit calculators for eBay, Etsy, Poshmark, Mercari, Amazon, StockX, Depop, Whatnot, TikTok Shop and Facebook Marketplace."},
     "home": {"name": "Home Project Calculators", "short": "Home", "icon": "🏠",
-             "blurb": "Figure out how much paint, mulch, gravel, concrete or flooring you need, and what it will cost, before you go to the store."},
+             "blurb": "Figure out how much paint, mulch, gravel, concrete, tile, drywall, fencing, decking or roofing you need, and what it will cost, before you go to the store."},
     "pets": {"name": "Pet Calculators", "short": "Pets", "icon": "🐾",
-             "blurb": "Feeding amounts, age conversions and tank stocking for dogs, cats and fish."},
+             "blurb": "Feeding amounts, age conversions, pregnancy due dates, water needs, chocolate toxicity and yearly costs for dogs, cats and fish."},
     "hobbies": {"name": "Hobby & Craft Calculators", "short": "Hobbies", "icon": "🧵",
-                "blurb": "3D printing costs, fabric yardage, lumber board feet and coffee brew ratios."},
+                "blurb": "3D printing costs, fabric and yarn amounts, quilting, knitting gauge, epoxy, candle wax, baker's percentages, photo print sizes and coffee ratios."},
     "money": {"name": "Money & Side Hustle Calculators", "short": "Money", "icon": "💵",
-              "blurb": "Take-home pay from side gigs, freelance rates and lease-versus-buy decisions."},
+              "blurb": "Side hustle taxes, gig driver earnings, freelance rates, debt payoff, savings goals, compound interest, rent affordability and lease versus buy."},
     "gaming": {"name": "Video Game Calculators", "short": "Gaming", "icon": "🎮",
                "blurb": "Minecraft coordinates and stacks, mouse sensitivity conversion, gacha pity odds, FPS, K/D and more."},
     "computer": {"name": "Computer & Tech Calculators", "short": "Tech", "icon": "💻",
@@ -152,11 +152,11 @@ def build():
             cat_key=key, cat=cat, items=by_cat[key], page={"path": f"/{key}/"}, **common))
 
     write("/", env.get_template("home.html").render(page={"path": "/"}, **common))
-    for name in ("about", "privacy", "contact"):
+    for name in ("about", "how-we-check", "privacy", "contact"):
         write(f"/{name}/", env.get_template(f"{name}.html").render(page={"path": f"/{name}/"}, **common))
     write("404.html", env.get_template("404.html").render(page={"path": "/404"}, **common))
 
-    urls = ["/"] + [f"/{k}/" for k in CATEGORIES] + [p["path"] for p in pages] + ["/about/", "/privacy/", "/contact/"]
+    urls = ["/"] + [f"/{k}/" for k in CATEGORIES] + [p["path"] for p in pages] + ["/about/", "/how-we-check/", "/privacy/", "/contact/"]
     today = date.today().isoformat()
     sitemap = ['<?xml version="1.0" encoding="UTF-8"?>',
                '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']

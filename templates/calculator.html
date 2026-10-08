@@ -26,8 +26,15 @@
         {% endfor %}
       </div>
       {% endif %}
+      {% if page.sources %}
+      <h2>Sources</h2>
+      <ul class="sources">
+        {% for src in page.sources %}<li>{% if src.url %}<a href="{{ src.url }}" rel="noopener" target="_blank">{{ src.name }}</a>{% else %}{{ src.name }}{% endif %}{% if src.note %}: {{ src.note }}{% endif %}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
       {% if page.updated %}<p class="updated">Rates and figures last checked {{ page.updated }}.</p>{% endif %}
-      <p class="disclaimer">This calculator gives estimates for planning. Check current rates and product labels before you buy, list or file.</p>
+      <p class="disclaimer">This calculator gives estimates for planning. Check current rates and product labels before you buy, list or file. <a href="/how-we-check/">How we check our calculators</a>.</p>
     </article>
     {{ ad() }}
   </div>

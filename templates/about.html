@@ -1,14 +1,41 @@
 {% extends "base.html" %}
 {% block title %}About | {{ site.name }}{% endblock %}
-{% block description %}About {{ site.name }}: free, simple calculators for everyday decisions.{% endblock %}
+{% block description %}About {{ site.name }}: who runs it, why it exists and how its free calculators are built and checked.{% endblock %}
 {% block content %}
 <div class="prose">
 <h1>About {{ site.name }}</h1>
-<p>{{ site.name }} is a collection of free calculators for everyday decisions: what you'll earn selling
-online, how much material a project needs, how much to feed a pet, and what a side gig really pays.</p>
-<p>Every calculator runs in your browser. Nothing you type is sent to us or stored. Each page explains
-the formula it uses, so you can check the math yourself.</p>
-<p>Fees, tax rates and product specs change. We review figures regularly and note when each page was last
-checked. If you spot something out of date, please <a href="/contact/">let us know</a>.</p>
+<p>{{ site.name }} is a free collection of calculators for the small, practical questions that come up every day:
+what you'll actually take home from a sale, how many bags of mulch a bed needs, how much to feed a puppy, how long a
+download will take or how much water goes with a cup of rice.</p>
+<p>It's run by Bailey, an independent designer and creator. The idea is simple: each page should answer one
+question quickly, work well on a phone, and show its working so you never have to take a number on faith.</p>
+
+<h2>What makes these calculators different</h2>
+<ul>
+  <li><strong>The math is on the page.</strong> Every calculator explains the formula it uses and walks through a
+    worked example with real numbers, so you can check the result yourself.</li>
+  <li><strong>Figures come from the source.</strong> Marketplace fees, tax rates, food-safety temperatures and
+    scientific constants are taken from the organizations that publish them, and those pages list their sources.</li>
+  <li><strong>Every page shows when it was last checked.</strong> Fees and rates change, so each calculator notes
+    the month its figures were reviewed.</li>
+  <li><strong>Nothing you type leaves your device.</strong> The calculations run in your browser. There are no
+    accounts and no sign-ups.</li>
+</ul>
+<p>Read more about how pages are written, tested and kept up to date in
+<a href="/how-we-check/">How we check our calculators</a>.</p>
+
+<h2>What's here</h2>
+<ul>
+  {% for key, c in categories.items() %}<li><a href="/{{ key }}/">{{ c.name }}</a>: {{ c.blurb }}</li>
+  {% endfor %}
+</ul>
+
+<h2>How the site is funded</h2>
+<p>{{ site.name }} is free to use and is supported by advertising. Ads never change a calculator's results, and no
+company pays to be featured or recommended.</p>
+
+<h2>Get in touch</h2>
+<p>Found a number that's out of date, a bug, or a calculator you wish existed? <a href="/contact/">Get in touch</a>.
+Corrections are fixed as quickly as possible and the page's "last checked" date is updated.</p>
 </div>
 {% endblock %}

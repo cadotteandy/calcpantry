@@ -14,6 +14,10 @@
     {"q": "How long do I cook a turkey at 325 °F?", "a": "For an unstuffed whole turkey, roughly 3 to 3 3/4 hours for 12 to 14 pounds, 3 3/4 to 4 1/4 hours for 14 to 18 pounds, and 4 1/2 to 5 hours for 20 to 24 pounds, per the USDA. Stuffed birds take a little longer. These are estimates; the turkey is done when a thermometer reads 165 °F."},
     {"q": "What temperature is turkey done?", "a": "165 °F, measured with a food thermometer in the innermost part of the thigh, the innermost part of the wing, and the thickest part of the breast. If the bird is stuffed, the center of the stuffing must also reach 165 °F."},
     {"q": "Can I cook a turkey from frozen?", "a": "Yes. The USDA says it's safe, but it takes about 50% longer than a thawed turkey, and you remove the giblet packet partway through with tongs once it loosens."}
+  ],
+  "sources": [
+    {"name": "USDA FSIS: Let's Talk Turkey, a consumer guide to safely roasting a turkey", "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/poultry/lets-talk-turkey-roasting"},
+    {"name": "USDA FSIS: Turkey Basics, safe thawing", "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/poultry/turkey-basics-safe-thawing"}
   ]
 }
 ---
@@ -108,10 +112,11 @@ document.addEventListener("DOMContentLoaded", () => Calc.run((v, out) => {
     note = "Turkeys over 24 lb are beyond the USDA table. Plan on at least 5 hours and go by the thermometer.";
   } else {
     const row = T.find((r) => w < r[0] || (r[0] !== 8 && w <= r[0]));
-    const range = v.stuffed ? row[2] : row[1];
+    // USDA: stuffed 6–8 lb breast 2½–3½ h; under 6 lb "not usually applicable".
+    const range = v.stuffed ? (row[0] === 8 ? (w >= 6 ? [2.5, 3.5] : null) : row[2]) : row[1];
     if (!range) {
-      out.set("roast", "Not listed stuffed");
-      note = "The USDA doesn't list stuffed times for birds this small. Bake the stuffing separately in a dish.";
+      out.set("roast", "Bake stuffing separately");
+      note = "USDA says stuffing isn't usually practical under 6 lb. Bake the stuffing separately in a dish.";
     } else {
       out.set("roast", `${hm(range[0])} – ${hm(range[1])}`);
       note = v.stuffed
@@ -149,7 +154,7 @@ roasting time = USDA range for the weight class, at 325 °F</div>
 <h2>USDA roasting times at 325 °F</h2>
 <table>
   <tr><th>Weight</th><th>Unstuffed</th><th>Stuffed</th></tr>
-  <tr><td>4 to 8 lb (breast)</td><td>1 1/2 to 3 1/4 hours</td><td>Not listed</td></tr>
+  <tr><td>4 to 8 lb (breast)</td><td>1 1/2 to 3 1/4 hours</td><td>2 1/2 to 3 1/2 hours (6 to 8 lb; not usually done under 6 lb)</td></tr>
   <tr><td>8 to 12 lb</td><td>2 3/4 to 3 hours</td><td>3 to 3 1/2 hours</td></tr>
   <tr><td>12 to 14 lb</td><td>3 to 3 3/4 hours</td><td>3 1/2 to 4 hours</td></tr>
   <tr><td>14 to 18 lb</td><td>3 3/4 to 4 1/4 hours</td><td>4 to 4 1/4 hours</td></tr>
