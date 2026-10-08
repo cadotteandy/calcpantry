@@ -1,3 +1,5 @@
 dist/
 __pycache__/
 *.pyc
+update-report.md
+update-check.log
